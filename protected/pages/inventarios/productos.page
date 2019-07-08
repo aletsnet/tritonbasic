@@ -1,0 +1,1133 @@
+<com:TContent ID="Main">
+	<div class="col-md-12">
+		<div class="box box-primary">
+			<div class="box-header">
+				<i class="fa fa-cube"></i>
+				<h3 class="box-title">Productos en inventario</h3>
+				<com:TActiveButton id="btnBlanco"
+								   style="display: none;"
+								   CausesValidation="false"
+								   OnClick="btnBlanco_OnClick" >
+					Boton default
+				</com:TActiveButton>
+			</div>
+			<div class="box-body pad table-responsive">
+				<div class="form-group">
+					<div class="col-lg-12">
+						<com:TActiveButton ValidationGroup="BuscarCodigo"
+									 CssClass="btn btn-success"
+									 style="display: none;"
+									 OnClick="btnBuscar_Producto_OnClick" >
+							<i class="fa fa-search"></i>
+							<prop:ClientSide OnLoading="Msg('Por favor espere mientras se procesa la petición',true);"
+											 OnComplete="Msg('Listo',false);"
+											 OnException="Msg('Se a producido un error, solicite apoyo técnico',true);"/>
+						</com:TActiveButton>
+						<com:TLinkButton Id="btnNuevo"
+										 CausesValidation="false"
+										 cssclass="btn btn-default"
+										 Attributes.type="button"
+										 OnClick="btnNuevo_OnClick" >
+							<i class="glyphicon glyphicon-file"></i>
+							Nuevo
+						</com:TLinkButton>
+						<com:THyperLink cssclass="btn btn-default"
+										NavigateUrl="<%= $this->Service->constructUrl('inventarios.productos') %>" >
+							<b>
+								<i class="glyphicon glyphicon-search"></i>
+							</b>
+							Buscar
+						</com:THyperLink>
+					</div>
+				</div>
+			</div>
+			<com:TPanel id="tpanelAviso" cssclass="form-group">
+				<div class="alert alert-success alert-styled-left alert-arrow-left alert-bordered">
+					<button type="button" class="close" data-dismiss="alert"><span>&times;</span><span class="sr-only">Close</span></button>
+					<span class="text-semibold">Guardado</span> El registro se guardo sin problemas.
+				</div>
+				<com:TClientScript>
+					$(<%= $this->tpanelAviso->Clientid %>).hide(4000);
+				</com:TClientScript>
+			</com:TPanel>
+			<com:TActivePanel id="Formulario" cssclass="box-body form-horizontal">
+				<div class="form-group">
+					<div class="col-lg-12">
+					<com:TValidationSummary ValidationGroup="Captura"
+												CssClass="col-lg-12 alert alert-danger alert-bordered"
+												Display="Dynamic"
+												HeaderText="Campos requeridos" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-sm-2">
+						Foto del producto:
+					</label>
+					<com:TActivePanel id="camara" CssClass="col-lg-5" visible="false">
+						<link rel="stylesheet" href="css/app.css">
+						<!--- <script type="text/javascript" src="assets/js/webcam.min.js"></script> --->
+						<style>
+							#container {
+								margin: 0px auto;
+								width: 500px;
+								height: 375px;
+								border: 10px #333 solid;
+							}
+						</style>
+						<div id="container" >
+							<video autoplay="true" id="camara" class="col-lg-12" >
+							 
+							</video>
+							<canvas id="foto" width="500" height="375"></canvas>
+						</div>
+						<com:TClientScript>
+							//Nos aseguramos que estén definidas
+							//algunas funciones básicas
+							window.URL = window.URL || window.webkitURL;
+							navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia ||
+							function() {
+								alert('Su navegador no soporta navigator.getUserMedia().');
+							};
+							
+							//Este objeto guardará algunos datos sobre la cámara
+							window.datosVideo = {
+								'StreamVideo': null,
+								'url': null
+							}
+							
+							function inicia() {
+								//Pedimos al navegador que nos da acceso a 
+								//algún dispositivo de video (la webcam)
+								navigator.getUserMedia({
+									'audio': false,
+									'video': true
+								}, function(streamVideo) {
+									datosVideo.StreamVideo = streamVideo;
+									datosVideo.url = window.URL.createObjectURL(streamVideo);
+									jQuery('#camara').attr('src', datosVideo.url);
+							
+								}, function() {
+									alert('No fue posible obtener acceso a la cámara.');
+								});
+							
+							}
+							
+							function detener() {
+							
+								if (datosVideo.StreamVideo) {
+									datosVideo.StreamVideo.stop();
+									window.URL.revokeObjectURL(datosVideo.url);
+								}
+							
+							}
+							
+							function captura_foto() {
+								var oCamara, oFoto, oContexto, w, h;
+							
+								oCamara = jQuery('#camara');
+								oFoto = jQuery('#foto');
+								w = oCamara.width();
+								h = oCamara.height();
+								oFoto.attr({
+									'width': w,
+									'height': h
+								});
+								oContexto = oFoto[0].getContext('2d');
+								oContexto.drawImage(oCamara[0], 0, 0, w, h);
+								if(oCamara.paused || oCamara.ended) return false; // if no video, exit here
+								detener();
+								
+								//context.drawImage(v,0,0,w,h); // draw video feed to canvas
+								
+								var uri = oFoto[0].toDataURL("image/png"); // convert canvas to data URI
+								//console.log(uri); // uncomment line to log URI for testing
+								
+								//imgtag.src = uri; // add URI to IMG tag src
+								$("#<%= $this->imagetxt->ClientID %>").val(uri);
+								oFoto.hide();
+								jQuery("#<%= $this->btnCapturaCamara->ClientID %>").click();
+							}
+							
+							inicia();
+						</com:TClientScript>
+					</com:TActivePanel>
+					<com:TActivePanel id="imagenfija" CssClass="col-lg-3">
+						<div class="panel-image hide-panel-body" id="foto">
+							<com:TActiveImage ID="foto"
+											  cssclass="img-responsive"
+											  ImageUrl="image/producto.png"
+											  attributes.onclick='jQuery("#<%= $this->fotoFile->ClientID %>").click();'/>
+							
+						</div>
+					</com:TActivePanel>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-lg-2">
+						
+					</label>
+					<div class="col-lg-10">
+						<com:TActiveLabel id="leyenda" Text="" />
+						<com:TActiveHiddenField Id="file" />
+						<com:TActiveHiddenField Id="imagetxt" />
+						<com:TActiveFileUpload id="fotoFile" MaxFileSize="2560000" OnFileUpload="fileUploaded" style="display: none;" attributes.onchange ="foto(this.value);" Attributes.accept="image/png, image/jpeg" >
+							<prop:ClientSide OnLoading="Msg('Por favor espere mientras se procesa la petición',true);"
+														 OnComplete="Msg('Listo',false);"
+														 OnException="Msg('Se a producido un error, solicite apoyo técnico',true);"/>
+						</com:TActiveFileUpload>
+						<com:TActiveLinkButton id="subir" cssclass="btnLoad" Text="Guardar Foto" OnClick="BtnSubirFoto" style="display: none;" />
+						<a id="btnArchivo" Class="btn bg-purple margin" onclick='jQuery("#<%= $this->fotoFile->ClientID %>").click();' >
+							<b>
+								<i class="glyphicon glyphicon-picture"></i>
+							</b>
+							Subir Foto
+						</a>
+						<com:TActiveLinkButton  id="btnCamara"
+										  CssClass="btn bg-maroon margin"
+										  OnClick="BtnCamara" >
+							<b>
+								<i class="glyphicon glyphicon-facetime-video"></i>
+							</b>
+							Usar Cámara
+							<prop:ClientSide OnLoading="Msg('Por favor espere mientras se procesa la petición',true);"
+														 OnComplete="Msg('Listo',false);"
+														 OnException="Msg('Se a producido un error, solicite apoyo técnico',true);"/>
+						</com:TActiveLinkButton>
+						<com:TActiveHyperLink id="btnTomar"
+										CssClass="btn bg-olive margin"
+										visible="false"
+										Attributes.onclick="captura_foto();">
+							<b>
+								<i class="glyphicon glyphicon-ok"></i>
+							</b>
+							Tomar Foto
+						</com:TActiveHyperLink>
+						<com:TButton id="btnCapturaCamara"
+											   Text="Guardar Foto"
+											   OnClick="btnCapturaCamara"
+											   ValidationGroup="novalidado"
+											   style="display: none;" >
+						</com:TButton>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label">
+						<com:TRequiredFieldValidator
+													 ValidationGroup="Captura"
+													 ControlToValidate="codigovalido"
+													 CssClass="glyphicon glyphicon-asterisk"
+													 Text=" "
+													 ErrorMessage="Codigo esta reservado para el sistema, use otro"
+													 Display="Dynamic" />
+						<com:TRequiredFieldValidator
+													 ValidationGroup="Captura"
+													 ControlToValidate="txtCodigo"
+													 CssClass="glyphicon glyphicon-asterisk"
+													 Text=" "
+													 ErrorMessage="Codigo del producto"
+													 Display="Dynamic" />
+						<com:TRequiredFieldValidator
+													 ValidationGroup="BuscarCodigo"
+													 ControlToValidate="txtCodigo"
+													 CssClass="glyphicon glyphicon-asterisk"
+													 Text=" "
+													 Display="Dynamic" />
+						<com:TRegularExpressionValidator ValidationGroup="Captura"
+														 ControlToValidate="txtCodigo"
+														 CssClass="glyphicon glyphicon-asterisk"
+														 Text=" "
+														 ErrorMessage="Codigo no es valido"
+														 Display="Dynamic"
+														 RegularExpression="\S+"/>
+						<com:TRegularExpressionValidator ValidationGroup="BuscarCodigo"
+														 ControlToValidate="txtCodigo"
+														 CssClass="glyphicon glyphicon-asterisk"
+														 Text=" "
+														 ErrorMessage="Codigo no es valido"
+														 Display="Dynamic"
+														 RegularExpression="\S+"/>
+						Codigo del producto:
+					</label>
+					<div class="col-sm-6">
+						<div class="input-group">
+							<span class="input-group-addon"><i class="fa fa-barcode"></i></span>
+							<com:TActiveTextBox ID="txtCodigo"
+												AutoPostBack="false"
+												CssClass="form-control"
+												Attributes.autocomplete="off"
+												Attributes.placeholder="Codigo del producto o servicio"
+												Attributes.onkeypress="ide = '<%= $this->btnBuscar_Producto->ClientID %>'; Enterkey(event);"
+												Text=""
+												MaxLength="20" />
+							<com:TActiveLabel id="codigoactivo" cssclass="input-group-btn">
+								<label class="btn btn-info btn-flat">
+									<i class="fa fa-asterisk"></i>
+								</label>
+							</com:TActiveLabel>
+						</div>
+					</div>
+					
+					<div class="col-sm-4">
+						<com:TActiveLinkButton  id="btnBuscar_Producto"
+												ValidationGroup="BuscarCodigo"
+												CssClass="btn btn-info"
+												OnClick="btnBuscar_Producto_OnClick" >
+							<i class="fa fa-search"></i>
+							<prop:ClientSide OnLoading="Msg('Por favor espere mientras se procesa la petición',true);"
+											 OnComplete="Msg('Listo',false);"
+											 OnException="Msg('Se a producido un error, solicite apoyo técnico',true);"/>
+						</com:TActiveLinkButton>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label">
+						<com:TRequiredFieldValidator
+													 ValidationGroup="Captura"
+													 ControlToValidate="txtNombre"
+													 CssClass="glyphicon glyphicon-asterisk"
+													 Text=" "
+													 ErrorMessage="Nombre"
+													 Display="Dynamic" />
+						Nombre:
+					</label>
+					<div class="col-sm-6">
+						<com:TActiveTextBox ID="txtNombre"
+											CssClass="form-control"
+											Attributes.placeholder="Nombre del producto"
+											Text=""
+											MaxLength="120"
+											AutoPostBack="false"
+											Attributes.autocomplete="off" />
+						<com:TActiveHiddenField Id="id_productos" />
+						<com:TActiveHiddenField Id="id_inventarios" />
+						<com:TActiveHiddenField Id="codigovalido" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label">
+						Descripción:
+					</label>
+					<div class="col-sm-6">
+						<com:TActiveTextBox ID="txtDescripcion"
+											CssClass="form-control"
+											TextMode="MultiLine"
+											Attributes.placeholder="Datos relevantes del producto"
+											Text=""
+											MaxLength="2550"
+											AutoPostBack="false"
+											Attributes.autocomplete="off" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label">
+						<com:TRequiredFieldValidator
+													 ValidationGroup="Captura"
+													 ControlToValidate="cmdDepartamento"
+													 CssClass="glyphicon glyphicon-asterisk"
+													 Text=" "
+													 ErrorMessage="Apartado / Departamento"
+													 Display="Dynamic" />
+						Apartado / Departamento:
+					</label>
+					<div class="col-sm-5">
+						<com:TActiveDropDownList ID="cmdDepartamento"
+										   AutoPostBack="false"
+										   cssclass="form-control"
+										   DataTextField="nombre"
+										   DataValueField="id_departamentos"
+										   PromptText=" "
+										   PromptValue="0" />
+					</div>
+					<div class="col-sm-5">
+						<com:TActiveLinkButton  id="btnAgregar_departamentos"
+												CausesValidation="false"
+												CssClass="btn btn-success"
+												OnClick="btnAgregar_departamentos_OnClick" >
+							<prop:ClientSide OnLoading=""
+											 OnComplete="$('#ModalDepartamentos').modal('show');"
+											 OnException=""/>
+							<i class="fa fa-plus"></i>
+						</com:TActiveLinkButton>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label">
+						<com:TRequiredFieldValidator
+													 ValidationGroup="Captura"
+													 ControlToValidate="cmdBodega"
+													 CssClass="glyphicon glyphicon-asterisk"
+													 Text=" "
+													 ErrorMessage="Almacen / Bodega"
+													 Display="Dynamic" />
+						Almacen / Bodega:
+					</label>
+					<div class="col-sm-5">
+						<com:TDropDownList ID="cmdBodega"
+										   AutoPostBack="false"
+										   cssclass="form-control"
+										   DataTextField="bodega"
+										   DataValueField="id_bodegas"  />
+						
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label">
+						<com:TCustomValidator ValidationGroup="Captura"
+											  ControlToValidate="ChProducto1"
+											  CssClass="glyphicon glyphicon-asterisk"
+											  OnServerValidate="Validador_ChProducto"
+											  Text=" "
+											  ErrorMessage="Activo"
+											  Display="Dynamic" />
+						
+					</label>
+					<div class="col-sm-5">
+						<label>
+							<com:TActiveRadioButton ID="ChProducto1"
+													cssclass="flat-red"
+													GroupName="active"
+													AutoPostBack="false" />
+							Producto
+						</label>
+						<label>
+							<com:TActiveRadioButton ID="ChProducto0"
+													cssclass="flat-red"
+													GroupName="active"
+													AutoPostBack="false" />
+							Servicio
+						</label>
+						
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label">
+						<com:TRangeValidator ValidationGroup="Captura"
+											 EnableClientScript="false"
+											 ControlToValidate="txtPrecioAdquisicion"
+											 DataType="Float"
+											 MinValue="0"
+											 CssClass="glyphicon glyphicon-asterisk"
+											 Text=" "
+											 ErrorMessage="Precio adquisición"
+											 Display="Dynamic" />
+						Precio de adquisición:
+					</label>
+					<div class="col-sm-5">
+						<div class="input-group">
+							<span class="input-group-addon">$</span>
+							<com:TActiveTextBox ID="txtPrecioAdquisicion"
+												CssClass="form-control"
+												Attributes.placeholder="0.00"
+												Text=""
+												MaxLength="20"
+												AutoPostBack="false"
+												Attributes.autocomplete="off" />
+						</div>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label">
+						<com:TRequiredFieldValidator
+													 ValidationGroup="Captura"
+													 ControlToValidate="txtPrecioPublico"
+													 CssClass="glyphicon glyphicon-asterisk"
+													 Text=" "
+													 ErrorMessage="Precio publico"
+													 Display="Dynamic" />
+						<com:TRangeValidator ValidationGroup="Captura"
+											 EnableClientScript="false"
+											 ControlToValidate="txtPrecioPublico"
+											 DataType="Float"
+											 MinValue="0"
+											 CssClass="glyphicon glyphicon-asterisk"
+											 Text=" "
+											 ErrorMessage="Precio publico"
+											 Display="Dynamic" />
+						Precio publico:
+					</label>
+					<div class="col-sm-5">
+						<div class="input-group">
+							<span class="input-group-addon">$</span>
+							<com:TActiveTextBox ID="txtPrecioPublico"
+												CssClass="form-control"
+												Attributes.placeholder="0.00"
+												Text=""
+												MaxLength="20"
+												AutoPostBack="false"
+												Attributes.autocomplete="off" />
+						</div>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label">
+						<com:TRequiredFieldValidator
+													 ValidationGroup="Captura"
+													 ControlToValidate="txtStock"
+													 CssClass="glyphicon glyphicon-asterisk"
+													 Text=" "
+													 ErrorMessage="Existencias"
+													 Display="Dynamic" />
+						<com:TRangeValidator ValidationGroup="Captura"
+											 EnableClientScript="false"
+											 ControlToValidate="txtStock"
+											 DataType="Float"
+											 MinValue="0"
+											 CssClass="glyphicon glyphicon-asterisk"
+											 Text=" "
+											 ErrorMessage="Existencias"
+											 Display="Dynamic" />
+						Existencias:
+					</label>
+					<div class="col-sm-5">
+						<div class="input-group">
+							
+							<com:TActiveTextBox ID="txtStock"
+												CssClass="form-control"
+												Attributes.placeholder="Stock"
+												Text=""
+												MaxLength="20"
+												AutoPostBack="false"
+												Attributes.autocomplete="off" />
+							<span class="input-group-addon"><i class="fa fa-cubes"></i></span>
+						</div>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label">
+						<com:TRangeValidator ValidationGroup="Captura"
+											 EnableClientScript="false"
+											 ControlToValidate="txtMinimo"
+											 DataType="Float"
+											 MinValue="0"
+											 CssClass="glyphicon glyphicon-asterisk"
+											 Text=" "
+											 ErrorMessage="Stock mínimo"
+											 Display="Dynamic" />
+						Mínimo:
+					</label>
+					<div class="col-sm-5">
+						<div class="input-group">
+							<com:TActiveTextBox ID="txtMinimo"
+												CssClass="form-control"
+												Attributes.placeholder="Stock mínimo"
+												Text=""
+												MaxLength="20"
+												AutoPostBack="false"
+												Attributes.autocomplete="off" />
+							<span class="input-group-addon"><i class="fa fa-cubes"></i></span>
+						</div>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label">
+						<com:TRangeValidator ValidationGroup="Captura"
+											 EnableClientScript="false"
+											 ControlToValidate="txtMaximo"
+											 DataType="Float"
+											 MinValue="0"
+											 CssClass="glyphicon glyphicon-asterisk"
+											 Text=" "
+											 ErrorMessage="Stock maximo"
+											 Display="Dynamic" />
+						Máximo:
+					</label>
+					<div class="col-sm-5">
+						<div class="input-group">
+							<com:TActiveTextBox ID="txtMaximo"
+												CssClass="form-control"
+												Attributes.placeholder="Stock máximo"
+												Text=""
+												MaxLength="20"
+												AutoPostBack="false"
+												Attributes.autocomplete="off" />
+							<span class="input-group-addon"><i class="fa fa-cubes"></i></span>
+						</div>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label">
+						<com:TRequiredFieldValidator
+													 ValidationGroup="Captura"
+													 ControlToValidate="txtUnidad"
+													 CssClass="glyphicon glyphicon-asterisk"
+													 Text=" "
+													 ErrorMessage="Unidad de medida"
+													 Display="Dynamic" />
+						Unidad de medida:
+					</label>
+					<div class="col-sm-5">
+						<div class="input-group">
+							
+							<com:TActiveTextBox ID="txtUnidad"
+												CssClass="form-control"
+												Attributes.placeholder="pz."
+												Text="U"
+												MaxLength="4"
+												AutoPostBack="false"
+												Attributes.autocomplete="off" />
+						</div>
+					</div>
+				</div>
+				<com:TPanel id="ptDatosFiscales00" cssclass="form-group">
+					<div class="col-sm-2 text-right">
+					</div>
+					<div class="col-sm-10">
+						<h5>
+							<i class="fa fa-bank"></i>Datos para facturación
+						</h5>
+					</div>
+				</com:TPanel>
+				<com:TPanel id="ptDatosFiscales01" cssclass="form-group">
+					<label class="col-sm-2 control-label">
+						Clave de productos y servicios:
+					</label>
+					<div class="col-sm-2">
+						<div class="input-group">
+							<com:TActiveTextBox ID="txtClaveProdServ"
+												CssClass="form-control"
+												MaxLength="10"
+												AutoPostBack="false"
+												Attributes.autocomplete="off" />
+							<label class="input-group-btn">
+								<com:TActiveLinkButton  id="btnBuscarProdServ"
+														CausesValidation="false"
+														CssClass="btn btn-success"
+														OnClick="btnBuscarProdServ_OnClick" >
+									<prop:ClientSide OnLoading=""
+													 OnComplete=" $('#ModalClaveProdServ').modal('show');"
+													 OnException=""/>
+									<i class="fa fa-search"></i>
+								</com:TActiveLinkButton>
+							</label>
+						</div>
+					</div>
+					<div class="col-sm-5">
+						<com:TActiveLabel id="lSatProducto"></com:TActiveLabel>
+					</div>
+				</com:TPanel>
+				<com:TPanel id="ptDatosFiscales02" cssclass="form-group">
+					<label class="col-sm-2 control-label">
+						Unidad de medida:
+					</label>
+					<div class="col-sm-2">
+						<div class="input-group">
+							<com:TActiveTextBox ID="txtClaveUnidad"
+												CssClass="form-control"
+												MaxLength="10"
+												AutoPostBack="false"
+												Attributes.autocomplete="off" />
+							<label class="input-group-btn">
+								<com:TActiveLinkButton  id="btnBuscarClaveUnidad"
+														CausesValidation="false"
+														CssClass="btn btn-success"
+														OnClick="btnBuscarClaveUnidad_OnClick" >
+									<prop:ClientSide OnLoading=""
+													 OnComplete="$('#ModalClaveUnidad').modal('show');"
+													 OnException=""/>
+									<i class="fa fa-search"></i>
+								</com:TActiveLinkButton>
+							</label>
+						</div>
+					</div>
+					<div class="col-sm-5">
+						<com:TActiveLabel id="lSatUnidaded"></com:TActiveLabel>
+					</div>
+				</com:TPanel>
+				<com:TPanel id="ptDatosFiscales03" cssclass="form-group">
+					<label class="col-sm-2 control-label">
+						Impuestos:
+					</label>
+					<div class="col-sm-6">
+						<com:TActiveRepeater ID="rpImpuesto" OnItemCreated="rpImpuesto_OnItemCreated" DataKeyField="valor" >
+							<prop:HeaderTemplate>
+						<table class="table table-bordered">
+							<thead>
+								<tr>
+									<th>#</th>
+									<th>Impuesto</th>
+									<th>Taza</th>
+									<th> Aplica </th>
+									<th> Incluido </th>
+									<th> Valor </th>
+								</tr>
+							</thead>
+							<tbody>
+							</prop:HeaderTemplate>
+							<prop:ItemTemplate>
+								<tr>
+									<td>
+										<com:TLabel id="lnum" />
+									</td>
+									<td>
+										<com:TLabel id="limpuesto" />
+									</td>
+									<td>
+										<com:TActiveLabel id="ltaza" />
+										<com:TActiveDropDownList ID="cmdTaza"
+																 AutoPostBack="true"
+																 cssclass="form-control"
+																 DataTextField="tasa"
+																 DataValueField="tasa"
+																 OnSelectedIndexChanged="page.cmdTaza_onChange"/>
+									</td>
+									<td>
+										<com:TActiveCheckBox id="chAplica" OnCheckedChanged="page.chAplica_onChange" />
+									</td>
+									<td>
+										<com:TActiveCheckBox id="chIncluido" OnCheckedChanged="page.chIncluido_onChange" />
+									</td>
+									<td class="text-right">
+										<com:TActiveLabel id="limporte" />
+										<com:TActiveHiddenField Id="vimporte" />
+									</td>
+								</tr>
+							</prop:ItemTemplate>
+							<prop:FooterTemplate>
+							</tbody>
+							<tfoot>
+								<tr>
+									<td colspan="5" class="text-right">
+										Importe:
+									</td>
+									<td class="text-right">
+										<com:TActiveLabel id="ltotal" />
+									</td>
+								</tr>
+							</tfoot>
+						</table>
+							</prop:FooterTemplate>
+						</com:TActiveRepeater>
+					</div>
+				</com:TPanel>
+				<div class="form-group">
+					<div class="col-sm-6">
+						
+					</div>
+					<div class="col-sm-6">
+						<com:TLinkButton  id="btnGuardar"
+												ValidationGroup="Captura"
+												CssClass="btn btn-success"
+												OnClick="btnGuardar_OnClick" >
+							<i class="fa fa-save"></i> Guardar
+						</com:TLinkButton>
+					</div>
+				</div>
+			</com:TActivePanel>
+			<com:TPanel id="Buscador" cssclass="box-body form-horizontal">
+				<div class="form-group">
+					<label class="col-sm-2 control-label">
+						Almacen / Bodega:
+					</label>
+					<div class="col-sm-3">
+						<com:TActiveDropDownList ID="cmdBodega2"
+										   AutoPostBack="false"
+										   cssclass="form-control"
+										   DataTextField="bodega"
+										   DataValueField="id_bodegas"/>
+						
+					</div>
+					<div class="col-sm-3">
+						<com:TActiveDropDownList ID="cmdServicios"
+												 cssclass="form-control"
+												 AutoPostBack="true"
+												 OnSelectedIndexChanged="btnBuscar_OnClick">
+							<prop:ClientSide OnLoading="Msg('Por favor espere mientras se procesa la petición',true);"
+														 OnComplete="Msg('Listo',false);"
+														 OnException="Msg('Se a producido un error, solicite apoyo técnico',true);"/>
+							<com:TListItem Value=" " Text="Mostrar Todo" />
+							<com:TListItem Value="1" Text="Productos" Selected="true" />
+							<com:TListItem Value="0" Text="Servicios" />
+						</com:TActiveDropDownList>
+					</div>
+					<div class="col-sm-4">
+						
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label">
+						Nombre:
+					</label>
+					<div class="col-sm-5">
+						<com:TActiveTextBox ID="txtBuscar"
+											AutoPostBack="false"
+											CssClass="form-control"
+											Attributes.onkeypress="ide = '<%= $this->btnBuscar->ClientID %>'; Enterkey(event);"
+											Text=""
+											MaxLength="100" />
+					</div>
+					<div class="col-sm-5">
+						<com:TActiveLinkButton  id="btnBuscar"
+												CausesValidation="false"
+												CssClass="btn btn-info"
+												OnClick="btnBuscar_OnClick" >
+							<i class="fa fa-search"></i> 
+							<prop:ClientSide OnLoading="Msg('Por favor espere mientras se procesa la petición',true);"
+														 OnComplete="Msg('Listo',false);"
+														 OnException="Msg('Se a producido un error, solicite apoyo técnico',true);"/>
+						</com:TActiveLinkButton>
+						<com:TLinkButton  id="btnExportarXLS"
+												CausesValidation="false"
+												CssClass="btn btn-default"
+												OnClick="btnExportarXLS_OnClick" >
+							<i class="fa fa-file-excel-o"></i>
+						</com:TLinkButton>
+						<com:THyperLink id="linkPdf" CssClass="btn btn-default" Target="_blank" >
+							<i class="fa fa-file-pdf-o"></i>
+						</com:THyperLink>
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-sm-3">
+						Elementos: <b><com:TActiveLabel id="nelementos" text="0" /> </b>
+					</div>
+					<div class="col-sm-9">
+						
+					</div>
+				</div>
+			</com:TPanel>
+			<com:TActivePanel id="tpSinDatos" CssClass="table-responsive">
+				<table class="table table-bordered">
+					<thead>
+						<tr>
+							<th>#</th>
+							<th>Codigo</th>
+							<th>Producto / Servicio</th>
+							<th>Apartado / Departamento</th>
+							<th>Precio</th>
+							<th>Existencia</th>
+							<th>*</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td colspan="7">No hay elementos que mostrar</td>
+						</tr>
+					</tbody>
+				</table>
+			</com:TActivePanel>
+			<com:TActivePanel id="tpDatos" cssclass="table-responsive">
+				<div class="form-group">
+				<com:TActiveDataGrid ID="dgTabla"
+									 PageSize="10"
+									 PagerStyle.Mode="Numeric"
+									 DataKeyField="id_inventarios"
+									 AutoGenerateColumns="false"
+									 CssClass="table table-bordered"
+									 OnPageIndexChanged="changePage"
+									 AllowPaging="true"
+									 AllowCustomPaging="true"
+									 PagerStyle.Position="TopAndBottom"
+									 PagerStyle.Visible="true"
+									 PagerStyle.NextPageText="Sig."
+									 PagerStyle.PrevPageText="Ant."
+									 PagerStyle.PageButtonCount="4";
+									 OnPagerCreated="pagerCreated"
+									 OnItemCreated="itemCreated"
+									 OnDeleteCommand="deleteItem"
+									 OnEditCommand="editItem"
+									 OnUpdateCommand="saveItem"
+									 OnCancelCommand="cancelItem">
+						<com:TTemplateColumn HeaderText="#" ID="rowI">
+							<prop:ItemTemplate>
+								<com:TLiteral id="lNumero" />
+							</prop:ItemTemplate>
+						</com:TTemplateColumn>
+						<com:TTemplateColumn HeaderText="*" ID="rowServicios">
+							<prop:ItemTemplate>
+								<com:TLiteral id="lTipo" />
+							</prop:ItemTemplate>
+						</com:TTemplateColumn>
+						<com:TTemplateColumn HeaderText="Foto" ID="rowImagen">
+							<prop:ItemTemplate>
+								<com:TActiveImage ID="foto" CssClass="img-circle" ImageUrl="image/producto.png" Style="width: 64px;" />
+							</prop:ItemTemplate>
+						</com:TTemplateColumn>
+						<com:TTemplateColumn HeaderText="Producto / Servicio" ID="rowProducto">
+							<prop:ItemTemplate>
+								<b><com:TLiteral id="lCodigo" /></b> <br />
+								<com:TLiteral id="lProducto" />
+							</prop:ItemTemplate>
+						</com:TTemplateColumn>
+						<com:TTemplateColumn HeaderText="Datos Fiscales" ID="rowDatosFiscales">
+							<prop:ItemTemplate>
+								<com:TLiteral id="lSatConcepto" /> <br />
+								<com:TLiteral id="lSatUnidad" /> <br />
+								<com:TLiteral id="lSatImpuestos" />
+							</prop:ItemTemplate>
+						</com:TTemplateColumn>
+						<com:TTemplateColumn HeaderText="Valor" ID="rowValor">
+							<prop:ItemTemplate>
+								<com:TNumberFormat id="lValor" Type="currency" Culture="es_MX" Currency="$ " />
+							</prop:ItemTemplate>
+						</com:TTemplateColumn>
+						<com:TTemplateColumn HeaderText="Importe" ID="rowPrecioPublico">
+							<prop:ItemTemplate>
+								<com:TNumberFormat id="lPrecioPublico" Type="currency" Culture="es_MX" Currency="$ "  /> 
+							</prop:ItemTemplate>
+							<prop:EditItemTemplate>
+								<com:TActiveTextBox id="txtPrecioPublico" />
+							</prop:EditItemTemplate>
+						</com:TTemplateColumn>
+						<com:TTemplateColumn HeaderText="Inventario" ID="rowBart">
+							<prop:ItemTemplate>
+								<com:TLiteral id="lStock" /> 
+								<com:TLiteral id="lPorcentajeStock" /> <br />
+								<com:TLiteral id="lBartStock" />
+							</prop:ItemTemplate>
+							<prop:EditItemTemplate>
+								<com:TActiveTextBox id="txtStock" />
+							</prop:EditItemTemplate>
+						</com:TTemplateColumn>
+						<com:TActiveEditCommandColumn ID="rowEditar"
+													  HeaderStyle.Width="100px"
+													  ItemStyle.HorizontalAlign="Center" />
+						<com:TTemplateColumn HeaderText="*" ID="rowBotonos">
+							<prop:ItemTemplate>
+								<com:THyperLink id="btnEditar"
+												cssclass="btn bg-purple">
+												<i class="fa fa-edit"></i>
+								</com:THyperLink>
+							</prop:ItemTemplate>
+						</com:TTemplateColumn>
+						<com:TButtonColumn ID="DeleteColumn" CausesValidation="false" CommandName="delete" />
+					</com:TActiveDataGrid>
+				</div>
+			</com:TActivePanel>
+		</div>
+	</div>
+	<div id="ModalDepartamentos" class="modal" role="dialog">
+		<div class="modal-dialog modal-gl">
+			<div class="modal-body">
+				<div class="box">
+					<div class="box-body">
+						<table class="table table-striped">
+							<tr>
+								<td>#</td>
+								<td>Nombre</td>
+								<td>*</td>
+							</tr>
+							<tr>
+								<td>
+									<com:TRequiredFieldValidator ValidationGroup="newDepartemanto"
+																 ControlToValidate="txtDepartemanto"
+																 CssClass="glyphicon glyphicon-asterisk"
+																 Text=" Apartado / Departamento "
+																 Display="Dynamic" />
+								</td>
+								<td><com:TActiveTextBox ID="txtDepartemanto" CssClass="form-control" Attributes.placeholder="Departamento" Text="" MaxLength="200" AutoPostBack="false" /></td>
+								<td>
+									<com:TActiveLinkButton  id="btnGuardar_departamentos"
+															ValidationGroup="newDepartemanto"
+															CssClass="btn btn-success"
+															OnClick="btnGuardar_departamentos_OnClick" >
+										
+										<i class="fa fa-save"></i>
+									</com:TActiveLinkButton>
+								</td>
+							</tr>
+						</table>
+						<com:TActiveRepeater ID="RpDepartamento" DataKeyField="id_departamentos" OnItemDataBound="RpDepartamento_DataBound">
+							<prop:HeaderTemplate>
+						<table class="table table-striped">
+							</prop:HeaderTemplate>
+							<prop:ItemTemplate>
+							<tr>
+								<td><com:TLiteral id="lnumero" /></td>
+								<td><%# $this->Data->nombre %></td>
+								<td>
+									<com:TActiveLinkButton  id="btnBorrar_departamentos"
+															CausesValidation="false"
+															CssClass="btn btn-danger"
+															OnClick="Page.btnBorrar_departamentos_OnClick" >
+										<i class="fa fa-trash"></i>
+									</com:TActiveLinkButton>
+									<com:TActiveLinkButton  id="btnUsar_departamentos"
+															CausesValidation="false"
+															CssClass="btn btn-info"
+															OnClick="Page.btnUsar_departamentos_OnClick" >
+										<prop:ClientSide OnLoading=""
+														 OnComplete=" $('#ModalDepartamentos').modal('hide');"
+														 OnException=""/>
+										<i class="fa fa-check"></i>
+									</com:TActiveLinkButton>
+								</td>
+							</tr>
+							</prop:ItemTemplate>
+							<prop:FooterTemplate>
+						</table>
+							</prop:FooterTemplate>
+						</com:TActiveRepeater>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="ModalClaveProdServ" class="modal" role="dialog">
+		<div class="modal-dialog modal-gl">
+			<div class="modal-body">
+				<div class="box">
+					<div class="box-body">
+						<div class="form-group">
+							<div class="col-sm-12">
+								<div class="input-group">
+									<com:TActiveTextBox ID="txtConcepto"
+														AutoPostBack="false"
+														CssClass="form-control"
+														Attributes.onkeypress="ide = '<%= $this->btnBuscarConcepto->ClientID %>'; Enterkey(event);"
+														Text=""
+														MaxLength="100" />
+									<label class="input-group-btn">
+										<com:TActiveLinkButton  id="btnBuscarConcepto"
+																CausesValidation="false"
+																CssClass="btn btn-success"
+																OnClick="btnBuscarConcepto_OnClick" >
+											<i class="fa fa-search"></i>
+										</com:TActiveLinkButton>
+										<a class="btn btn-danger" data-dismiss="modal">
+											<i class="fa fa-close"></i>
+										</a>
+									</label>
+								</div>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-12">
+								<com:TActiveLabel id="lnumero" />
+							</div>
+						</div>
+						<div class="form-group">
+							<com:TActiveDataGrid ID="RpClaveProdServ"
+												 PageSize="10"
+												 PagerStyle.Mode="Numeric"
+												 DataKeyField="claveprodserv"
+												 AutoGenerateColumns="false"
+												 CssClass="table table-bordered"
+												 OnPageIndexChanged="RpClaveProdServ_changePage"
+												 AllowPaging="true"
+												 AllowCustomPaging="true"
+												 PagerStyle.Position="TopAndBottom"
+												 PagerStyle.Visible="true"
+												 PagerStyle.NextPageText="Sig."
+												 PagerStyle.PrevPageText="Ant."
+												 PagerStyle.PageButtonCount="4";
+												 OnPagerCreated  = "RpClaveProdServ_pagerCreated"
+												 OnItemCreated   = "RpClaveProdServ_DataBound" >
+									<com:TTemplateColumn HeaderText="#" ID="rowClaveprodserv">
+										<prop:ItemTemplate>
+											<com:TLiteral id="lCodigo" />
+										</prop:ItemTemplate>
+									</com:TTemplateColumn>
+									<com:TTemplateColumn HeaderText="Concepto" ID="rowConcepto">
+										<prop:ItemTemplate>
+											<com:TLiteral id="lConcepto" />
+										</prop:ItemTemplate>
+									</com:TTemplateColumn>
+									<com:TTemplateColumn HeaderText="*" ID="rowClick">
+										<prop:ItemTemplate>
+											<com:TActiveLinkButton Id="btnUsarClaveProdServ"
+															 CausesValidation="false"
+															 cssclass="btn btn-success"
+															 OnClick="Page.btnUsarClaveProdServ_OnClick" >
+												<prop:ClientSide OnLoading=""
+																 OnComplete=" $('#ModalClaveProdServ').modal('hide');"
+																 OnException=""/>
+												<i class="fa fa-check"></i>
+											</com:TActiveLinkButton>
+										</prop:ItemTemplate>
+									</com:TTemplateColumn>
+							</com:TActiveDataGrid>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="ModalClaveUnidad" class="modal" role="dialog">
+		<div class="modal-dialog modal-gl">
+			<div class="modal-body">
+				<div class="box">
+					<div class="box-body">
+						<div class="form-group">
+							<div class="col-sm-12">
+								<div class="input-group">
+									<com:TActiveTextBox ID="txtUnidadNombre"
+														AutoPostBack="false"
+														CssClass="form-control"
+														Text=""
+														Attributes.onkeypress="ide = '<%= $this->btnBuscarUnidad->ClientID %>'; Enterkey(event);"
+														MaxLength="100" />
+									<label class="input-group-btn">
+										<com:TActiveLinkButton  id="btnBuscarUnidad"
+																CausesValidation="false"
+																CssClass="btn btn-success"
+																OnClick="btnBuscarClaveUnidad_OnClick" >
+											<i class="fa fa-search"></i>
+										</com:TActiveLinkButton>
+										<a class="btn btn-danger" data-dismiss="modal">
+											<i class="fa fa-close"></i>
+										</a>
+									</label>
+								</div>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-12">
+								<com:TActiveLabel id="lnumero2" />
+							</div>
+						</div>
+						<div class="form-group">
+							<com:TActiveDataGrid ID="RpClaveUnidad"
+												 PageSize="10"
+												 PagerStyle.Mode="Numeric"
+												 DataKeyField="claveunidad"
+												 AutoGenerateColumns="false"
+												 CssClass="table table-bordered"
+												 OnPageIndexChanged="RpClaveUnidad_changePage"
+												 AllowPaging="true"
+												 AllowCustomPaging="true"
+												 PagerStyle.Position="TopAndBottom"
+												 PagerStyle.Visible="true"
+												 PagerStyle.NextPageText="Sig."
+												 PagerStyle.PrevPageText="Ant."
+												 PagerStyle.PageButtonCount="4";
+												 OnPagerCreated  = "RpClaveUnidad_pagerCreated"
+												 OnItemCreated   = "RpClaveUnidad_DataBound" >
+									<com:TTemplateColumn HeaderText="#" ID="rowClaveUnidad">
+										<prop:ItemTemplate>
+											<com:TLiteral id="lCodigo" />
+										</prop:ItemTemplate>
+									</com:TTemplateColumn>
+									<com:TTemplateColumn HeaderText="Concepto" ID="rowNombreUnidad">
+										<prop:ItemTemplate>
+											<com:TLiteral id="lUnidad" />
+										</prop:ItemTemplate>
+									</com:TTemplateColumn>
+									<com:TTemplateColumn HeaderText="*" ID="rowUnidadSat">
+										<prop:ItemTemplate>
+											<com:TActiveLinkButton Id="btnUsarClaveUnidad"
+															 CausesValidation="false"
+															 cssclass="btn btn-success"
+															 OnClick="Page.btnUsarClaveUnidad_OnClick" >
+												<prop:ClientSide OnLoading=""
+																 OnComplete=" $('#ModalClaveUnidad').modal('hide');"
+																 OnException=""/>
+												<i class="fa fa-check"></i>
+											</com:TActiveLinkButton>
+										</prop:ItemTemplate>
+									</com:TTemplateColumn>
+							</com:TActiveDataGrid>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<com:TClientScript>
+		$("#<%= $this->txtCodigo->ClientID %>" ).change(function() {
+			$("#<%= $this->btnBuscar_Producto->ClientID %>").click();
+		});
+		
+		$(".btnbuscar" ).change(function() {
+			$("#<%= $this->btnBuscar->ClientID %>").click();
+		});
+	</com:TClientScript>
+</com:TContent>

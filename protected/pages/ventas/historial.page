@@ -1,0 +1,319 @@
+<com:TContent ID="Main">
+	<div class="col-md-12">
+		<div class="box box-primary">
+			<div class="box-header">
+				<i class="fa fa-navicon"></i>
+				<h3 class="box-title">Ventas realizadas</h3>
+			</div>
+			<com:TPanel id="tpanelAviso" cssclass="box-body">
+				<div class="alert alert-success alert-styled-left alert-arrow-left alert-bordered">
+					<button type="button" class="close" data-dismiss="alert"><span>&times;</span><span class="sr-only">Close</span></button>
+					<span class="text-semibold">Guardado</span> El registro se guardo sin problemas.
+				</div>
+				<com:TClientScript>
+					$(<%= $this->tpanelAviso->Clientid %>).hide(4000);
+				</com:TClientScript>
+			</com:TPanel>
+			<com:TPanel id="Buscador" cssclass="box-body form-horizontal">
+				<div class="form-group">
+					<label class="col-sm-2 control-label">
+						Fecha:
+						<com:TActiveButton  CausesValidation="false"
+											CssClass="btn btn-info"
+											style="display: none;"
+											OnClick="btnBuscar_OnClick" >
+							<i class="fa fa-search"></i> 
+							<prop:ClientSide OnLoading="Msg('Por favor espere mientras se procesa la petición',true);"
+														 OnComplete="Msg('Listo',false);"
+														 OnException="Msg('Se a producido un error, solicite apoyo técnico',true);"/>
+						</com:TActiveButton>
+					</label>
+					<div class="col-sm-3" style=" z-index: 10;">
+						<com:TJuiDatePicker ID="fecha_inicio" cssclass="form-control"/>
+					</div>
+					<div class="col-sm-3" style=" z-index: 10;">
+						<com:TJuiDatePicker ID="fecha_final" cssclass="form-control"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label">
+						Nombre:
+					</label>
+					<div class="col-sm-5">
+						<com:TActiveTextBox ID="txtBuscar"
+											AutoPostBack="false"
+											CssClass="form-control"
+											Text=""
+											MaxLength="100" />
+					</div>
+					<div class="col-sm-5">
+						<com:TActiveLinkButton  id="btnBuscar"
+												CausesValidation="false"
+												CssClass="btn btn-info"
+												OnClick="btnBuscar_OnClick" >
+							<i class="fa fa-search"></i> 
+							<prop:ClientSide OnLoading="Msg('Por favor espere mientras se procesa la petición',true);"
+														 OnComplete="Msg('Listo',false);"
+														 OnException="Msg('Se a producido un error, solicite apoyo técnico',true);"/>
+						</com:TActiveLinkButton>
+						<com:TLinkButton  id="btnExportarXLS"
+												CausesValidation="false"
+												CssClass="btn btn-default"
+												OnClick="btnExportarXLS_OnClick" >
+							<i class="fa fa-file-excel-o"></i>
+						</com:TLinkButton>
+						<com:TActiveHyperLink id="linkPdf" CssClass="btn btn-default" Target="_blank" >
+							<i class="fa fa-file-pdf-o"></i>
+						</com:TActiveHyperLink>
+					</div>
+				</div>
+			</com:TPanel>
+			<com:TActivePanel id="tpSinDatos" CssClass="box-body form-horizontal">
+				<table class="table table-bordered">
+					<thead>
+						<tr>
+							<th>#</th>
+							<th>Codigo</th>
+							<th>Producto / Servicio</th>
+							<th>Apartado / Departamento</th>
+							<th>Precio</th>
+							<th>Existencia</th>
+							<th>*</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td colspan="7">No hay elementos que mostrar</td>
+						</tr>
+					</tbody>
+				</table>
+			</com:TActivePanel>
+			<com:TActivePanel id="tpDatos" cssclass="box-body form-horizontal">
+				<com:TActiveDataGrid ID="dgTabla"
+									 PageSize="10"
+									 PagerStyle.Mode="Numeric"
+									 DataKeyField="id_ventas"
+									 AutoGenerateColumns="false"
+									 CssClass="table table-bordered"
+									 OnPageIndexChanged="changePage"
+									 AllowPaging="true"
+									 AllowCustomPaging="true"
+									 PagerStyle.Position="TopAndBottom"
+									 PagerStyle.Visible="true"
+									 PagerStyle.NextPageText="Sig."
+									 PagerStyle.PrevPageText="Ant."
+									 PagerStyle.PageButtonCount="4";
+									 OnPagerCreated="pagerCreated"
+									 OnItemCreated="itemCreated"
+									 OnDeleteCommand="deleteItem" >
+						<com:TBoundColumn HeaderText="Folio" DataField="id_ventas" />
+						<com:TBoundColumn HeaderText="Corte" DataField="id_cortes" />
+						<com:TBoundColumn HeaderText="Atendio" DataField="bs_usuarios.user" />
+						<com:TBoundColumn HeaderText="Cliente" DataField="ms_clientes.nombre" />
+						<com:TTemplateColumn HeaderText="Forma de pago" ID="rowFormaPago">
+							<prop:ItemTemplate>
+								<com:TActiveLabel id="lFormaPago"/>
+							</prop:ItemTemplate>
+						</com:TTemplateColumn>
+						<com:TTemplateColumn HeaderText="Fecha" ID="rowFecha">
+							<prop:ItemTemplate>
+								<com:TDateFormat id="lFecha" Pattern="dd/MMMM/yy hh:mm a" />
+							</prop:ItemTemplate>
+						</com:TTemplateColumn>
+						<com:TTemplateColumn HeaderText="Descuento" ID="rowDescuento">
+							<prop:ItemTemplate>
+								<com:TNumberFormat id="lDescuento" Type="currency" Culture="es_MX" Currency="$ " />
+							</prop:ItemTemplate>
+						</com:TTemplateColumn>
+						<com:TTemplateColumn HeaderText="Venta" ID="rowVenta">
+							<prop:ItemTemplate>
+								<com:TNumberFormat id="lVenta" Type="currency" Culture="es_MX" Currency="$ " />
+							</prop:ItemTemplate>
+						</com:TTemplateColumn>
+						<com:TTemplateColumn HeaderText="Total" ID="rowTotalVenta">
+							<prop:ItemTemplate>
+								<com:TNumberFormat id="lTotal" Type="currency" Culture="es_MX" Currency="$ " />
+							</prop:ItemTemplate>
+						</com:TTemplateColumn>
+						<com:TTemplateColumn HeaderText="Estatus" ID="rowEstatus">
+							<prop:ItemTemplate>
+								<com:TLiteral id="lestatus" />
+							</prop:ItemTemplate>
+						</com:TTemplateColumn>
+						<com:TTemplateColumn HeaderText="*" ID="rowBotonos">
+							<prop:ItemTemplate>
+								<com:TActiveLinkButton Id="btnView"
+												 CausesValidation="false"
+												 cssclass="btn bg-maroon"
+												 OnClick="Page.btnView_OnClick" >
+											<prop:ClientSide OnComplete="$('#ModalVenta').modal('show');"
+															 OnException="$('#ModalVenta').modal('show');"/>
+										<i class="fa fa-eye"></i>
+								</com:TActiveLinkButton>
+								<com:TActiveLinkButton  id="btnBorrar_Ventas"
+														CausesValidation="false"
+														CssClass="btn btn-danger"
+														OnClick="Page.btnBorrar_Ventas_OnClick" >
+									<i class="fa fa-trash"></i>
+								</com:TActiveLinkButton>
+								<com:TActiveHyperLink id="linkTicket" CssClass="btn bg-purple" Target="_blank" >
+									<i class="icon fa fa-print"></i>
+								</com:TActiveHyperLink>
+							</prop:ItemTemplate>
+						</com:TTemplateColumn>
+						<com:TButtonColumn ID="DeleteColumn" CausesValidation="false" CommandName="delete" />
+				</com:TActiveDataGrid>
+				
+			</com:TActivePanel>
+		</div>
+	</div>
+	<div id="ModalVenta" class="modal" tabindex="-1" >
+		<div class="modal-dialog" style="width:1250px;">
+			<div class="modal-content">
+				<div class="modal-header">
+					<div class="col-sm-3">
+						Folio: <com:TActiveLabel id="lidventa" />
+						<com:TActiveHiddenField Id="id_ventas" />
+					</div>
+					<div class="col-sm-2">
+						D: <com:TActiveLabel id="lDescuento" />
+					</div>
+					<div class="col-sm-2">
+						T: <com:TActiveLabel id="lTotal" />
+					</div>
+					<div class="col-sm-2">
+						U: <com:TActiveLabel id="lUser" />
+					</div>
+					<div class="col-sm-3">
+						F: <com:TActiveLabel id="lFecha" />
+					</div>
+				</div>
+				<!-- /.box-header -->
+				<div class="modal-body">
+					<div class="form-group">
+						<div class="col-sm-6">
+							Cliente: <com:TActiveLabel id="lCliente" />
+						</div>
+						<div class="col-sm-6">
+							<com:TActiveLabel id="lEstatus" />
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="col-sm-12">
+							<com:TActiveLabel id="lExtra" />
+						</div>
+					</div>
+					<div id="lFormaPago" style="text-align: right;">
+						<com:TActiveLabel id="lFormapago" />
+					</div>
+					<div id="tpFormaPago" class="col-sm-12" style="text-align: right; display: none;">
+						<label>Forma de Pago:</label>
+						<com:TActiveHiddenField Id="formadepago" value="1" />
+							<label id="labelFormaPago1" class="badge bg-green" style="font-size: 14px;">
+								<i class="fa fa-money"></i>
+								Efectivo
+								<com:TActiveRadioButton ID="rdFormaPago1" Checked="true" GroupName="FormaPago" style="display:none;" Attributes.onchange="formapago(1)"/>
+							</label>
+							<label id="labelFormaPago2" class="badge bg-red" style="font-size: 14px;">
+								<i class="fa fa-credit-card"></i>
+								Tarjeta
+								<com:TActiveRadioButton ID="rdFormaPago2" GroupName="FormaPago" style="display:none;" Attributes.onchange="formapago(2)" />
+							</label>
+							<label id="labelFormaPago3" class="badge bg-red" style="font-size: 14px;">
+								<i class="fa fa-credit"></i>
+								Cheque
+								<com:TActiveRadioButton ID="rdFormaPago3" GroupName="FormaPago" style="display:none;" Attributes.onchange="formapago(3)" />
+							</label>
+							<label id="labelFormaPago4" class="badge bg-red" style="font-size: 14px;">
+								<i class="fa fa-briefcase"></i>
+								Traferencia
+								<com:TActiveRadioButton ID="rdFormaPago4" GroupName="FormaPago" style="display:none;" Attributes.onchange="formapago(4)" />
+							</label>
+							<label id="labelFormaPago5" class="badge bg-red" style="font-size: 14px;">
+								<i class="fa fa-cube"></i>
+								Otro
+								<com:TActiveRadioButton ID="rdFormaPago5" GroupName="FormaPago" style="display:none;" Attributes.onchange="formapago(5)" />
+							</label>
+						<com:TActiveLinkButton  id="btnGuardarModoPago"
+												CausesValidation="false"
+												CssClass="icon btn btn-success"
+												OnClick="Page.btnGuardarModoPago_OnClick"
+												Attributes.onclick="$('#lFormaPago').show();$('#tpFormaPago').hide();">
+							<i class="fa fa-save"></i>
+						</com:TActiveLinkButton>
+						<a id="btnCancelar" class="icon btn btn-danger" onclick="$('#lFormaPago').show();$('#tpFormaPago').hide();">
+							<i class="fa fa-close"></i>
+						</a>
+					</div>
+					<div class="form-group">
+						<com:TActiveRepeater ID="RpListaCompra" DataKeyField="id_ventas_detalle" OnItemDataBound="RpListaCompra_DataBound">
+							<prop:HeaderTemplate>
+								<table class="table table-striped">
+									<tr>
+										<th style="width: 10px">#</th>
+										<th>Codigo</th>
+										<th>Producto</th>
+										<th>Precio</th>
+										<th>Cant. </th>
+										<th>Desc. %</th>
+										<th>SubTotal</th>
+									</tr>
+							</prop:HeaderTemplate>
+							<prop:ItemTemplate>
+								<tr>
+									<td><com:TLiteral id="lnumero" /></td>
+									<td><%# $this->Data->ms_inventarios->ms_productos->codigo %></td>
+									<td><%# $this->Data->ms_inventarios->ms_productos->nombre %></td>
+									<td><com:TLiteral id="precio" /></td>
+									<td><%# $this->Data->cantidad %></td>
+									<td><com:TLiteral id="descuento" /></td>
+									<td><com:TLiteral id="subtotal" /></td>
+								</tr>
+							</prop:ItemTemplate>
+							<prop:FooterTemplate>
+								<tr>
+									<td colspan="7" style="text-align: right;">
+										<h4>Total: <b><com:TLiteral id="total" /></b></h4>
+									</td>
+								</tr>
+								</table>
+							</prop:FooterTemplate>
+						</com:TActiveRepeater>
+					</div>
+				</div>
+				<!-- /.box-body -->
+				<div class="modal-footer">
+					<com:TActiveLinkButton  id="btnBorrar_Ventas"
+											CausesValidation="false"
+											CssClass="icon btn btn-danger"
+											OnClick="Page.btnBorrar_Ventas_OnClick" >
+						<i class="fa fa-trash"></i>
+					</com:TActiveLinkButton>
+					<com:TActiveHyperLink id="linkTicket" CssClass="btn bg-purple" Target="_blank" >
+						<i class="icon fa fa-print"></i>
+					</com:TActiveHyperLink>
+					<a Class="btn btn-danger" data-dismiss="modal"  >
+						<i class="fa fa-close"></i>
+					</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<com:TClientScript>
+		
+		$(".btnbuscar" ).change(function() {
+			$("#<%= $this->btnBuscar->ClientID %>").click();
+		});
+		
+		
+		
+	function formapago(index){
+		for(i=1;i<=5;i++){
+			$("#labelFormaPago" + i).attr("class","badge bg-red");
+		}
+		$("#labelFormaPago"+index).attr("class","badge bg-green");
+		
+		$("#<%= $this->formadepago->ClientID %>").val(index);
+	}
+	</com:TClientScript>
+</com:TContent>

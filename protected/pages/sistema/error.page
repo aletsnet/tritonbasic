@@ -1,0 +1,29 @@
+<%@  Title="Ups - Expediente" %>
+<com:TContent ID="barra">
+    <li>
+        <com:THyperLink
+                        CssClass="linkTags"
+                        NavigateUrl="<%= $this->Service->constructUrl('inicio.inicio') %>">
+                        <i class="iconfa-home"></i>
+        </com:THyperLink>
+        <span class="separator"></span>
+    </li>
+    <li>Ocurrio un bug en es sistema, avise a su administra</li>
+</com:TContent>
+<com:TContent ID="titulo">
+    <div class="pageicon">
+        <span class="iconfa-user"></span>
+    </div>
+    <div class="pagetitle">
+        <h5>Ocurrio un bug en es sistema, avise a su administra</h5>
+        <h1>Ocurrio un bug en es sistema, avise a su administra</h1>
+    </div>
+</com:TContent>
+<com:TContent ID="Main">
+    <div class="widgetbox box-inverse">
+        <h4 class="widgettitle">
+            Ocurrio un bug en es sistema, avise a su administra
+        </h4>
+        
+    </div>
+</com:TContent>

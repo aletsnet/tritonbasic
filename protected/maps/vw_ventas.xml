@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<sqlMap namespace="Ventas">
+    <select id="vwVentas" resultClass="LMsVentas">
+        SELECT
+                a.*
+        FROM
+                ms_ventas a
+        INNER JOIN
+                ms_clientes b
+            ON
+                a.id_clientes = b.id_clientes
+        INNER JOIN
+                bs_usuarios c
+            ON
+                c.id_usuarios = a.id_usuarios
+        WHERE
+                a.estatus IN (2,3,4,5,6)
+            AND
+                a.id_sucursales = #idsucursales#
+            AND
+                if(#fechainicio# != '',(fecha_inicio BETWEEN #fechainicio# AND #fechafinal# OR fecha_termina BETWEEN #fechainicio# AND #fechafinal#),true)
+            AND
+                if(#tbuscar# != '', ( a.id_ventas like #tbuscar# OR b.nombre like #tbuscar# OR c.nombre like #tbuscar#), true)
+        ORDER BY
+            fecha_termina desc
+        LIMIT #offset#,#rows#
+    </select>
+    <select id="vwVentas_count" resultClass="int">
+        SELECT
+                COUNT(a.id_ventas)
+        FROM
+                ms_ventas a
+        INNER JOIN
+                ms_clientes b
+            ON
+                a.id_clientes = b.id_clientes
+        INNER JOIN
+                bs_usuarios c
+            ON
+                c.id_usuarios = a.id_usuarios
+        WHERE
+                a.estatus IN (2,3,4,5,6)
+            AND
+                a.id_sucursales = #idsucursales#
+            AND
+                if(#fechainicio# != '',(fecha_inicio BETWEEN #fechainicio# AND #fechafinal# OR fecha_termina BETWEEN #fechainicio# AND #fechafinal#),true)
+            AND
+                if(#tbuscar# != '', ( a.id_ventas like #tbuscar# OR b.nombre like #tbuscar# OR c.nombre like #tbuscar#), true)
+    </select>
+    <select id="vwVentas_exportar" resultClass="LMsVentas">
+        SELECT
+                a.*
+        FROM
+                ms_ventas a
+        INNER JOIN
+                ms_clientes b
+            ON
+                a.id_clientes = b.id_clientes
+        INNER JOIN
+                bs_usuarios c
+            ON
+                c.id_usuarios = a.id_usuarios
+        WHERE
+                a.estatus IN (2,3,4,5,6)
+            AND
+                a.id_sucursales = #idsucursales#
+            AND
+                if(#fechainicio# != '',(fecha_inicio BETWEEN #fechainicio# AND #fechafinal# OR fecha_termina BETWEEN #fechainicio# AND #fechafinal#),true)
+            AND
+                if(#tbuscar# != '', ( a.id_ventas like #tbuscar# OR b.nombre like #tbuscar# OR c.nombre like #tbuscar#), true)
+        ORDER BY
+            fecha_termina desc
+    </select>
+</sqlMap>

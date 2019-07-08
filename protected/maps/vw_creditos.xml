@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<sqlMap namespace="Creditos">
+    <select id="vwCreditos" resultClass="LMsVentas">
+        SELECT
+                a.*
+        FROM
+                ms_ventas a
+        INNER JOIN
+                ms_clientes b
+            ON
+                a.id_clientes = b.id_clientes
+        WHERE
+                a.tipo_venta = 5
+            AND
+                a.id_sucursales = #idsucursales#
+            AND ( b.nombre like #buscar#
+                    OR b.rfc like #buscar#
+                    OR b.telefono like #buscar#
+                    OR a.id_ventas = #buscar# )
+        GROUP BY a.id_clientes
+        ORDER BY
+            b.nombre asc
+        LIMIT #offset#,#rows#
+    </select>
+    <select id="vwCreditos_count" resultClass="int">
+        SELECT
+                COUNT(a.id_ventas)
+        FROM
+                ms_ventas a
+        INNER JOIN
+                ms_clientes b
+            ON
+                a.id_clientes = b.id_clientes
+        WHERE
+                a.tipo_venta = 5
+            AND
+                a.id_sucursales = #idsucursales#
+            AND ( b.nombre like #buscar#
+                    OR b.rfc like #buscar#
+                    OR b.telefono like #buscar#
+                    OR a.id_ventas = #buscar# )
+        GROUP BY a.id_clientes
+    </select>
+    <select id="vwCreditos_exportar" resultClass="LMsVentas">
+        SELECT
+                a.*
+        FROM
+                ms_ventas a
+        INNER JOIN
+                ms_clientes b
+            ON
+                a.id_clientes = b.id_clientes
+        WHERE
+                a.estatus = 5
+            AND
+                a.id_sucursales = #idsucursales#
+            AND ( b.nombre like #buscar#
+                    OR b.rfc like #buscar#
+                    OR b.telefono like #buscar#
+                    OR a.id_ventas = #buscar# )
+        GROUP BY a.id_clientes
+    </select>
+    <select id="vwCreditos_recaudado" resultClass="int">
+        SELECT
+                SUM(a.monto) montos
+        FROM
+            ct_creditos_abonos a
+        INNER JOIN
+                ms_ventas b
+            ON
+                b.id_ventas = a.id_ventas
+        WHERE
+            b.id_cortes = #idcorte#
+    </select>
+</sqlMap>

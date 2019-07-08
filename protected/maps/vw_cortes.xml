@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<sqlMap namespace="Cortes">
+    <select id="vwFoliosCortes" resultClass="LCtFoliosCreditos">
+        SELECT
+                f.*
+        FROM
+                ct_folios_creditos f
+        INNER JOIN
+                ms_ventas v
+            ON
+                f.id_ventas = v.id_ventas
+        WHERE
+                f.borrado = 0
+            AND
+                v.id_cortes = #id_corte#
+    </select>
+    <select id="vwProductosVendidos" resultClass="Array">
+        SELECT
+                a.codigo,
+                a.nombre,
+                concat(SUM(c.cantidad),' ', b.unidad )cantidad, 
+                SUM(c.precio_vendido) monto
+        FROM
+                ms_productos a
+        INNER JOIN
+                ms_inventarios b
+            ON
+                a.id_productos = b.id_productos
+        INNER JOIN
+                ct_ventas_detalle c
+            ON
+                b.id_inventarios = c.id_inventarios
+        INNER JOIN
+                ms_ventas d
+            ON d.id_ventas = c.id_ventas
+        WHERE
+            d.id_cortes = #id_corte#
+			AND 
+				d.estatus = 3
+        GROUP BY
+            b.id_inventarios
+        ORDER BY
+            monto DESC
+    </select>
+</sqlMap>

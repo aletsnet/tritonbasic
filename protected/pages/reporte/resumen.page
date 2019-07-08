@@ -1,0 +1,164 @@
+<com:TContent ID="Main">
+    <div class="col-md-9">
+        <div class="box box-success">
+			<div class="box-header">
+				<i class="fa fa-map"></i>
+				<h3 class="box-title">Mapa de incidencias</h3>
+			</div>
+            <div class="box-body pad table-responsive">
+                <div id="map" style="height: 800px;">
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="box box-success">
+			<div class="box-header">
+				<i class="fa fa-certificate"></i>
+				<h3 class="box-title">Herramientas</h3>
+			</div>
+            <div class="box-body pad table-responsive">
+                <com:TPanel id="lfuente" cssclass="form-group">
+                    <label class="control-label ">
+                        Fuente:
+					</label>
+                </com:TPanel>
+                <com:TPanel id="cfuente" cssclass="form-group ">
+						<com:TDropDownList ID="cmdFuente"
+                                                 AutoPostBack="true"
+                                                 cssclass="form-control"
+                                                 DataTextField="dependencia"
+                                                 DataValueField="id_usuarios"
+                                                 PromptText=" Todas las fuentes"
+                                                 PromptValue="0"
+                                                 Attributes.onchange="Msg('Por favor espere mientras se procesa la petición',true);"
+                                                 OnTextChanged="MostarMapa">
+                        </com:TDropDownList>
+                </com:TPanel>
+                <div class="form-group">
+                    <label class="control-label ">
+                        Semáforo:
+					</label>
+                </div>
+                <div class="form-group">
+					<div >
+						<com:TDropDownList ID="cmdPrioridad"
+                                           AutoPostBack="true"
+                                           cssclass="form-control"
+                                           DataTextField="opcion"
+                                           DataValueField="valor"
+                                           PromptText=" Todos los prioridad"
+                                           PromptValue="0"
+                                           CausesValidation="false"
+                                           Attributes.onchange="Msg('Por favor espere mientras se procesa la petición',true);"
+                                           OnTextChanged="MostarMapa">
+                        </com:TDropDownList>
+					</div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label ">
+                        Estruturas:
+					</label>
+                </div>
+                <div class="form-group">
+					<div >
+                        <com:TDropDownList ID="cmdArea"
+                                           AutoPostBack="true"
+                                           cssclass="form-control"
+                                           DataTextField="area"
+                                           DataValueField="id_areas"
+                                           PromptText=" Todas las estructuras"
+                                           PromptValue="0"
+                                           CausesValidation="false"
+                                           Attributes.onchange="Msg('Por favor espere mientras se procesa la petición',true);"
+                                           OnTextChanged="MostarMapa">
+                        </com:TDropDownList>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label ">
+                        Tema:
+					</label>
+                </div>
+                <div class="form-group">
+					<div>
+						<com:TDropDownList ID="cmdTema"
+                                           AutoPostBack="true"
+                                           cssclass="form-control"
+                                           DataTextField="opcion"
+                                           DataValueField="valor"
+                                           PromptText=" Todos los temas"
+                                           PromptValue="0"
+                                           CausesValidation="false"
+                                           Attributes.onchange="Msg('Por favor espere mientras se procesa la petición',true);"
+                                           OnTextChanged="MostarMapa">
+                        </com:TDropDownList>
+					</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="box box-success">
+			<div class="box-header">
+				<i class="fa fa-map-pin"></i>
+				<h3 class="box-title">Ficha técnica</h3>
+			</div>
+            <div class="box-body pad table-responsive">
+                <div class="form-group">
+                    <label id="lmunicipio" class="control-label ">
+                        
+					</label>
+                    <com:TActiveLinkButton id="btnFichaMap"
+                                           CssClass="btn btn-success btn-xs"
+                                           OnClick="btnFichaMap_OnClick"
+                                           CausesValidation="false">
+                        <prop:ClientSide OnLoading="Msg('Por favor espere mientras se procesa la petición',true);"
+                                         OnComplete="Msg('Listo',false);"
+                                         OnException="Msg('Se a producido un error, solicite apoyo técnico',true);"/>
+                        <i class="fa fa-refresh"></i>
+                    </com:TActiveLinkButton>
+                </div>
+                <com:TActiveLabel id="lFichaMap" cssclass="form-group" />
+                <com:TActiveHiddenField id="idMunicipios" />
+            </div>
+        </div>
+    </div>
+    
+    <com:TActiveLabel id="js"/>
+    
+    <script>
+        var map;
+        var inf;
+		$(document).ready(function(){
+		
+			var styles = [];
+			
+			map = new GMaps({
+				div: '#map',
+				lat: 20.464,
+				lng: -98.86,
+				zoom:9
+			});
+			
+			map.setOptions({styles: styles});
+			
+			map.addControl({
+                position: 'top_center',
+				content: '<div id="maplMunicipio">Estado de Hidalgo</div>',
+				style: {
+				  margin: '5px',
+				  padding: '1px 50px',
+				  border: 'solid 1px #717B87',
+				  background: '#fff'
+				}
+			});
+            
+            <%= $this->layers %>
+		});
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?async=2&key=AIzaSyA2ylKpHXD1d1UiNaly_dQHLzm9UVvS6UE"></script>
+    <script type="text/javascript" src="js/gmaps.js"></script>
+</com:TContent>

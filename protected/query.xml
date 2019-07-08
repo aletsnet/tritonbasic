@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<sqlMapConfig>
+    <sqlMap name="sistema_base"  resource="maps/vw_sistemas.xml" />
+    <sqlMap name="vwInventarios" resource="maps/vw_inventarios.xml" />
+    <sqlMap name="vwVentas"      resource="maps/vw_ventas.xml" />
+    <sqlMap name="vwCortes"      resource="maps/vw_cortes.xml" />
+    <sqlMap name="vwCreditos"    resource="maps/vw_creditos.xml" />
+    <sqlMap name="vwReportes"    resource="maps/vw_reportes.xml" />
+</sqlMapConfig>

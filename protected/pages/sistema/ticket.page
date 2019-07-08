@@ -1,0 +1,211 @@
+<com:TContent ID="Main">
+	<div class="col-md-12">
+		<div class="box box-primary">
+			<div class="box-header">
+				<i class="fa fa-expeditedssl"></i>
+				<h3 class="box-title">Configuración de ticket</h3>
+			</div>
+			<div class="box-body ">
+				<div class="row">
+					<div class="col-lg-6 form-horizontal">
+						<div class="form-group">
+							<div class="col-lg-12">
+								<com:TValidationSummary ValidationGroup="Captura"
+															CssClass="col-lg-12 alert alert-danger alert-bordered"
+															Display="Dynamic"
+															HeaderText="Campos requeridos" />
+							</div>
+						</div>
+						<div class="form-group" style="text-align: right;">
+							<div class="col-sm-12">
+								<com:TLinkButton ValidationGroup="Captura"
+													   cssclass="btn bg-olive"
+													   Attributes.type="button"
+													   OnClick="btnGuardar_OnClick" >
+									<i class="fa fa-save"></i> Guardar
+								</com:TLinkButton>
+								<a id="btnMostrar" class="btn bg-navy" onclick="mostrarTicket();">
+									<i class="fa fa-ticket"></i> Mostrar
+								</a>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-sm-2">
+								Foto:
+							</label>
+							<com:TActivePanel id="imagenfija" CssClass="col-lg-5">
+								<div class="panel-image hide-panel-body" id="foto">
+									<com:TActiveImage ID="foto"
+													  cssclass="img-responsive"
+													  ImageUrl="image/logo.png"
+													  attributes.onclick='jQuery("#<%= $this->fotoFile->ClientID %>").click();'/>
+									
+								</div>
+							</com:TActivePanel>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-lg-2">
+								
+							</label>
+							<div class="col-lg-10">
+								<com:TActiveLabel id="leyenda" Text="" />
+								<com:TActiveHiddenField Id="file" />
+								<com:TActiveHiddenField Id="imagetxt" />
+								<com:TActiveFileUpload id="fotoFile" MaxFileSize="2560000" OnFileUpload="fileUploaded" style="display: none;" attributes.onchange ="foto(this.value);" Attributes.accept="image/png, image/jpeg" >
+									<prop:ClientSide OnLoading="Msg('Por favor espere mientras se procesa la petición',true);"
+																 OnComplete="Msg('Listo',false);"
+																 OnException="Msg('Se a producido un error, solicite apoyo técnico',true);"/>
+								</com:TActiveFileUpload>
+								<com:TActiveLinkButton id="subir" cssclass="btnLoad" Text="Guardar Foto" OnClick="BtnSubirFoto" style="display: none;" />
+								<a id="btnArchivo" Class="btn bg-purple margin" onclick='jQuery("#<%= $this->fotoFile->ClientID %>").click();' >
+									<b>
+										<i class="glyphicon glyphicon-picture"></i>
+									</b>
+									Subir Foto
+								</a>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-2 control-label">
+								<com:TRequiredFieldValidator
+															 ValidationGroup="Captura"
+															 ControlToValidate="txtNombre"
+															 CssClass="glyphicon glyphicon-asterisk"
+															 Text=" "
+															 ErrorMessage="Nombre"
+															 Display="Dynamic" />
+								Nombre de la sucursal:
+							</label>
+							<div class="col-sm-10">
+								<com:TActiveTextBox ID="txtNombre"
+													CssClass="form-control"
+													Attributes.placeholder="Nombre de la sucursal"
+													Text=""
+													MaxLength="250"
+													AutoPostBack="false"
+													Attributes.autocomplete="off" />
+								<com:TActiveHiddenField Id="id_sucursal" />
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-2 control-label">
+								<com:TRequiredFieldValidator
+															 ValidationGroup="Captura"
+															 ControlToValidate="txtDireccion"
+															 CssClass="glyphicon glyphicon-asterisk"
+															 Text=" "
+															 ErrorMessage="Nombre"
+															 Display="Dynamic" />
+								Dirección:
+							</label>
+							<div class="col-sm-10">
+								<com:TActiveTextBox ID="txtDireccion"
+													TextMode="MultiLine"
+													CssClass="form-control"
+													Attributes.placeholder="Dirección de la sucursal"
+													Text=""
+													MaxLength="2550"
+													AutoPostBack="false"
+													Attributes.autocomplete="off" />
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-2 control-label">
+								Corte del día:
+							</label>
+							<div class="col-sm-10">
+								<label>
+									<com:TActiveCheckBox ID="ckCorte" AutoPostBack="false" />
+									Compartido
+								</label>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-2 control-label">
+								<com:TRequiredFieldValidator
+															 ValidationGroup="Captura"
+															 ControlToValidate="txtEncabezado"
+															 CssClass="glyphicon glyphicon-asterisk"
+															 Text=" "
+															 ErrorMessage="Nombre"
+															 Display="Dynamic" />
+								Encabezado:
+							</label>
+							<div class="col-sm-10">
+								<com:TActiveTextBox ID="txtEncabezado"
+													TextMode="MultiLine"
+													CssClass="form-control"
+													Attributes.placeholder="Encabezado del ticket"
+													Text=""
+													MaxLength="2550"
+													AutoPostBack="false"
+													Attributes.autocomplete="off" />
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-2 control-label">
+								<com:TRequiredFieldValidator
+															 ValidationGroup="Captura"
+															 ControlToValidate="txtPiePagina"
+															 CssClass="glyphicon glyphicon-asterisk"
+															 Text=" "
+															 ErrorMessage="Nombre"
+															 Display="Dynamic" />
+								Pie de pagína:
+							</label>
+							<div class="col-sm-10">
+								<com:TActiveTextBox ID="txtPiePagina"
+													TextMode="MultiLine"
+													CssClass="form-control"
+													Attributes.placeholder="Pie de pagína del ticket"
+													Text=""
+													MaxLength="2550"
+													AutoPostBack="false"
+													Attributes.autocomplete="off" />
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-2 control-label">
+								Impresión del ticket:
+							</label>
+							<div class="col-sm-10">
+								<div class="checkbox">
+									<label>
+										<com:TActiveCheckBox ID="ckTicket" AutoPostBack="false" />
+										Automática
+									</label> <br />
+									<label>
+										<com:TActiveCheckBox ID="ckMostrar" AutoPostBack="false" />
+										Mostrar impresoras
+									</label>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-6" style="height: 600px;">
+						<div class="row" style="height: 100%;">
+							<div class="col-sm-12" style="height: 100%;">
+								<iframe id="ifTicket" src="<%= $this->Service->constructUrl('sistema.viewticket') %>" frameborder="0" style="height: 100%; width: 100%;">
+									Navegador no soporta iframe
+								</iframe>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script>
+		function mostrarTicket(){
+			var foto = jQuery("#<%= $this->file->ClientID %>").val();
+			var sucursal = jQuery("#<%= $this->txtNombre->ClientID %>").val();
+			var top = jQuery("#<%= $this->txtEncabezado->ClientID %>").val();
+			var button = jQuery("#<%= $this->txtPiePagina->ClientID %>").val();
+			var impresoras = jQuery("#<%= $this->ckMostrar->ClientID %>").val();
+			var automatico = jQuery("#<%= $this->ckTicket->ClientID %>").val();
+			var url = "<%= $this->Service->constructUrl('sistema.viewticket') %>";
+			url = url + "&modo=2&foto="+foto+"&sucursal="+sucursal+"&top="+top+"&button="+button+"&impresoras="+impresoras+"&automatico="+automatico;
+			$("#ifTicket").attr("src",url);
+		}
+	</script>
+</com:TContent>

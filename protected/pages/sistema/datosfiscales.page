@@ -1,0 +1,206 @@
+<com:TContent ID="Main">
+	<div class="col-md-12">
+		<div class="box box-primary">
+			<div class="box-header">
+				<i class="fa fa-bank"></i>
+				<h3 class="box-title">Datos fiscales</h3>
+			</div>
+			<div class="box-body form-horizontal">
+				<div class="form-group">
+					<com:TValidationSummary ValidationGroup="Captura"
+											CssClass="col-lg-12 alert alert-danger alert-bordered"
+											Display="Dynamic"
+											HeaderText="Campos requeridos" />
+					
+					<com:TActiveHiddenField Id="idcontratos" />
+					<com:TActiveHiddenField Id="idtipo" />
+					
+				</div>
+				<div class="form-group">
+					<label class="control-label col-sm-2">
+						Logo:
+					</label>
+					<com:TActivePanel id="imagenfija" CssClass="col-lg-2">
+						<div class="panel-image hide-panel-body" id="foto">
+							<com:TActiveImage ID="logo"
+											  cssclass="img-responsive"
+											  attributes.onclick='jQuery("#<%= $this->fotoFile->ClientID %>").click();'/>
+						</div>
+					</com:TActivePanel>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-lg-2">
+						
+					</label>
+					<div class="col-lg-10">
+						<com:TActiveLabel id="leyenda" Text="" />
+						<com:TActiveHiddenField Id="file" />
+						<com:TActiveHiddenField Id="imagetxt" />
+						<com:TActiveFileUpload id="fotoFile" MaxFileSize="2560000" OnFileUpload="fileUploaded" style="display: none;" attributes.onchange ="foto(this.value);" Attributes.accept="image/png, image/jpeg" >
+							<prop:ClientSide OnLoading="Msg('Por favor espere mientras se procesa la petición',true);"
+														 OnComplete="Msg('Listo',false);"
+														 OnException="Msg('Se a producido un error, solicite apoyo técnico',true);"/>
+						</com:TActiveFileUpload>
+						<com:TActiveLinkButton id="subir" cssclass="btnLoad" Text="Guardar Foto" OnClick="BtnSubirFoto" style="display: none;" />
+						<a id="btnArchivo" Class="btn bg-purple margin" onclick='jQuery("#<%= $this->fotoFile->ClientID %>").click();' >
+							<b>
+								<i class="glyphicon glyphicon-picture"></i>
+							</b>
+							Subir logo
+						</a>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label">
+						<com:TRequiredFieldValidator
+													 ValidationGroup="Captura"
+													 ControlToValidate="txtNombre"
+													 CssClass="glyphicon glyphicon-asterisk"
+													 Text=" "
+													 ErrorMessage="Nombre"
+													 Display="Dynamic" />
+                        <com:TRegularExpressionValidator ValidationGroup="Captura"
+														 ControlToValidate="txtNombre"
+														 CssClass="glyphicon glyphicon-asterisk"
+														 ErrorMessage =" Nombre"
+														 Text=" "
+														 RegularExpression="[A-ZÑa-zñ ]+"
+														 Display="Dynamic"/>
+						Nombre:
+					</label>
+					<div class="col-sm-6">
+						<com:TActiveTextBox ID="txtNombre"
+											CssClass="form-control"
+											Attributes.placeholder="Nombre completo"
+											Text=""
+											MaxLength="240"
+											AutoPostBack="false"
+											Attributes.autocomplete="off" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label">
+						<com:TRequiredFieldValidator
+													 ValidationGroup="Captura"
+													 ControlToValidate="txtRfc"
+													 CssClass="glyphicon glyphicon-asterisk"
+													 Text=" "
+													 ErrorMessage="RFC"
+													 Display="Dynamic" />
+                        <com:TRegularExpressionValidator ValidationGroup="Captura"
+														 ControlToValidate="txtRfc"
+														 CssClass="glyphicon glyphicon-asterisk"
+														 ErrorMessage =" Nombre"
+														 Text=" "
+														 RegularExpression="[a-zA-Z]{3,4}(\d{6})((\D|\d){2,3})?$"
+														 Display="Dynamic"/>
+						RFC:
+					</label>
+					<div class="col-sm-6">
+						<com:TActiveTextBox ID="txtRfc"
+											AutoPostBack="false"
+											CssClass="form-control"
+											Attributes.autocomplete="off"
+											Attributes.placeholder="RFC"
+											Text=""
+											MaxLength="150" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label">
+						<com:TRequiredFieldValidator
+													 ValidationGroup="Captura"
+													 ControlToValidate="txtRazonSocial"
+													 CssClass="glyphicon glyphicon-asterisk"
+													 Text=" "
+													 ErrorMessage=" Razón Social"
+													 Display="Dynamic" />
+                        <com:TRegularExpressionValidator ValidationGroup="Captura"
+														 ControlToValidate="txtNombre"
+														 CssClass="glyphicon glyphicon-asterisk"
+														 ErrorMessage =" Razón Social"
+														 Text=" "
+														 RegularExpression="[A-ZÑa-zñ ]+"
+														 Display="Dynamic"/>
+						Razón Social:
+					</label>
+					<div class="col-sm-6">
+						<com:TActiveTextBox ID="txtRazonSocial"
+											CssClass="form-control"
+											Attributes.placeholder="Razón social"
+											Text=""
+											MaxLength="240"
+											AutoPostBack="false"
+											Attributes.autocomplete="off" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label">
+						<com:TRequiredFieldValidator ValidationGroup="Captura"
+													 ControlToValidate="cmdRegimen"
+													 CssClass="glyphicon glyphicon-asterisk"
+													 Text=" "
+													 ErrorMessage="RFC"
+													 Display="Dynamic" />
+						Regime fiscal:
+					</label>
+					<div class="col-sm-3">
+						<com:TActiveDropDownList ID="cmdRegimen"
+                                                 AutoPostBack="false"
+                                                 cssclass="form-control"
+                                                 DataTextField="opcion"
+                                                 DataValueField="valor"
+                                                 PromptText=" "
+                                                 PromptValue="0" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label">
+						<com:TRequiredFieldValidator
+													 ValidationGroup="Captura"
+													 ControlToValidate="txtTelefono"
+													 CssClass="glyphicon glyphicon-asterisk"
+													 Text=" "
+													 ErrorMessage="Teléfono"
+													 Display="Dynamic" />
+						Teléfono:
+					</label>
+					<div class="col-sm-3">
+						<com:TActiveTextBox ID="txtTelefono"
+											AutoPostBack="false"
+											CssClass="form-control"
+											Attributes.autocomplete="off"
+											Attributes.placeholder="Teléfono o movil "
+											Text=""
+											MaxLength="10" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label text-red">
+						Nota:
+					</label>
+					<div class="col-sm-5">
+						<dd class="text-red">
+                            ** Usar mayúsculas
+						</dd>
+						
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-sm-6">
+						
+					</div>
+					<div class="col-sm-6">
+						<com:TLinkButton  id="btnGuardar"
+												ValidationGroup="Captura"
+												CssClass="btn btn-success"
+												OnClick="btnGuardar_OnClick" >
+							<i class="fa fa-save"></i> Guardar
+						</com:TLinkButton>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</com:TContent>
+            

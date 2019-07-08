@@ -1,0 +1,263 @@
+<com:TContent ID="Main">
+	<div class="col-md-12">
+		<div class="box box-primary">
+			<div class="box-header">
+				<i class="fa fa-tasks"></i>
+				<h3 class="box-title">Dependencia</h3>
+			</div>
+			<div class="box-body pad table-responsive">
+				<div class="form-group">
+					<div class="col-lg-12">
+						<com:TLinkButton Id="btnNuevo"
+										 CausesValidation="false"
+										 cssclass="btn btn-default"
+										 Attributes.type="button"
+										 OnClick="btnNuevo_OnClick" >
+							<i class="glyphicon glyphicon-file"></i>
+							Nuevo
+						</com:TLinkButton>
+						<com:THyperLink cssclass="btn btn-default"
+										NavigateUrl="<%= $this->Service->constructUrl('sistema.dependencias') %>" >
+							<b>
+								<i class="glyphicon glyphicon-search"></i>
+							</b>
+							Buscar
+						</com:THyperLink>
+						
+					</div>
+				</div>
+			</div>
+			<com:TPanel id="tpanelAviso" cssclass="form-group">
+				<div class="alert alert-success alert-styled-left alert-arrow-left alert-bordered">
+					<button type="button" class="close" data-dismiss="alert"><span>&times;</span><span class="sr-only">Close</span></button>
+					<span class="text-semibold">Guardado</span> El registro se guardo sin problemas.
+				</div>
+				<com:TClientScript>
+					$(<%= $this->tpanelAviso->Clientid %>).hide(4000);
+				</com:TClientScript>
+			</com:TPanel>
+			<com:TPanel id="Formulario" cssclass="box-body form-horizontal">
+				<div class="form-group">
+					<div class="col-lg-12">
+					<com:TValidationSummary ValidationGroup="Captura"
+												CssClass="col-lg-12 alert alert-danger alert-bordered"
+												Display="Dynamic"
+												HeaderText="Campos requeridos" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-sm-2">
+						Logo:
+					</label>
+					<com:TActivePanel id="imagenfija" CssClass="col-lg-2">
+						<div class="panel-image hide-panel-body" id="foto">
+							<com:TActiveImage ID="foto"
+											  cssclass="img-responsive"
+											  ImageUrl="image/logos/pri.png"
+											  attributes.onclick='jQuery("#<%= $this->fotoFile->ClientID %>").click();'/>
+							
+						</div>
+					</com:TActivePanel>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-lg-2">
+						
+					</label>
+					<div class="col-lg-10">
+						<com:TActiveLabel id="leyenda" Text="" />
+						<com:TActiveHiddenField Id="file" />
+						<com:TActiveHiddenField Id="imagetxt" />
+						<com:TActiveFileUpload id="fotoFile" MaxFileSize="2560000" OnFileUpload="fileUploaded" style="display: none;" attributes.onchange ="foto(this.value);" Attributes.accept="image/png, image/jpeg" >
+							<prop:ClientSide OnLoading="Msg('Por favor espere mientras se procesa la petición',true);"
+														 OnComplete="Msg('Listo',false);"
+														 OnException="Msg('Se a producido un error, solicite apoyo técnico',true);"/>
+						</com:TActiveFileUpload>
+						<com:TActiveLinkButton id="subir" cssclass="btnLoad" Text="Guardar Foto" OnClick="BtnSubirFoto" style="display: none;" />
+						<a id="btnArchivo" Class="btn bg-purple margin" onclick='jQuery("#<%= $this->fotoFile->ClientID %>").click();' >
+							<b>
+								<i class="glyphicon glyphicon-picture"></i>
+							</b>
+							Subir logo
+						</a>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label">
+						<com:TRequiredFieldValidator
+													 ValidationGroup="Captura"
+													 ControlToValidate="txtDependencia"
+													 CssClass="glyphicon glyphicon-asterisk"
+													 Text=" "
+													 ErrorMessage="Sucursal"
+													 Display="Dynamic" />
+						Sucursal:
+					</label>
+					<div class="col-sm-6">
+						<com:TActiveTextBox ID="txtDependencia"
+											CssClass="form-control"
+											Attributes.placeholder="Nombre de la sucursal"
+											Text=""
+											MaxLength="250"
+											AutoPostBack="false"
+											Attributes.autocomplete="off" />
+						<com:TActiveHiddenField Id="id_dependencias" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label">
+						<com:TRequiredFieldValidator
+													 ValidationGroup="Captura"
+													 ControlToValidate="txtDireccion"
+													 CssClass="glyphicon glyphicon-asterisk"
+													 Text=" "
+													 ErrorMessage="Dirección"
+													 Display="Dynamic" />
+						Dirección:
+					</label>
+					<div class="col-sm-6">
+						<com:TActiveTextBox ID="txtDireccion"
+											AutoPostBack="false"
+											CssClass="form-control"
+											Attributes.autocomplete="off"
+											Attributes.placeholder="Ubicación de la sucursal"
+											Text=""
+											MaxLength="500" />
+					</div>
+				</div>
+				<div class="box-footer">
+					<label class="col-sm-6 control-label">
+						<i class="glyphicon glyphicon-print"></i> Configuración de ticket
+					</label>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label">
+						Encabezado del ticket:
+					</label>
+					<div class="col-sm-10">
+						<com:THtmlArea ID="TareaEncabezado" CssClass="form-control" Text="" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label">
+						Pie del ticket:
+					</label>
+					<div class="col-sm-10">
+						<com:THtmlArea ID="TareaPie" CssClass="form-control" Text="" />
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-sm-6">
+						
+					</div>
+					<div class="col-sm-6">
+						<com:TLinkButton  id="btnGuardar"
+												ValidationGroup="Captura"
+												CssClass="btn btn-success"
+												OnClick="btnGuardar_OnClick" >
+							<i class="fa fa-save"></i> Guardar
+						</com:TLinkButton>
+					</div>
+				</div>
+			</com:TPanel>
+			<com:TPanel id="Buscador" cssclass="box-body form-horizontal">
+				<div class="form-group">
+					<label class="col-sm-2 control-label">
+						Nombre:
+					</label>
+					<div class="col-sm-5">
+						<com:TActiveTextBox ID="txtBuscar"
+											AutoPostBack="false"
+											CssClass="form-control"
+											Text=""
+											MaxLength="100" />
+					</div>
+					<div class="col-sm-5">
+						<com:TActiveLinkButton  id="btnBuscar"
+												CausesValidation="false"
+												CssClass="btn btn-info"
+												OnClick="btnBuscar_OnClick" >
+							<i class="fa fa-search"></i> 
+							<prop:ClientSide OnLoading="Msg('Por favor espere mientras se procesa la petición',true);"
+														 OnComplete="Msg('Listo',false);"
+														 OnException="Msg('Se a producido un error, solicite apoyo técnico',true);"/>
+						</com:TActiveLinkButton>
+						<com:TLinkButton  id="btnExportarXLS"
+												CausesValidation="false"
+												CssClass="btn btn-default"
+												OnClick="btnExportarXLS_OnClick" >
+							<i class="fa fa-file-excel-o"></i>
+						</com:TLinkButton>
+						<com:THyperLink id="linkPdf" CssClass="btn btn-default" Target="_blank" >
+							<i class="fa fa-file-pdf-o"></i>
+						</com:THyperLink>
+					</div>
+				</div>
+			</com:TPanel>
+			<com:TPanel id="tpSinDatos" CssClass="table-responsive">
+				<table class="table table-bordered">
+					<thead>
+						<tr>
+							<th>#</th>
+							<th>Usuario</th>
+							<th>Nombre</th>
+							<th>Cargo</th>
+							<th>Sucursal</th>
+							<th>Rol</th>
+							<th>Acceso</th>
+							<th>*</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td colspan="7">No hay elementos que mostrar</td>
+						</tr>
+					</tbody>
+				</table>
+			</com:TPanel>
+			<com:TPanel id="tpDatos" cssclass="table-responsive">
+				<div class="form-group">
+				<com:TActiveDataGrid ID="dgTabla"
+									 PageSize="10"
+									 PagerStyle.Mode="Numeric"
+									 DataKeyField="id_dependencias"
+									 AutoGenerateColumns="false"
+									 CssClass="table table-bordered"
+									 OnPageIndexChanged="changePage"
+									 AllowPaging="true"
+									 AllowCustomPaging="true"
+									 PagerStyle.Position="TopAndBottom"
+									 PagerStyle.Visible="true"
+									 PagerStyle.NextPageText="Sig."
+									 PagerStyle.PrevPageText="Ant."
+									 PagerStyle.PageButtonCount="4";
+									 OnPagerCreated="pagerCreated"
+									 OnItemCreated="itemCreated"
+									 OnDeleteCommand="deleteItem" >
+						<com:TTemplateColumn HeaderText="#" ID="rowI">
+							<prop:ItemTemplate>
+								<com:TLiteral id="lNumero" />
+							</prop:ItemTemplate>
+						</com:TTemplateColumn>
+						<com:TTemplateColumn HeaderText="Logo" ID="rowImagen">
+							<prop:ItemTemplate>
+								<com:TActiveImage ID="logo" CssClass="img-circle" ImageUrl="image/logos/pri.png" Style="width: 64px;" />
+							</prop:ItemTemplate>
+						</com:TTemplateColumn>
+						<com:TBoundColumn HeaderText="Coordinación" DataField="dependencia" />
+						<com:TBoundColumn HeaderText="Dirección" DataField="direccion" />
+						<com:TTemplateColumn HeaderText="*" ID="rowBotonos">
+							<prop:ItemTemplate>
+								<com:TLinkButton Id="btnEditar"
+												 CausesValidation="false"
+												 cssclass="btn btn-default"
+												 OnClick="Page.btnEditar_OnClick" >
+										<i class="fa fa-file-text-o"></i>
+								</com:TLinkButton>
+							</prop:ItemTemplate>
+						</com:TTemplateColumn>
+					</com:TActiveDataGrid>
+				</div>
+			</com:TPanel>
+		</div>
+	</div>
+</com:TContent>

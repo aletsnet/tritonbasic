@@ -1,0 +1,400 @@
+<com:TContent ID="Main">
+    <div class="col-md-12">
+        <div class="box box-primary">
+			<div class="box-header">
+				<i class="fa fa-user"></i>
+				<h3 class="box-title">Perfil de usuario</h3>
+			</div>
+            <div class="box-body form-horizontal">
+                <com:TActivePanel id="tpanelAviso" cssclass="form-group">
+                    <div class="alert alert-success alert-styled-left alert-arrow-left alert-bordered">
+                        <button type="button" class="close" data-dismiss="alert"><span>&times;</span><span class="sr-only">Close</span></button>
+                        <span class="text-semibold">Guardado</span> El registro se guardo sin problemas.
+                    </div>
+                    <com:TClientScript>
+                        $(<%= $this->tpanelAviso->Clientid %>).hide(4000);
+                    </com:TClientScript>
+                </com:TActivePanel>
+                <div class="form-group">
+                    <div class="col-lg-12">
+                    <com:TValidationSummary ValidationGroup="PerfilSave"
+                                                CssClass="col-lg-12 alert alert-danger alert-bordered"
+                                                Display="Dynamic"
+                                                HeaderText="Campos requeridos" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-sm-3">
+                        Foto:
+                    </label>
+                    <com:TActivePanel id="camara" CssClass="col-lg-5" visible="false">
+                        <style>
+                            #container {
+                                margin: 0px auto;
+                                width: 500px;
+                                height: 375px;
+                                border: 10px #333 solid;
+                            }
+                        </style>
+                        <div id="container" >
+                            <video autoplay="true" id="camara" class="col-lg-12" >
+                             
+                            </video>
+                            <canvas id="foto" width="500" height="375"></canvas>
+                        </div>
+                        <com:TClientScript>
+                            //Nos aseguramos que estén definidas
+                            //algunas funciones básicas
+                            window.URL = window.URL || window.webkitURL;
+                            navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia ||
+                            function() {
+                                alert('Su navegador no soporta navigator.getUserMedia().');
+                            };
+                            
+                            //Este objeto guardará algunos datos sobre la cámara
+                            window.datosVideo = {
+                                'StreamVideo': null,
+                                'url': null
+                            }
+                            
+                            function inicia() {
+                                //Pedimos al navegador que nos da acceso a 
+                                //algún dispositivo de video (la webcam)
+                                navigator.getUserMedia({
+                                    'audio': false,
+                                    'video': true
+                                }, function(streamVideo) {
+                                    datosVideo.StreamVideo = streamVideo;
+                                    datosVideo.url = window.URL.createObjectURL(streamVideo);
+                                    jQuery('#camara').attr('src', datosVideo.url);
+                            
+                                }, function() {
+                                    alert('No fue posible obtener acceso a la cámara.');
+                                });
+                            
+                            }
+                            
+                            function detener() {
+                            
+                                if (datosVideo.StreamVideo) {
+                                    datosVideo.StreamVideo.stop();
+                                    window.URL.revokeObjectURL(datosVideo.url);
+                                }
+                            
+                            }
+                            
+                            function captura_foto() {
+                                var oCamara, oFoto, oContexto, w, h;
+                            
+                                oCamara = jQuery('#camara');
+                                oFoto = jQuery('#foto');
+                                w = oCamara.width();
+                                h = oCamara.height();
+                                oFoto.attr({
+                                    'width': w,
+                                    'height': h
+                                });
+                                oContexto = oFoto[0].getContext('2d');
+                                oContexto.drawImage(oCamara[0], 0, 0, w, h);
+                                if(oCamara.paused || oCamara.ended) return false; // if no video, exit here
+                                detener();
+                                
+                                //context.drawImage(v,0,0,w,h); // draw video feed to canvas
+                                
+                                var uri = oFoto[0].toDataURL("image/png"); // convert canvas to data URI
+                                //console.log(uri); // uncomment line to log URI for testing
+                                
+                                //imgtag.src = uri; // add URI to IMG tag src
+                                $("#<%= $this->imagetxt->ClientID %>").val(uri);
+                                oFoto.hide();
+                                jQuery("#<%= $this->btnCapturaCamara->ClientID %>").click();
+                            }
+                            
+                            inicia();
+                        </com:TClientScript>
+                    </com:TActivePanel>
+                    <com:TActivePanel id="imagenfija" CssClass="col-lg-5">
+                        <div class="panel-image hide-panel-body" id="foto">
+                            <com:TActiveImage ID="foto"
+                                              cssclass="img-responsive"
+                                              ImageUrl="image/logos/pri.png"
+                                              Style="width: 128px;"
+                                              attributes.onclick='jQuery("#<%= $this->fotoFile->ClientID %>").click();'/>
+                            
+                        </div>
+                    </com:TActivePanel>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-lg-3">
+                        
+                    </label>
+                    <div class="col-lg-9">
+                        <com:TActiveLabel id="leyenda" Text="" />
+                        <com:TActiveHiddenField Id="file" />
+                        <com:TActiveHiddenField Id="imagetxt" />
+                        <com:TActiveFileUpload id="fotoFile" MaxFileSize="2560000" OnFileUpload="fileUploaded" style="display: none;" attributes.onchange ="foto(this.value);" Attributes.accept="image/png, image/jpeg" >
+                            <prop:ClientSide OnLoading="Msg('Por favor espere mientras se procesa la petición',true);"
+                                                         OnComplete="Msg('Listo',false);"
+                                                         OnException="Msg('Se a producido un error, solicite apoyo técnico',true);"/>
+                        </com:TActiveFileUpload>
+                        <com:TActiveLinkButton id="subir" cssclass="btnLoad" Text="Guardar Foto" OnClick="BtnSubirFoto" style="display: none;" />
+                        <a id="btnArchivo" Class="btn bg-purple margin" onclick='jQuery("#<%= $this->fotoFile->ClientID %>").click();' >
+                            <b>
+                                <i class="glyphicon glyphicon-picture"></i>
+                            </b>
+                            Subir Foto
+                        </a>
+                        <com:TActiveLinkButton  id="btnCamara"
+                                          CssClass="btn bg-maroon margin"
+                                          OnClick="BtnCamara" >
+                            <b>
+                                <i class="glyphicon glyphicon-facetime-video"></i>
+                            </b>
+                            Usar Cámara
+                            <prop:ClientSide OnLoading="Msg('Por favor espere mientras se procesa la petición',true);"
+                                                         OnComplete="Msg('Listo',false);"
+                                                         OnException="Msg('Se a producido un error, solicite apoyo técnico',true);"/>
+                        </com:TActiveLinkButton>
+                        <com:TActiveHyperLink id="btnTomar"
+                                        CssClass="btn bg-olive margin"
+                                        visible="false"
+                                        Attributes.onclick="captura_foto();">
+                            <b>
+                                <i class="glyphicon glyphicon-ok"></i>
+                            </b>
+                            Tomar Foto
+                        </com:TActiveHyperLink>
+                        <com:TActiveButton id="btnCapturaCamara"
+                                               Text="Guardar Foto"
+                                               OnClick="btnCapturaCamara"
+                                               ValidationGroup="novalidado"
+                                               style="display: none;" >
+                        </com:TActiveButton>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">
+                        <com:TRequiredFieldValidator
+                                                     ValidationGroup="PerfilSave"
+                                                     ControlToValidate="txtNombre"
+                                                     CssClass="glyphicon glyphicon-asterisk"
+                                                     Text=" "
+                                                     ErrorMessage="Nombre"
+                                                     Display="Dynamic" />
+                        Nombre:
+                    </label>
+                    <div class="col-sm-9">
+                        <com:TActiveTextBox ID="txtNombre"
+                                            CssClass="form-control"
+                                            Attributes.placeholder="Nombre completo"
+                                            Text=""
+                                            MaxLength="240"
+                                            AutoPostBack="false"
+                                            Attributes.autocomplete="off" />
+                        <com:TActiveHiddenField Id="id_usuarios" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">
+                        <com:TRequiredFieldValidator
+                                                     ValidationGroup="PerfilSave"
+                                                     ControlToValidate="txtCargo"
+                                                     CssClass="glyphicon glyphicon-asterisk"
+                                                     Text=" "
+                                                     ErrorMessage="Cargo"
+                                                     Display="Dynamic" />
+                        Cargo:
+                    </label>
+                    <div class="col-sm-9">
+                        <com:TActiveTextBox ID="txtCargo"
+                                            AutoPostBack="false"
+                                            CssClass="form-control"
+                                            Attributes.autocomplete="off"
+                                            Attributes.placeholder="Cargo o actividad "
+                                            Text=""
+                                            MaxLength="150" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">
+                        <com:TRequiredFieldValidator
+                                                     ValidationGroup="PerfilSave"
+                                                     ControlToValidate="txtEmail"
+                                                     CssClass="glyphicon glyphicon-asterisk"
+                                                     Text=" "
+                                                     ErrorMessage="Email es requerido"
+                                                     Display="Dynamic" />
+                        <com:TRegularExpressionValidator ValidationGroup="PerfilSave"
+                                                         ControlToValidate="txtEmail"
+                                                         CssClass="glyphicon glyphicon-asterisk"
+                                                         Text=" "
+                                                         ErrorMessage="Email no es valido"
+                                                         Display="Dynamic"
+                                                         RegularExpression="[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})$"/>
+                        Email:
+                    </label>
+                    <div class="col-sm-9">
+                        <com:TActiveTextBox ID="txtEmail"
+                                            AutoPostBack="false"
+                                            CssClass="form-control"
+                                            Attributes.autocomplete="off"
+                                            Attributes.placeholder="usuario@dominio.ej"
+                                            Text=""
+                                            MaxLength="200" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">
+                        <com:TRequiredFieldValidator
+                                                     ValidationGroup="PerfilSave"
+                                                     ControlToValidate="txtTelefono"
+                                                     CssClass="glyphicon glyphicon-asterisk"
+                                                     Text=" "
+                                                     ErrorMessage="Telefono"
+                                                     Display="Dynamic" />
+                        <com:TRegularExpressionValidator ValidationGroup="PerfilSave"
+                                                         ControlToValidate="txtTelefono"
+                                                         CssClass="glyphicon glyphicon-asterisk"
+                                                         Text=" "
+                                                         ErrorMessage="Teléfono"
+                                                         Display="Dynamic"
+                                                         RegularExpression="\d{10}"/>
+                        Teléfono:
+                    </label>
+                    <div class="col-sm-9">
+                        <com:TActiveTextBox ID="txtTelefono"
+                                            AutoPostBack="false"
+                                            CssClass="form-control"
+                                            Attributes.autocomplete="off"
+                                            Attributes.placeholder="ej. 7712342344"
+                                            Text=""
+                                            MaxLength="200" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">
+                        <com:TRequiredFieldValidator
+                                                     ValidationGroup="PerfilSave"
+                                                     ControlToValidate="loginvalido"
+                                                     CssClass="glyphicon glyphicon-asterisk"
+                                                     Text=" "
+                                                     ErrorMessage="Usuario valido"
+                                                     Display="Dynamic" />
+                        <com:TRequiredFieldValidator
+                                                     ValidationGroup="PerfilSave"
+                                                     ControlToValidate="txtUsuario"
+                                                     CssClass="glyphicon glyphicon-asterisk"
+                                                     Text=" "
+                                                     ErrorMessage="Usuario"
+                                                     Display="Dynamic" />
+                        <com:TRegularExpressionValidator ValidationGroup="PerfilSave"
+                                                         ControlToValidate="txtUsuario"
+                                                         CssClass="glyphicon glyphicon-asterisk"
+                                                         Text=" "
+                                                         ErrorMessage="Codigo no es valido"
+                                                         Display="Dynamic"
+                                                         RegularExpression="\S+"/>
+                        <com:TRegularExpressionValidator ValidationGroup="buscarUsuario"
+                                                         ControlToValidate="txtUsuario"
+                                                         CssClass="glyphicon glyphicon-asterisk"
+                                                         Text=" "
+                                                         ErrorMessage="Codigo no es valido"
+                                                         Display="Dynamic"
+                                                         RegularExpression="\S+"/>
+                        Usuario:
+                    </label>
+                    <div class="col-sm-9">
+                        <div class="input-group">
+                            <com:TActiveTextBox ID="txtUsuario"
+                                                AutoPostBack="true"
+                                                CssClass="form-control"
+                                                Attributes.autocomplete="off"
+                                                Attributes.placeholder="Usuario"
+                                                Text=""
+                                                MaxLength="20"
+                                                CausesValidation="false"
+                                                OnTextChanged="txtUsuario_OnTextChanged">
+                                <prop:ClientSide OnLoading="Msg('Por favor espere mientras se procesa la petición',true);"
+                                                 OnComplete="Msg('Listo',false);"
+                                                 OnException="Msg('Se a producido un error, solicite apoyo técnico',true);"/>
+                            </com:TActiveTextBox>
+                            <com:TActiveLabel id="lbstatus" CssClass="input-group-addon">
+                                <i class="fa fa-certificate"></i>
+                            </com:TActiveLabel>
+                        </div>
+                        <com:TActiveHiddenField Id="loginvalido" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">
+                        <com:TCustomValidator ValidationGroup="PerfilSave"
+                                              ControlToValidate="txtPassword"
+                                              CssClass="glyphicon glyphicon-asterisk"
+                                              OnServerValidate="Validador_txtPassword"
+                                              Text=" "
+                                              ErrorMessage="Tipo de acceso"
+                                              Display="Dynamic" />
+                        <com:TRegularExpressionValidator ValidationGroup="PerfilSave"
+                                                         ControlToValidate="txtPassword"
+                                                         CssClass="glyphicon glyphicon-asterisk"
+                                                         Text=" "
+                                                         ErrorMessage="Codigo no es valido"
+                                                         Display="Dynamic"
+                                                         RegularExpression="\S+"/>
+                        Contraseña:
+                    </label>
+                    <div class="col-sm-9">
+                        <com:TActiveTextBox ID="txtPassword"
+                                            TextMode="Password"
+                                            AutoPostBack="false"
+                                            CssClass="form-control"
+                                            Attributes.autocomplete="off"
+                                            Attributes.placeholder="Contraseña"
+                                            Text=""
+                                            MaxLength="20" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">
+                        Rol:
+                    </label>
+                    <div class="col-sm-9">
+                        <com:TActiveLabel id="lRol" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">
+                        Sector / Org.:
+                    </label>
+                    <div class="col-sm-9">
+                        <com:TActiveLabel id="lDependencia" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">
+                        Activo
+                    </label>
+                    <div class="col-sm-5">
+                        <com:TActiveLabel id="lActivo" />
+                        <com:TActiveLabel id="lJsScript" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">
+                        <com:TActiveLinkButton CssClass="btn btn-primary"
+                                                 OnClick="btnPerfilGuardar"
+                                                 ValidationGroup="PerfilSave" >
+                            <i class="fa fa-save"></i> Guadar
+                            <prop:ClientSide OnLoading="Msg('Por favor espere mientras se procesa la petición',true);"
+                                             OnComplete="Msg('Listo',false);"
+                                             OnException="Msg('Se a producido un error, solicite apoyo técnico',true);"/>
+                        </com:TActiveLinkButton>
+                    </label>
+                    <div class="col-sm-5">
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</com:TContent>

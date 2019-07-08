@@ -1,0 +1,247 @@
+<com:TContent ID="Main">
+	<div class="col-md-12">
+		<div class="box box-primary">
+			<div class="box-header">
+				<i class="fa fa-ticket"></i>
+				<h3 class="box-title">Ticket's y sus propiedades</h3>
+			</div>
+			<div class="box-body">
+				<div class="form-group">
+					<com:TActiveLabel id="lMesanje" />
+				</div>
+				<div class="form-group">
+					<div class="row">
+					<label class="col-sm-2 control-label">
+						Folio:
+					</label>
+					<div class="col-sm-6" >
+						<div class="input-group">
+							<span class="input-group-addon"><i class="fa fa-edit"></i></span>
+							<com:TActiveTextBox ID="txtFolio"
+												AutoPostBack="false"
+												CssClass="form-control"
+												Attributes.autocomplete="off"
+												Attributes.placeholder=""
+												Text=""
+												MaxLength="150" />
+						</div>
+					</div>
+					<div class="col-sm-2">
+						<com:TActiveButton CausesValidation="false"
+										   style="display: none;"
+										   cssclass="btn btn-success"
+										   OnClick="btnBuscar_OnClick" >
+							<i class="fa fa-search"></i> Buscar
+						</com:TActiveButton>
+						<com:TActiveLinkButton Id="btnBuscar"
+										   CausesValidation="false"
+										   cssclass="btn btn-success"
+										   OnClick="btnBuscar_OnClick" >
+							<i class="fa fa-search"></i> Buscar
+						</com:TActiveLinkButton>
+					</div>
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="row">
+					<div class="col-md-6">
+						<h4>
+							Cliente: <b><com:TActiveLabel id="lCliente" /></b>
+						</h4>
+					</div>
+					<div class="col-md-2">
+						<h4>
+							Total: <b><com:TActiveLabel id="lTotal" /></b>
+						</h4>
+					</div>
+					<div class="col-md-2">
+						<h4>
+							Descuento: <b><com:TActiveLabel id="lDescuento" /></b>
+						</h4>
+						<com:TActiveHiddenField Id="id_clientes" />
+						<com:TActiveHiddenField Id="id_ventas" />
+						<com:TActiveHiddenField Id="params" />
+						<com:TActiveHiddenField Id="inactividad" />
+					</div>
+					<div class="col-md-2">
+						<i class="fa fa-clock-o"></i> <com:TActiveLabel id="lTiempo"></com:TActiveLabel>
+					</div>
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="row">
+					<div class="col-md-9">
+						<label >Venta: <com:TActiveLabel id="lid_cortes" />-<com:TActiveLabel id="lfolioventa" /> - Productos: <com:TActiveLabel id="lnproductos" /></label>
+					</div>
+					<div class="col-md-3">
+						<com:TActiveLabel id="lestatus" />
+					</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="col-md-8">
+		<div class="box box-primary">
+			<div class="box-header">
+				<i class="fa fa-ticket"></i>
+				<h3 class="box-title">Ticket</h3>
+			</div>
+			<div class="box-body">
+				<div class="form-group">
+					<com:TActiveHiddenField Id="id_cortes" />
+					<com:TActiveRepeater ID="RpListaCompra" DataKeyField="id_ventas_detalle" OnItemDataBound="RpListaCompra_DataBound">
+						<prop:HeaderTemplate>
+							<table class="table table-striped">
+								<tr>
+									<th style="width: 10px">#</th>
+									<th>Codigo</th>
+									<th>Producto</th>
+									<th>Precio</th>
+									<th>Cant. </th>
+									<th>Desc. %</th>
+									<th>SubTotal</th>
+									<th>Estatus</th>
+									<th>*</th>
+								</tr>
+						</prop:HeaderTemplate>
+						<prop:ItemTemplate>
+							<tr>
+								<td><com:TLiteral id="lnumero" /></td>
+								<td><%# $this->Data->ms_inventarios->ms_productos->codigo %></td>
+								<td><%# $this->Data->ms_inventarios->ms_productos->nombre %></td>
+								<td><com:TLiteral id="precio" /></td>
+								<td><%# $this->Data->cantidad %></td>
+								<td><com:TLiteral id="descuento" /></td>
+								<td><com:TLiteral id="subtotal" /></td>
+								<td><com:TLiteral id="lestatus" /></td>
+								<td>
+									<com:TLinkButton id="btnDevolver"
+																	CausesValidation="false"
+																	CssClass="icon btn bg-purple"
+																	OnClick="Page.btnDevolver_OnClick" >
+												<i class="fa fa-repeat"></i>
+									</com:TLinkButton>
+								</td>
+							</tr>
+						</prop:ItemTemplate>
+						<prop:FooterTemplate>
+							<tr>
+								<td colspan="9" style="text-align: right;">
+									<h4>Total: <b><com:TLiteral id="total" /></b></h4>
+								</td>
+							</tr>
+							</table>
+						</prop:FooterTemplate>
+					</com:TActiveRepeater>
+					<com:TActivePanel id="ListaBasia" >
+						<table class="table table-bordered">
+							<tr>
+								<th style="width: 10px">#</th>
+								<th>Codigo</th>
+								<th>Nombre</th>
+								<th>Precio</th>
+								<th>Cantidad</th>
+								<th>SubTotal</th>
+								<th>*</th>
+							</tr>
+							<tr>
+								<td colspan="7">No hay elementos que mostrar</td>
+							</tr>
+						</table>
+					</com:TActivePanel>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="col-md-4">
+		<div class="box box-primary">
+			<div class="box-header">
+				<i class="fa fa-repeat"></i>
+				<h3 class="box-title">Devoliciones</h3>
+			</div>
+			<div class="box-body">
+				<div class="form-group">
+					<i class="fa fa-cube"></i>
+					<label>Productos</label>
+				</div>
+				<div class="form-group">
+					<div class="row">
+					<com:TActiveRepeater ID="RpListaDevolucion" DataKeyField="id_corte_movimientos" OnItemDataBound="RpListaDevolucion_DataBound">
+						<prop:HeaderTemplate>
+							<table class="table table-striped">
+								<tr>
+									<th style="width: 10px">#</th>
+									<th>Codigo</th>
+									<th>Producto</th>
+								</tr>
+						</prop:HeaderTemplate>
+						<prop:ItemTemplate>
+							<tr>
+								<td><com:TLiteral id="lnumero" /></td>
+								<td><%# $this->Data->ct_ventas_detalle->ms_inventarios->ms_productos->codigo %></td>
+								<td><%# $this->Data->ct_ventas_detalle->ms_inventarios->ms_productos->nombre %></td>
+							</tr>
+						</prop:ItemTemplate>
+						<prop:FooterTemplate>
+							</table>
+						</prop:FooterTemplate>
+					</com:TActiveRepeater>
+					<com:TActivePanel id="SinDatos1" >
+						<table class="table table-bordered">
+							<tr>
+								<th style="width: 10px">#</th>
+								<th>Codigo</th>
+								<th>Nombre</th>
+							</tr>
+							<tr>
+								<td colspan="3">No hay elementos que mostrar</td>
+							</tr>
+						</table>
+					</com:TActivePanel>
+					</div>
+				</div>
+				<div class="form-group">
+					
+					<i class="fa fa-credit-card"></i>
+					<label>Folio de saldo</label>
+					
+				</div>
+				<div class="form-group">
+					<div class="row">
+					<label class="col-md-2">Folio:</label>
+					<com:TActiveLabel id="id_folios_creditos" cssclass="col-md-4" />
+					<label class="col-md-2">Saldo:</label>
+					<com:TActiveLabel id="lsaldo" cssclass="col-md-4" />
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="row">
+						<label class="col-md-2"> </label>
+						<com:TActiveLabel id="folio_estatus" cssclass="col-md-4" />
+						<com:TActiveLabel id="orden_js" style="display: none;" />
+						<label class="col-md-2">
+							<com:TActiveHyperLink id="linkTicket"
+												  style="display: none;"
+												  Target="_blank" >
+								<i class="icon fa fa-print"></i>
+							</com:TActiveHyperLink>
+						</label>
+						<div class="col-md-4">
+							<com:TActiveLinkButton Id="btnActivarFolio"
+													CausesValidation="false"
+													cssclass="btn btn-success"
+													Attributes.onclick="if(!confirm('¿Esta seguro de activar folio de credito ?')) return false;";
+													OnClick="btnActivarFolio_OnClick" >
+								<prop:ClientSide OnLoading="Msg('Por favor espere mientras se procesa la petición',true);"
+												 OnComplete="Msg('Listo',false);"
+												 OnException="Msg('Se a producido un error, solicite apoyo técnico',true);"/>
+									<i class="fa fa-thumbs-o-up"></i> Activar
+							</com:TActiveLinkButton>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</com:TContent>

@@ -1,0 +1,578 @@
+<com:TContent ID="Main">
+	<div class="col-md-12">
+			<div class="col-md-6">
+				<div class="box box-primary">
+					<div class="box-header">
+						<i class="fa fa-navicon"></i>
+						<h3 class="box-title">Datos Generales</h3>
+					</div>
+					<div class="box-body form-horizontal">
+						<div class="form-group">
+							<label class="col-sm-3" style="text-align: right;">
+								Corte:
+							</label>
+							<div class="col-sm-9" >
+								<com:TActiveLabel id="lid_cortes" />
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3" style="text-align: right;">
+								Fecha inicio:
+							</label>
+							<div class="col-sm-9" >
+								<com:TActiveLabel id="lFechaInicio" /> ( <com:TActiveLabel id="lFechaFinal"  /> )
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3" style="text-align: right;">
+								Inicio de caja:
+							</label>
+							<div class="col-sm-3" style="text-align: right;">
+								<com:TActiveLabel id="lInicioCaja" />
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3" style="text-align: right;">
+								Gasto realizados:
+							</label>
+							<div class="col-sm-3" style="text-align: right;">
+								<com:TActiveLabel id="lGastosRealizados" />
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3" style="text-align: right;">
+								Entradas adicionales:
+							</label>
+							<div class="col-sm-3" style="text-align: right;">
+								<com:TActiveLabel id="lEntradasAdicionales"  />
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3" style="text-align: right;">
+								Ventas realizadas:
+							</label>
+							<div class="col-sm-3" style="text-align: right;">
+								<com:TActiveLabel id="lVentasRealizadas" />
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3" style="text-align: right;">
+								Creditos realizados:
+							</label>
+							<div class="col-sm-3" style="text-align: right;">
+								<com:TActiveLabel id="lCreditosRealizados" />
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3" style="text-align: right;">
+								Abonos a creditos:
+							</label>
+							<div class="col-sm-3" style="text-align: right;">
+								<com:TActiveLabel id="lPagosCredito" />
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="progress progress-xxs">
+								<div class="progress-bar progress-bar-danger progress-bar-striped"
+									 role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"
+									 style="width: 100%">
+								</div>
+							</div>
+						</div>
+						<div class="form-group" style="">
+							<label class="col-sm-3" style="text-align: right;">
+								Efectivo:
+							</label>
+							<div class="col-sm-3" style="text-align: right;">
+								<com:TActiveLabel id="lEfectivo" />
+							</div>
+						</div>
+						<div class="form-group" style="">
+							<label class="col-sm-3" style="text-align: right;">
+								Tarjeta de credito:
+							</label>
+							<div class="col-sm-3" style="text-align: right;">
+								<com:TActiveLabel id="lTarjeta" />
+							</div>
+						</div>
+						<div class="form-group" style="">
+							<label class="col-sm-3" style="text-align: right;">
+								Cheques:
+							</label>
+							<div class="col-sm-3" style="text-align: right;">
+								<com:TActiveLabel id="lCheque" />
+							</div>
+						</div>
+						<div class="form-group" style="">
+							<label class="col-sm-3" style="text-align: right;">
+								Trasferencia:
+							</label>
+							<div class="col-sm-3" style="text-align: right;">
+								<com:TActiveLabel id="lTrasferencia" />
+							</div>
+						</div>
+						<div class="form-group" style="">
+							<label class="col-sm-3" style="text-align: right;">
+								Otros:
+							</label>
+							<div class="col-sm-3" style="text-align: right;">
+								<com:TActiveLabel id="lOtros" />
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="progress progress-xxs">
+								<div class="progress-bar progress-bar-danger progress-bar-striped"
+									 role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"
+									 style="width: 100%">
+								</div>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3" style="text-align: right;">
+								Total:
+							</label>
+							<div class="col-sm-3" style="text-align: right;">
+								<com:TActiveLabel id="lTotal" />
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3" style="text-align: right;">
+								En caja:
+							</label>
+							<div class="col-sm-3" >
+								<com:TActiveTextBox ID="lEnCaja"
+													style="text-align: right;"
+													AutoPostBack="false"
+													CssClass="form-control"
+													Attributes.autocomplete="off"
+													Attributes.placeholder="$   0.00"
+													Text=""
+													MaxLength="21" />
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3" style="text-align: right;">
+								Retirar:
+							</label>
+							<div class="col-sm-3" style="text-align: right;">
+								<com:TActiveLabel id="lRetiroDeposito" />
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3" style="text-align: right;">
+								Observaciones:
+							</label>
+							<div class="col-sm-9">
+								<com:TActiveTextBox ID="txtObservaciones"
+													TextMode="MultiLine"
+														AutoPostBack="false"
+														CssClass="form-control"
+														Attributes.autocomplete="off"
+														Attributes.placeholder="Observaciones"
+														Text=""
+														MaxLength="5950" />
+							</div>
+						</div>
+					</div>
+					<div class="box-footer">
+						<div class="form-group">
+							<div class="col-sm-6">
+								<com:TActiveLabel id="lMensajeCorte" />
+								<com:TActiveHyperLink id="linkTicket"
+													  CssClass="btn bg-purple"
+													  Target="_blank" >
+									<i class="icon fa fa-print"></i>
+								</com:TActiveHyperLink>
+								<com:TLinkButton Id="btnGuardar"
+													   ValidationGroup="capturaCorte"
+													   cssclass="btn btn-info"
+													   OnClick="btnGuardar_OnClick" >
+										<i class="fa fa-save"></i> 
+								</com:TLinkButton>
+							</div>
+							<div class="col-sm-6" style="text-align: right;">
+								<com:TActiveLinkButton Id="btnTerminar"
+														CausesValidation="false"
+														cssclass="btn btn-danger"
+														Attributes.onclick="if(!confirm('¿Confirme cerrar este corte ?')) return false; else $('#<%= $this->linkTicket->ClientID %>')[0].click();";
+														OnClick="btnTerminar_OnClick" >
+									<prop:ClientSide OnLoading="Msg('Por favor espere mientras se procesa la petición',true);"
+													 OnComplete="Msg('Listo',false);"
+													 OnException="Msg('Se a producido un error, solicite apoyo técnico',true);"/>
+										<i class="fa fa-paperclip"></i> Terminar
+								</com:TActiveLinkButton>
+							</div>
+						</div>
+					</div>
+					<div class="box-body">
+						<div class="form-group">
+							<i class="fa fa-cube"></i>
+							<label>Productos vendidos</label>
+						</div>
+						<div class="form-group">
+							<com:TActiveRepeater ID="RpListaProductos" OnItemDataBound="RpListaProductos_DataBound">
+								<prop:HeaderTemplate>
+									<table class="table table-striped">
+										<tr>
+											<th style="width: 10px">#</th>
+											<th>Codigo</th>
+											<th>Producto</th>
+											<th>Cantidad</th>
+											<th>Monto</th>
+										</tr>
+								</prop:HeaderTemplate>
+								<prop:ItemTemplate>
+									<tr>
+										<td><com:TLiteral id="lnumero" /></td>
+										<td><%# $this->Data['codigo'] %></td>
+										<td><%# $this->Data['nombre'] %></td>
+										<td><%# $this->Data['cantidad'] %></td>
+										<td> $ <%# number_format($this->Data['monto'],2) %></td>
+									</tr>
+								</prop:ItemTemplate>
+								<prop:FooterTemplate>
+									</table>
+								</prop:FooterTemplate>
+							</com:TActiveRepeater>
+							<com:TActivePanel id="SinDatosX" >
+								<table class="table table-bordered">
+									<tr>
+										<th style="width: 10px">#</th>
+										<th>Codigo</th>
+										<th>Nombre</th>
+									</tr>
+									<tr>
+										<td colspan="3">No hay elementos que mostrar</td>
+									</tr>
+								</table>
+							</com:TActivePanel>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="box box-primary">
+					<div class="box-body">
+						<div class="form-group">
+							<i class="fa fa-dollar"></i>
+							<label>Gastos (-)</label>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-7">
+								<div class="input-group">
+									<span class="input-group-addon"><i class="fa fa-edit"></i></span>
+									<com:TRequiredFieldValidator ValidationGroup="AddGuardar"
+																 ControlToValidate="txtDescripcion"
+																 CssClass="glyphicon glyphicon-asterisk"
+																 Text=" "
+																 Display="Dynamic" />
+									<com:TActiveTextBox ID="txtDescripcion"
+														AutoPostBack="false"
+														CssClass="form-control"
+														Attributes.autocomplete="off"
+														Attributes.placeholder="Descripción"
+														Text=""
+														MaxLength="150" />
+								</div>
+							</div>
+							<div class="col-sm-3">
+								<div class="input-group">
+									<span class="input-group-addon"><i class="fa fa-dollar"></i></span>
+									<com:TRequiredFieldValidator ValidationGroup="AddGuardar"
+																 ControlToValidate="txtRetiros"
+																 CssClass="glyphicon glyphicon-asterisk"
+																 Text=" "
+																 Display="Dynamic" />
+									<com:TActiveTextBox ID="txtRetiros"
+														AutoPostBack="false"
+														CssClass="form-control"
+														Attributes.autocomplete="off"
+														Attributes.placeholder="0.00"
+														Text=""
+														MaxLength="150" />
+								</div>
+							</div>
+							<div class="col-sm-2">
+								<com:TActiveLinkButton Id="btnAnadirGasto"
+													   ValidationGroup="AddGuardar"
+													   cssclass="btn btn btn-success"
+													   OnClick="btnAnadirGasto_OnClick" >
+										<i class="fa fa-plus"></i>
+								</com:TActiveLinkButton>
+								&nbsp; <br />
+								&nbsp; <br />
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-12">
+								<com:TActiveRepeater ID="RpListaRetiros" DataKeyField="id_corte_retiros">
+									<prop:HeaderTemplate>
+										<table class="table table-striped">
+											<tr>
+												<th style="width: 10px">#</th>
+												<th>Descripción</th>
+												<th>Monto</th>
+												<th>*</th>
+											</tr>
+									</prop:HeaderTemplate>
+									<prop:ItemTemplate>
+										<tr>
+											<td><com:TLiteral id="lnumero" /></td>
+											<td><%# $this->Data->descripcion %></td>
+											<td> $ <%# number_format($this->Data->monto,2) %></td>
+											<td>
+												<com:TActiveLinkButton Id="btnQuitarGasto"
+																	   CausesValidation="false"
+																	   cssclass="btn btn btn-success"
+																	   OnClick="Page.btnQuitarGasto_onClick" >
+														<i class="fa fa-trash"></i>
+												</com:TActiveLinkButton>
+											</td>
+										</tr>
+									</prop:ItemTemplate>
+									<prop:FooterTemplate>
+										</table>
+									</prop:FooterTemplate>
+								</com:TActiveRepeater>
+								<com:TActivePanel id="SinDatos0" >
+									<table class="table table-bordered">
+										<tr>
+											<th style="width: 10px">#</th>
+											<th>Descripción</th>
+											<th>Monto</th>
+											<th>*</th>
+										</tr>
+										<tr>
+											<td colspan="4">No hay elementos que mostrar</td>
+										</tr>
+									</table>
+								</com:TActivePanel>
+							</div>
+						</div>
+						<div class="form-group">
+							<i class="fa fa-dollar"></i>
+							<label>Entradas Adicionales (+)</label>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-7">
+								<div class="input-group">
+									<span class="input-group-addon"><i class="fa fa-edit"></i></span>
+									<com:TRequiredFieldValidator ValidationGroup="AddEntradas"
+																 ControlToValidate="txtDescripcion2"
+																 CssClass="glyphicon glyphicon-asterisk"
+																 Text=" "
+																 Display="Dynamic" />
+									<com:TActiveTextBox ID="txtDescripcion2"
+														AutoPostBack="false"
+														CssClass="form-control"
+														Attributes.autocomplete="off"
+														Attributes.placeholder="Descripción"
+														Text=""
+														MaxLength="150" />
+								</div>
+							</div>
+							<div class="col-sm-3">
+								<div class="input-group">
+									<span class="input-group-addon"><i class="fa fa-dollar"></i></span>
+									<com:TRequiredFieldValidator ValidationGroup="AddEntradas"
+																 ControlToValidate="txtEntradas2"
+																 CssClass="glyphicon glyphicon-asterisk"
+																 Text=" "
+																 Display="Dynamic" />
+									<com:TActiveTextBox ID="txtEntradas2"
+														AutoPostBack="false"
+														CssClass="form-control"
+														Attributes.autocomplete="off"
+														Attributes.placeholder="0.00"
+														Text=""
+														MaxLength="150" />
+								</div>
+							</div>
+							<div class="col-sm-2">
+								<com:TActiveLinkButton Id="btnAnadirEntradas"
+													   ValidationGroup="AddEntradas"
+													   cssclass="btn btn btn-success"
+													   OnClick="btnAnadirEntradas_OnClick" >
+										<i class="fa fa-plus"></i>
+								</com:TActiveLinkButton>
+								&nbsp; <br />
+								&nbsp; <br />
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-12">
+								<com:TActiveRepeater ID="RpListaEntradas" DataKeyField="id_corte_retiros">
+									<prop:HeaderTemplate>
+										<table class="table table-striped">
+											<tr>
+												<th style="width: 10px">#</th>
+												<th>Descripción</th>
+												<th>Monto</th>
+												<th>*</th>
+											</tr>
+									</prop:HeaderTemplate>
+									<prop:ItemTemplate>
+										<tr>
+											<td><com:TLiteral id="lnumero" /></td>
+											<td><%# $this->Data->descripcion %></td>
+											<td> $ <%# number_format($this->Data->monto,2) %></td>
+											<td>
+												<com:TActiveLinkButton Id="btnQuitarEntrada"
+																	   CausesValidation="false"
+																	   cssclass="btn btn btn-success"
+																	   OnClick="Page.btnQuitarEntrada_onClick" >
+														<i class="fa fa-trash"></i>
+												</com:TActiveLinkButton>
+											</td>
+										</tr>
+									</prop:ItemTemplate>
+									<prop:FooterTemplate>
+										</table>
+									</prop:FooterTemplate>
+								</com:TActiveRepeater>
+								<com:TActivePanel id="SinDatos5" >
+									<table class="table table-bordered">
+										<tr>
+											<th style="width: 10px">#</th>
+											<th>Descripción</th>
+											<th>Monto</th>
+											<th>*</th>
+										</tr>
+										<tr>
+											<td colspan="4">No hay elementos que mostrar</td>
+										</tr>
+									</table>
+								</com:TActivePanel>
+							</div>
+						</div>
+						<div class="form-group">
+							<i class="fa fa-repeat"></i>
+							<label>Devoluciones</label>
+						</div>
+						<div class="form-group">
+							<com:TActiveRepeater ID="RpListaDevolucion" DataKeyField="id_corte_movimientos" OnItemDataBound="RpListaDevolucion_DataBound">
+								<prop:HeaderTemplate>
+									<table class="table table-striped">
+										<tr>
+											<th style="width: 10px">#</th>
+											<th>Codigo</th>
+											<th>Producto</th>
+											<th>Cantidad</th>
+											<th>SubTotal</th>
+										</tr>
+								</prop:HeaderTemplate>
+								<prop:ItemTemplate>
+									<tr>
+										<td><com:TLiteral id="lnumero" /></td>
+										<td><%# $this->Data->ct_ventas_detalle->ms_inventarios->ms_productos->codigo %></td>
+										<td><%# $this->Data->ct_ventas_detalle->ms_inventarios->ms_productos->nombre %></td>
+										<td><%# $this->Data->ct_ventas_detalle->cantidad %></td>
+										<td> $ <%# number_format($this->Data->ct_ventas_detalle->precio_vendido,2) %></td>
+									</tr>
+								</prop:ItemTemplate>
+								<prop:FooterTemplate>
+									</table>
+								</prop:FooterTemplate>
+							</com:TActiveRepeater>
+							<com:TActivePanel id="SinDatos1" >
+								<table class="table table-bordered">
+									<tr>
+										<th style="width: 10px">#</th>
+										<th>Codigo</th>
+										<th>Nombre</th>
+									</tr>
+									<tr>
+										<td colspan="3">No hay elementos que mostrar</td>
+									</tr>
+								</table>
+							</com:TActivePanel>
+						</div>
+						<div class="form-group">
+							<i class="fa fa-credit-card"></i>
+							<label>Folios creados</label>
+						</div>
+						<div class="form-group">
+							<com:TActiveRepeater ID="RpListaFolios" DataKeyField="id_folios_creditos" OnItemDataBound="RpListaFolios_DataBound">
+								<prop:HeaderTemplate>
+									<table class="table table-striped">
+										<tr>
+											<th>Folio</th>
+											<th>Monto</th>
+											<th>Caduca</th>
+											<th>Estatus</th>
+										</tr>
+								</prop:HeaderTemplate>
+								<prop:ItemTemplate>
+									<tr>
+										<td><%# $this->Data->id_ventas %></td>
+										<td> $ <%# number_format($this->Data->monto,2) %></td>
+										<td><com:TActiveLabel id="caduca" /></td>
+										<td><com:TActiveLabel id="estatus" /></td>
+									</tr>
+								</prop:ItemTemplate>
+								<prop:FooterTemplate>
+									</table>
+								</prop:FooterTemplate>
+							</com:TActiveRepeater>
+							<com:TActivePanel id="SinDatos2" >
+								<table class="table table-bordered">
+									<tr>
+										<th>Folio</th>
+										<th>Monto</th>
+										<th>Caduca</th>
+										<th>Estatus</th>
+									</tr>
+									<tr>
+										<td colspan="4">No hay elementos que mostrar</td>
+									</tr>
+								</table>
+							</com:TActivePanel>
+						</div>
+						<div class="form-group">
+							<i class="fa fa-shopping-cart"></i>
+							<label>Ventas canceladas</label>
+						</div>
+						<div class="form-group">
+							<com:TActiveRepeater ID="RpListaVentas" DataKeyField="id_ventas" >
+								<prop:HeaderTemplate>
+									<table class="table table-striped">
+										<tr>
+											<th>Folio</th>
+											<th>Usuario</th>
+											<th>Monto</th>
+										</tr>
+								</prop:HeaderTemplate>
+								<prop:ItemTemplate>
+									<tr>
+										<td><%# $this->Data->id_ventas %></td>
+										<td><%# $this->Data->bs_usuarios->user %></td>
+										<td> $ <%# number_format($this->Data->total,2) %></td>
+									</tr>
+								</prop:ItemTemplate>
+								<prop:FooterTemplate>
+									</table>
+								</prop:FooterTemplate>
+							</com:TActiveRepeater>
+							<com:TActivePanel id="SinDatos3" >
+								<table class="table table-bordered">
+									<tr>
+										<th>Folio</th>
+										<th>Usuario</th>
+										<th>Monto</th>
+										<th>*</th>
+									</tr>
+									<tr>
+										<td colspan="4">No hay elementos que mostrar</td>
+									</tr>
+								</table>
+							</com:TActivePanel>
+						</div>
+					</div>
+				</div>
+			</div>
+	</div>
+	<com:TActiveHiddenField Id="id_cortes" />
+	<com:TActiveHiddenField Id="total" />
+	<com:TActiveHiddenField Id="retiro" />
+	<com:TActiveHiddenField Id="efectivo" />
+</com:TContent>

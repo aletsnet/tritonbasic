@@ -1,0 +1,6 @@
+protected/application.xml
+assets/*
+docs/*
+protected/runtime/*
+vendor/*
+composer.lock

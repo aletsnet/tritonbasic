@@ -1,0 +1,132 @@
+<com:TContent ID="Main">
+	<div class="col-md-12">
+		<div class="box box-primary">
+			<div class="box-header">
+				<i class="fa fa-line-chart"></i>
+				<h3 class="box-title">Gráfica</h3>
+			</div>
+			<div class="box-body form-horizontal">
+				<div class="form-group">
+					<label class="col-md-1 control-label">Fecha de </label>
+					<div class="col-md-2">
+						<com:TJuiDatePicker ID="fechainicio" cssclass="form-control"/>
+					</div>
+					<label class="col-md-1 control-label"> a </label>
+					<div class="col-md-2">
+						<com:TJuiDatePicker ID="fechafinal" cssclass="form-control"/>
+					</div>
+					<label class="col-md-1 control-label"> top: </label>
+					<div class="col-md-2">
+						<com:TActiveDropDownList ID="cmdTop"
+												 AutoPostBack="false"
+												 cssclass="form-control"
+												 DataTextField="opcion"
+												 DataValueField="valor"
+												 PromptText=" "
+												 PromptValue="0" />
+					</div>
+					<div class="col-md-2">
+						<com:TLinkButton  id="btnBuscar"
+												CausesValidation="false"
+												CssClass="btn btn-info"
+												OnClick="btnBuscar_OnClick"
+												Attributes.onclick="Msg('Por favor espere mientras se procesa la petición',true);">
+							<i class="fa fa-search"></i> 
+						</com:TLinkButton>
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-md-4">
+						<h3 class="box-title">
+							<i class="fa fa-list"></i> Articulos
+						</h3>
+					</div>
+					<div class="col-md-8">
+						<h3 class="box-title">
+							<i class="fa fa-line-chart"></i> Gráfica
+						</h3>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-1 control-label"> <i class="fa fa-cube"></i> </label>
+					<div class="col-md-2">
+						<com:TActiveTextBox ID="txtCodigo"
+												AutoPostBack="false"
+												CssClass="form-control"
+												Attributes.autocomplete="off"
+												Attributes.placeholder="Codigo/Nombre"
+												Text=""
+												MaxLength="120" />
+					</div>
+					<div class="col-md-2">
+						<com:TLinkButton CausesValidation="false"
+										 CssClass="btn btn-info"
+										 OnClick="btnBuscar_OnClick"
+										 Attributes.onclick="Msg('Por favor espere mientras se procesa la petición',true);">
+							<i class="fa fa-search"></i> 
+						</com:TLinkButton>
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-md-4">
+						<com:TActiveRepeater ID="RpLista" OnItemCreated="itemCreated_RpLista">
+							<prop:HeaderTemplate>
+								<table cellpadding="2" class="table table-hover">
+									<thead>
+										<tr>
+											<th width="10%" class="text-center"> </th>
+											<th width="35%" class="text-center">Articulos</th>
+											<th width="50%" class="text-center">Articulos</th>
+											<th width="10%" class="text-center">Cant.</th>
+										</tr>
+									</thead>
+									<tbody>
+							</prop:HeaderTemplate>
+							<prop:ItemTemplate>
+									<tr>
+										<td>
+											<com:TLabel id="lcolor" />
+										</td>
+										<td>
+											<com:TLabel id="lcodigo" />
+										</td>
+										<td>
+											<com:TLabel id="lnombre" />
+										</td>
+										<td class="text-right">
+											<com:TLabel id="lcantidad" />
+										</td>
+									</tr>
+							</prop:ItemTemplate>
+							<prop:FooterTemplate>
+									</tbody>
+									<tfoot>
+										<tr>
+											<td class="text-right" colspan="3">
+												<strong>Total:</strong>
+											</td>
+											<td class="text-right">
+												<strong><com:TLabel id="ltotal" /></strong>
+											</td>
+										</tr>
+									</tfoot>
+								</table>
+							</prop:FooterTemplate>
+						</com:TActiveRepeater>
+					</div>
+					<div class="col-md-8">
+						<div class="chart">
+							<canvas id="lineChart" style="height:450px"></canvas>
+						</div>
+						
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script src="vendor/almasaeed2010/adminlte/bower_components/chart.js/Chart.js "></script>
+	<com:TLabel id="jsGrafica" />
+	<script>
+		<%= $this->MakeGrafic %>
+	</script>
+</com:TContent>

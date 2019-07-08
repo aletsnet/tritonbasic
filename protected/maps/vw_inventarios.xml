@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<sqlMap namespace="Inventarios">
+    <select id="vwInventarios" resultClass="LMsInventarios">
+    
+        SELECT
+                m.*
+        FROM
+                ms_inventarios m
+        INNER JOIN
+                ms_productos p
+            ON
+                m.id_productos = p.id_productos
+        WHERE
+                m.borrado = 0
+            AND
+                p.borrado = 0
+            AND
+                m.id_sucursales = #idsucursales#
+            AND
+                if(#idbodegas# != '',m.id_bodegas = #idbodegas#,true)
+            AND
+                if(#tipo# != '',p.tipo = #tipo#, true)
+            AND
+                ( p.nombre like #nombre# OR p.codigo LIKE #nombre#)
+            AND
+                p.id_productos <![CDATA[ > ]]> 1
+        ORDER BY
+            p.nombre asc
+            LIMIT #offset#,#rows#
+    </select>
+    <select id="vwInventarios_count" resultClass="int">
+        SELECT
+                COUNT(m.id_inventarios)
+        FROM
+                ms_inventarios m
+        INNER JOIN
+                ms_productos p
+            ON
+                m.id_productos = p.id_productos
+        WHERE
+                m.borrado = 0
+            AND
+                p.borrado = 0
+            AND
+                m.id_sucursales = #idsucursales#
+            AND
+                if(#idbodegas# != '',m.id_bodegas = #idbodegas#,true)
+            AND
+                if(#tipo# != '',p.tipo = #tipo#, true)
+            AND
+                ( p.nombre like #nombre# OR p.codigo LIKE #nombre#)
+            AND
+                p.id_productos <![CDATA[ > ]]> 1
+    </select>
+    <select id="vwInventarios_exportar" resultClass="LMsInventarios">
+    
+        SELECT
+                m.*
+        FROM
+                ms_inventarios m
+        INNER JOIN
+                ms_productos p
+            ON
+                m.id_productos = p.id_productos
+        WHERE
+                m.borrado = 0
+            AND
+                p.borrado = 0
+            AND
+                m.id_sucursales = #idsucursales#
+            AND
+                if(#idbodegas# != '',m.id_bodegas = #idbodegas#,true)
+            AND
+                if(#tipo# != '',p.tipo = #tipo#, true)
+            AND
+                ( p.nombre like #nombre# OR p.codigo LIKE #nombre#)
+            AND
+                p.id_productos <![CDATA[ > ]]> 1
+        ORDER BY
+            p.nombre asc
+    </select>
+</sqlMap>

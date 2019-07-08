@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<sqlMap namespace="sistema_base">
+    <select id="vwMenuLateral" resultClass="LBsModulos">
+        SELECT
+                m.*
+        FROM
+                bs_modulos m
+        INNER JOIN
+                bs_servicios v
+            ON
+                m.id_modulos = v.id_modulos
+        INNER JOIN
+                bs_roles_servicios r
+            ON
+                r.id_servicios = v.id_servicios
+        WHERE
+                r.id_roles = #id_roles#
+            AND
+                r.activo = 1
+            AND
+                r.borrado = 0
+        GROUP BY
+            m.id_modulos
+        ORDER BY
+            m.orden asc
+    </select>
+    <select id="vwMenuTab" resultClass="LBsServicios">
+        SELECT
+                v.*
+        FROM
+                bs_servicios v
+        INNER JOIN
+                bs_roles_servicios r
+            ON
+                r.id_servicios = v.id_servicios
+        WHERE
+                r.id_roles = #id_roles#
+            AND 
+                v.id_modulos = #id_modulos#
+            AND
+                r.activo = 1
+            AND
+                r.borrado =0
+    </select>
+    <select id="vwSucursalesAcceso" resultClass="Array">
+        SELECT
+                id_accesos,
+                CONCAT(sucursal," - ", acceso) acceso
+        FROM
+                ct_accesos a
+        INNER JOIN
+                ct_sucursales b
+            ON
+                a.id_sucursal = b.id_sucursales
+        WHERE
+                b.borrado = 0
+            AND
+                a.activo = 1
+    </select>
+</sqlMap>

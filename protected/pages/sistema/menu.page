@@ -1,0 +1,30 @@
+<%@ Title="Menu" %>
+<com:TContent ID="Main">
+<com:TRepeater ID="RpModulos" OnItemCreated="repeaterDataBound" >
+    <prop:ItemTemplate>
+        <div class="col-md-6">
+            <div class="<%# $this->Data->css_class %>">
+                <div class="box-header">
+                    <span class="pull-right-container">
+                        <i class="<%# $this->Data->icon %> pull-right"></i>
+                    </span>
+                    <h3 class="box-title"><%# $this->Data->nombre %></h3>
+                </div>
+                <com:TRepeater ID="RpServicios">
+                    <prop:HeaderTemplate>
+                <div class="box-body">
+                    </prop:HeaderTemplate>
+                    <prop:ItemTemplate>
+                    <a class="btn btn-app" href="<%# $this->Service->constructUrl($this->Data->page_form,array('param' => $this->Data->param)) %>">
+                        <i class="<%# $this->Data->icon %>"></i> <%# $this->Data->nombre %>
+                    </a>
+                    </prop:ItemTemplate>
+                    <prop:FooterTemplate>
+                </div>
+                    </prop:FooterTemplate>
+                </com:TRepeater>
+            </div>
+        </div>
+    </prop:ItemTemplate>
+</com:TRepeater>
+</com:TContent>

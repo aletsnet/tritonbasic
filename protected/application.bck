@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<application id="sistembase2018" mode="Debug">
+    <paths>
+		<using namespace="System.I18N.*" />
+        <using namespace="Application.database.*" />
+        <using namespace="System.Web.UI.ActiveControls.*" />
+        <using namespace="System.Web.UI.JuiControls.*" />
+        <using namespace="System.Util.TVarDumper" />
+    </paths>
+    <modules>
+        <module id="globalization" class="TGlobalization" Charset="UTF-8" Culture="es" />
+        <module id="db" class="System.Data.TDataSourceConfig">
+            <database ConnectionString="mysql:host=localhost;dbname=triton_2018" username="alets" password="!Lumb3rj4ck" />
+        </module>
+        <module class="System.Data.ActiveRecord.TActiveRecordConfig" ConnectionID="db" />
+        <module id="query" class="System.Data.SqlMap.TSqlMapConfig" EnableCache="false" ConfigFile="Application.query" ConnectionID="db" />
+        <module id="auth" class="System.Security.TAuthManager" UserManager="users" LoginPage="login" />
+        <module id="users" class="System.Security.TDbUserManager" UserClass="Application.autentificacion" />
+        <module id="security" class="TSecurityManager" ValidationKey="uRJBSbpXjbssautb" />
+        <module id="request" class="THttpRequest" EnableCookieValidation="true" />
+        <module id="error" class="TErrorHandler" ErrorTemplatePath="Application.ErrorTemplates" />
+        <module id="log" class="System.Util.TLogRouter">
+            <route
+                class="TFileLogRoute"
+                Levels="Notice,Warning,Error,Alert,Fatal"
+                LogFile="bslog.txt"
+                MaxFileSize="4096"
+                MaxLogFiles="50"
+            />
+            <route
+                class="TDbLogRoute"
+                LogTableName="bs_log"
+                Levels="Notice,Warning,Error,Alert,Fatal"
+                ConnectionID="db"
+            />
+        </module>
+    </modules>
+    <!-- configuration for available services -->
+    <services>
+        <service id="wsat" class="System.Wsat.TWsatService" Password="qwaszx" />
+        <service id="page" class="TPageService" DefaultPage="sistema.menu">
+            <pages MasterClass="Application.layouts.MainLayout" EnableStateEncryption="false" />
+        </service>
+    </services>
+    <parameters>
+		<parameter id="version" value="1.0" />
+        <parameter id="proyect" value="Triton TPV" />
+        <parameter id="lproyect" value="Sistema de Terminal Punto de Venta " />
+        <parameter id="imgProyect" value="favicon/favicon-96x96.png" />
+        <parameter id="mailRecovery" value="" />
+        <parameter id="passRecovery" value="" />
+        <parameter id="imgExtenciones" value=" png, PNG, jpg, JPG" />
+        <parameter id="desarrollo" value="Megatec Pachuca" />
+        <parameter id="urlProyecto" value="megatec.mx" />
+        <parameter id="idsucursal" value="1" />
+        <parameter id="idcontrato" value="" />
+        <parameter id="keycontrato" value="" />
+	</parameters>
+</application>

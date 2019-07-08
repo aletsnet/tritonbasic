@@ -1,0 +1,141 @@
+<com:TContent ID="Main">
+	<div class="col-md-12">
+		<div class="box box-primary">
+			<div class="box-header">
+				<i class="fa fa-navicon"></i>
+				<h3 class="box-title">Ventas realizadas</h3>
+			</div>
+			<com:TPanel id="Buscador" cssclass="box-body form-horizontal">
+				<div class="form-group">
+					<label class="col-sm-2 control-label">
+						Fecha:
+						<com:TActiveButton  CausesValidation="false"
+											CssClass="btn btn-info"
+											style="display: none;"
+											OnClick="btnBuscar_OnClick" >
+							<i class="fa fa-search"></i> 
+							<prop:ClientSide OnLoading="Msg('Por favor espere mientras se procesa la petición',true);"
+														 OnComplete="Msg('Listo',false);"
+														 OnException="Msg('Se a producido un error, solicite apoyo técnico',true);"/>
+						</com:TActiveButton>
+					</label>
+					<div class="col-sm-3" style=" z-index: 10;">
+						<com:TActiveDatePicker ID="fecha_inicio" Mode="ImageButton" DateFormat="dd/MM/yyyy" AutoPostBack="false"/>
+					</div>
+					<div class="col-sm-3" style=" z-index: 10;">
+						<com:TActiveDatePicker ID="fecha_final"  Mode="ImageButton" DateFormat="dd/MM/yyyy" AutoPostBack="false" />
+					</div>
+					<div class="col-sm-4">
+						<com:TActiveLinkButton  id="btnBuscar"
+												CausesValidation="false"
+												CssClass="btn btn-info"
+												OnClick="btnBuscar_OnClick" >
+							<i class="fa fa-search"></i> 
+							<prop:ClientSide OnLoading="Msg('Por favor espere mientras se procesa la petición',true);"
+														 OnComplete="Msg('Listo',false);"
+														 OnException="Msg('Se a producido un error, solicite apoyo técnico',true);"/>
+						</com:TActiveLinkButton>
+						<com:TLinkButton  id="btnExportarXLS"
+												CausesValidation="false"
+												CssClass="btn btn-default"
+												OnClick="btnExportarXLS_OnClick" >
+							<i class="fa fa-file-excel-o"></i>
+						</com:TLinkButton>
+						<com:TActiveHyperLink id="linkPdf" CssClass="btn btn-default" Target="_blank" >
+							<i class="fa fa-file-pdf-o"></i>
+						</com:TActiveHyperLink>
+					</div>
+				</div>
+			</com:TPanel>
+			<com:TActivePanel id="tpSinDatos" CssClass="box-body form-horizontal">
+				<table class="table table-bordered">
+					<thead>
+						<tr>
+							<th>#</th>
+							<th>Codigo</th>
+							<th>Producto / Servicio</th>
+							<th>Apartado / Departamento</th>
+							<th>Precio</th>
+							<th>Existencia</th>
+							<th>*</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td colspan="7">No hay elementos que mostrar</td>
+						</tr>
+					</tbody>
+				</table>
+			</com:TActivePanel>
+			<com:TActivePanel id="tpDatos" cssclass="box-body form-horizontal">
+				<com:TActiveDataGrid ID="dgTabla"
+									 PageSize="10"
+									 PagerStyle.Mode="Numeric"
+									 DataKeyField="id_cortes"
+									 AutoGenerateColumns="false"
+									 CssClass="table table-bordered"
+									 OnPageIndexChanged="changePage"
+									 AllowPaging="true"
+									 AllowCustomPaging="true"
+									 PagerStyle.Position="TopAndBottom"
+									 PagerStyle.Visible="true"
+									 PagerStyle.NextPageText="Sig."
+									 PagerStyle.PrevPageText="Ant."
+									 PagerStyle.PageButtonCount="4"
+									 OnPagerCreated="pagerCreated"
+									 OnItemCreated="itemCreated"
+									 OnDeleteCommand="deleteItem" >
+						<com:TBoundColumn HeaderText="Corte" DataField="id_cortes" />
+						<com:TBoundColumn HeaderText="Atendio" DataField="bs_usuarios.user" />
+						<com:TTemplateColumn HeaderText="Fecha" ID="rowFecha">
+							<prop:ItemTemplate>
+								<com:TDateFormat id="lFecha" Pattern="dd/MMMM/yy hh:mm a" />
+							</prop:ItemTemplate>
+						</com:TTemplateColumn>
+						<com:TTemplateColumn HeaderText="Duración" ID="rowDuracion">
+							<prop:ItemTemplate>
+								<com:TActiveLabel id="lDuracion" />
+							</prop:ItemTemplate>
+						</com:TTemplateColumn>
+						<com:TTemplateColumn HeaderText="Gasto realizados" ID="rowGastos">
+							<prop:ItemTemplate>
+								<com:TActiveLabel id="lGastos" />
+							</prop:ItemTemplate>
+						</com:TTemplateColumn>
+						<com:TTemplateColumn HeaderText="Total" ID="rowTotal">
+							<prop:ItemTemplate>
+								<com:TActiveLabel id="lTotal" />
+							</prop:ItemTemplate>
+						</com:TTemplateColumn>
+						<com:TTemplateColumn HeaderText="Creditos realizados" ID="rowCreditos">
+							<prop:ItemTemplate>
+								<com:TActiveLabel id="lCreditos" />
+							</prop:ItemTemplate>
+						</com:TTemplateColumn>
+						<com:TTemplateColumn HeaderText="Inicio de Caja" ID="rowInicioCaja">
+							<prop:ItemTemplate>
+								<com:TActiveLabel id="lInicioCaja" />
+							</prop:ItemTemplate>
+						</com:TTemplateColumn>
+						<com:TTemplateColumn HeaderText="Retiro a depositar" ID="rowRetiro">
+							<prop:ItemTemplate>
+								<com:TActiveLabel id="lRetiro" />
+							</prop:ItemTemplate>
+						</com:TTemplateColumn>
+						<com:TTemplateColumn HeaderText="Estatus" ID="rowEstatus">
+							<prop:ItemTemplate>
+								<com:TLiteral id="lestatus" />
+							</prop:ItemTemplate>
+						</com:TTemplateColumn>
+						<com:TTemplateColumn HeaderText="*" ID="rowBotonos">
+							<prop:ItemTemplate>
+								<com:TActiveHyperLink id="linkTicket" CssClass="btn bg-purple" Target="_blank" >
+									<i class="icon fa fa-print"></i>
+								</com:TActiveHyperLink>
+							</prop:ItemTemplate>
+						</com:TTemplateColumn>
+				</com:TActiveDataGrid>
+			</com:TActivePanel>
+		</div>
+	</div>
+</com:TContent>

@@ -1,0 +1,62 @@
+<%@ MasterClass="Application.layouts.ModalLayout" %>
+<com:TContent ID="Main">
+	<div class="login-box">
+		<div class="login-logo">
+			<com:TLabel id="lProyecto" />
+		</div>
+		<!-- /.login-logo -->
+		<div class="login-box-body">
+			<!-- Profile Image -->
+			<div class="box box-success">
+				<div class="box-body box-profile">
+					<com:TImage id="lImgUser"
+								ImageUrl="image/logos/pri.png"
+								cssclass="profile-user-img img-responsive img-circle"
+								Attributes.alt="User Image" />
+					<com:TLabel id="lTema" />
+					<ul class="list-group list-group-unbordered" style="list-style: none;">
+						<li class="form-group has-feedback">
+							<com:TRequiredFieldValidator CssClass="error"
+														 ValidationGroup="login"
+														 ControlToValidate="Username"
+														 ErrorMessage="Por favor escriba su nombre de usuario."
+														 Display="Dynamic" />
+							<com:TTextBox ID="Username" CssClass="form-control" Attributes.placeholder="Usuario" />
+							<span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+						</li>
+						<li class="form-group has-feedback">
+							<com:TTextBox ID="Password" CssClass="form-control" Attributes.placeholder="Contraseña"  TextMode="Password" />
+							<com:TCustomValidator
+												  CssClass="error"
+												  ControlToValidate="Password"
+												  ValidationGroup="login"
+												  ErrorMessage="Su contraseña no es valida."
+												  Display="Dynamic"
+												  OnServerValidate="validateUser" />
+							<span class="glyphicon glyphicon-lock form-control-feedback"></span>
+						</li>
+					</ul>
+					<com:TButton CssClass=""
+								 style="display: none;"
+								 Text="Entrar"
+								 OnClick="loginButtonClicked"
+								 ValidationGroup="login" />
+					<com:TLinkButton CssClass="btn btn-success"
+									 OnClick="loginButtonClicked"
+									 ValidationGroup="login" >
+						<i class="fa fa-sign-in"></i> Entrar
+					</com:TLinkButton>
+				</div>
+				<!-- /.box-body -->
+				<div class="box-footer">
+					<com:TActiveHyperLink id="lnkRecordar">
+						¿Olvidaste la contraseña?
+					</com:TActiveHyperLink>
+				</div>
+			</div>
+			<!-- /.box -->
+		</div>
+		<!-- /.login-box-body -->
+	</div>
+	<!-- /.login-box -->
+</com:TContent>

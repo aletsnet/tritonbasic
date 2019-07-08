@@ -1,0 +1,68 @@
+<com:TContent ID="Main">
+	<div class="col-md-12">
+		<div class="box box-primary">
+			<div class="box-header">
+				<i class="fa fa-expeditedssl"></i>
+				<h3 class="box-title">Usuarios activos</h3>
+			</div>
+			<div class="box-body pad table-responsive">
+				<com:TPanel id="tpSinDatos" CssClass="table-responsive">
+					<table class="table table-bordered">
+						<thead>
+							<tr>
+								<th>#</th>
+								<th>Usuario</th>
+								<th>Ultima accion</th>
+								<th>Status</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td colspan="7">No hay elementos que mostrar</td>
+							</tr>
+						</tbody>
+					</table>
+				</com:TPanel>
+				<com:TPanel id="tpDatos" cssclass="table-responsive">
+					<div class="form-group">
+					<com:TActiveDataGrid ID="dgTabla"
+										 PageSize="10"
+										 PagerStyle.Mode="Numeric"
+										 DataKeyField="id_usuarios_activos"
+										 AutoGenerateColumns="false"
+										 CssClass="table table-bordered"
+										 OnPageIndexChanged="changePage"
+										 AllowPaging="true"
+										 AllowCustomPaging="true"
+										 PagerStyle.Position="TopAndBottom"
+										 PagerStyle.Visible="true"
+										 PagerStyle.NextPageText="Sig."
+										 PagerStyle.PrevPageText="Ant."
+										 PagerStyle.PageButtonCount="4"
+										 OnPagerCreated="pagerCreated"
+										 OnItemCreated="itemCreated"
+										 OnDeleteCommand="deleteItem" >
+							<com:TTemplateColumn HeaderText="#" ID="rowI">
+								<prop:ItemTemplate>
+									<com:TLiteral id="lNumero" />
+								</prop:ItemTemplate>
+							</com:TTemplateColumn>
+							<com:TTemplateColumn HeaderText="foto" ID="rowImagen">
+								<prop:ItemTemplate>
+									<com:TActiveImage ID="foto" CssClass="img-circle" ImageUrl="image/persona.jpg" Style="width: 64px;" />
+								</prop:ItemTemplate>
+							</com:TTemplateColumn>
+							<com:TBoundColumn HeaderText="Usuario" DataField="bs_usuarios.nombre" />
+							<com:TBoundColumn HeaderText="Ultimo acceso" DataField="fecha_ultima" />
+							<com:TTemplateColumn HeaderText="Estatus" ID="rowEstatus">
+								<prop:ItemTemplate>
+									<com:TLiteral id="estatus" />
+								</prop:ItemTemplate>
+							</com:TTemplateColumn>
+						</com:TActiveDataGrid>
+					</div>
+				</com:TPanel>
+			</div>
+		</div>
+	</div>
+</com:TContent>

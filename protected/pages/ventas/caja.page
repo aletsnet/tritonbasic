@@ -1,0 +1,806 @@
+<com:TContent ID="Main">
+	<div class="col-md-12">
+		<div class="box box-primary">
+			<div class="box-header">
+				<i class="fa fa-barcode"></i>
+				<h3 class="box-title">Terminal de venta <small><com:TActiveLabel id="lbModalidad"></com:TActiveLabel></small></h3>
+			</div>
+			<div class="box-body" role="form">
+				<div class="form-group">
+					<com:TActiveLabel id="lMesanje" />
+				</div>
+				<div class="form-group">
+					<div class="row">
+						<div class="col-md-9">
+							<div class="col-xs-3">
+								<com:TActiveDropDownList ID="cmdBodega"
+														 AutoPostBack="false"
+														 cssclass="form-control"
+														 DataTextField="bodega"
+														 DataValueField="id_bodegas"  />
+							</div>
+							<div class="col-xs-9">
+								<div class="input-group">
+									<span class="input-group-addon"><i class="fa fa-barcode"></i></span>
+									<com:TActiveTextBox ID="linecomando"
+														AutoPostBack="false"
+														CssClass="form-control"
+														Attributes.autocomplete="off"
+														Attributes.placeholder="Linea de comando"
+														Text=""
+														MaxLength="150" />
+									<com:TActiveLabel id="codigoactivo" cssclass="input-group-btn">
+										<a class="btn btn-info btn-flat"
+										   data-toggle="modal"
+										   data-target="#ModalListaFunciones">
+											<i class="fa fa-question"></i>
+										</a>
+									</com:TActiveLabel>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-3">
+							<com:TActiveLinkButton id="btnTerminar"
+												   style="display: none;"
+												   CssClass="btn bg-olive"
+												   CausesValidation="false"
+												   OnClick="btnTerminarVenta_OnClick" >
+								<prop:ClientSide OnLoading="Msg('Actualizando, por favor espere',true);"
+												 OnComplete="Msg('Listo',false);"
+												 OnException="Msg('Se a producido un error, solicite apoyo técnico',true);"/>
+								<i class="fa fa-check"></i>
+							</com:TActiveLinkButton>
+							<com:TActiveLinkButton id="btnActualizar"
+												   CssClass="btn btn-info"
+												   CausesValidation="false"
+												   OnClick="btnActualizar_OnClick" >
+								<prop:ClientSide OnLoading="Msg('Actualizando, por favor espere',true);"
+												 OnComplete="Msg('Listo',false);"
+												 OnException="Msg('Se a producido un error, solicite apoyo técnico',true);"/>
+								<i class="fa fa-refresh"></i>
+							</com:TActiveLinkButton>
+							<com:TActiveLinkButton ValidationGroup="BuscarCodigo"
+												   CssClass="btn btn-success"
+												   CausesValidation="false"
+												   OnClick="btnBuscarProducto_OnClick" >
+								<i class="fa fa-search"></i>
+							</com:TActiveLinkButton>
+							<com:TActiveHyperLink id="linkTicket" CssClass="btn bg-purple" Target="_blank" >
+								<i class="icon fa fa-print"></i>
+							</com:TActiveHyperLink>
+						</div>
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="row">
+						<div class="col-md-6">
+							<h4>
+								Cliente: <b><com:TActiveLabel id="lCliente" /></b>
+							</h4>
+						</div>
+						<div class="col-md-2">
+							<h4>
+								Total: <b><com:TActiveLabel id="lTotal" /></b>
+							</h4>
+						</div>
+						<div class="col-md-2">
+							<h4>
+								Descuento: <b><com:TActiveLabel id="lDescuento" /></b>
+							</h4>
+							<com:TActiveHiddenField Id="id_clientes" />
+							<com:TActiveHiddenField Id="id_ventas" />
+							<com:TActiveHiddenField Id="params" />
+							<com:TActiveHiddenField Id="inactividad" />
+							<com:TActiveHiddenField Id="formadepago" value="1" />
+						</div>
+						<div class="col-md-2">
+							<i class="fa fa-clock-o"></i> <label id="lTiempo"></label>
+						</div>
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="row">
+						<label class="col-md-4">
+							Venta:
+							<com:TActiveLabel id="lid_cortes" />-<com:TActiveLabel id="lfolioventa" />
+							- Productos: <com:TActiveLabel id="lnproductos" />
+						</label>
+						<div class="col-md-5">
+							<com:TActiveLabel id="lExtra" />
+						</div>
+						<div class="col-md-3">
+							<label >Ticket's pendientes</label>
+						</div>
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="row">
+						<div class="col-md-9">						
+							<com:TActiveHiddenField Id="id_cortes" />
+							<com:TActiveButton id="btnProcesar" CausesValidation="false" OnClick="btnProcesar_OnClick" style="display: none;">
+								<prop:ClientSide OnLoading="Msg('Por favor espere mientras se procesa la petición',true);"
+												 OnComplete="Msg('Listo',false);"
+												 OnException="Msg('Se a producido un error, solicite apoyo técnico',true);"/>
+							</com:TActiveButton>
+							<com:TActiveRepeater ID="RpListaCompra" DataKeyField="id_ventas_detalle" OnItemDataBound="RpListaCompra_DataBound">
+								<prop:HeaderTemplate>
+									<table class="table table-striped">
+										<tr>
+											<th style="width: 10px">#</th>
+											<th>Codigo</th>
+											<th>Producto</th>
+											<th>Precio</th>
+											<th>Cant. </th>
+											<th>Desc. %</th>
+											<th>SubTotal</th>
+											<th>*</th>
+										</tr>
+								</prop:HeaderTemplate>
+								<prop:ItemTemplate>
+									<tr>
+										<td><com:TLiteral id="lnumero" /></td>
+										<td><%# $this->Data->ms_inventarios->ms_productos->codigo %></td>
+										<td><%# $this->Data->ms_inventarios->ms_productos->nombre %></td>
+										<td><com:TLiteral id="precio" /></td>
+										<td><%# $this->Data->cantidad %></td>
+										<td><com:TLiteral id="descuento" /></td>
+										<td><com:TLiteral id="subtotal" /></td>
+										<td>
+											<com:TActiveLinkButton  id="btnEditar_Lista"
+																	CausesValidation="false"
+																	CssClass="btn btn-warning"
+																	OnClick="Page.btnEditar_Lista_OnClick"
+																	Attributes.data-toggle="modal"
+																	Attributes.data-target="#ModalEditarVenta">
+												<prop:ClientSide OnLoading="mensaje('lLista','Actualizando, por favor espere');"
+																 OnComplete="mensaje('lLista','Listo');"
+																 OnException="mensaje('lLista','Se a producido un error, solicite apoyo técnico');"/>
+												<i class="glyphicon glyphicon-edit"></i>
+											</com:TActiveLinkButton>
+											<com:TActiveLinkButton  id="btnBorrar_Lista"
+																			CausesValidation="false"
+																			CssClass="btn btn-danger"
+																			OnClick="Page.btnBorrar_Lista_OnClick" >
+												<prop:ClientSide OnLoading="Msg('Actualizando, por favor espere',true);"
+																 OnComplete="Msg('Listo',false);"
+																 OnException="Msg('Se a producido un error, solicite apoyo técnico',true);"/>
+												<i class="fa fa-trash"></i>
+											</com:TActiveLinkButton>
+										</td>
+									</tr>
+								</prop:ItemTemplate>
+								<prop:FooterTemplate>
+									<tr>
+										<td colspan="8" style="text-align: right;">
+											<h4>Total: <b><com:TLiteral id="total" /></b></h4>
+										</td>
+									</tr>
+									</table>
+								</prop:FooterTemplate>
+							</com:TActiveRepeater>
+							<com:TActivePanel id="ListaBacia" >
+								<table class="table table-bordered">
+									<tr>
+										<th style="width: 10px">#</th>
+										<th>Codigo</th>
+										<th>Nombre</th>
+										<th>Precio</th>
+										<th>Cantidad</th>
+										<th>SubTotal</th>
+										<th>*</th>
+									</tr>
+									<tr>
+										<td colspan="7">No hay elementos que mostrar</td>
+									</tr>
+								</table>
+							</com:TActivePanel>
+						</div>
+						<div class="col-md-3">
+							<com:TActiveRepeater ID="RpListaVentas" DataKeyField="id_ventas" OnItemDataBound="RpListaVentas_DataBound">
+								<prop:HeaderTemplate>
+									<table class="table table-striped">
+										<tr>
+											<th style="width: 10px">#</th>
+											<th class="text-center">Venta</th>
+											<th style="width: 150px" class="text-center">*</th>
+										</tr>
+								</prop:HeaderTemplate>
+								<prop:ItemTemplate>
+									<tr>
+										<td><com:TLiteral id="lj" /></td>
+										<td class="text-right"><com:TLiteral id="lventas" /></td>
+										<td class="text-right">
+											<com:TActiveLinkButton  id="btnEditar_Ventas"
+																	CausesValidation="false"
+																	CssClass="btn btn-warning"
+																	OnClick="Page.btnEditar_Venta_OnClick" >
+												<i class="glyphicon glyphicon-edit"></i>
+											</com:TActiveLinkButton>
+											<com:TActiveLinkButton  id="btnBorrar_Ventas"
+																			CausesValidation="false"
+																			CssClass="btn btn-danger"
+																			OnClick="Page.btnBorrar_Ventas_OnClick" >
+														<i class="fa fa-trash"></i>
+											</com:TActiveLinkButton>
+											<com:TActiveHyperLink id="linkTicket" CssClass="btn bg-purple" Target="_blank" >
+												<i class="icon fa fa-print"></i>
+											</com:TActiveHyperLink>
+										</td>
+									</tr>
+								</prop:ItemTemplate>
+								<prop:FooterTemplate>
+									</table>
+								</prop:FooterTemplate>
+							</com:TActiveRepeater>
+							<com:TActivePanel id="ListaVentaBacia" >
+								<table class="table table-bordered">
+									<tr>
+										<th style="width: 10px">#</th>
+										<th>Venta</th>
+										<th>*</th>
+									</tr>
+									<tr>
+										<td colspan="3">No hay elementos que mostrar</td>
+									</tr>
+								</table>
+							</com:TActivePanel>
+						</div>
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="row">
+						<label class="col-md-3">
+							Selecciona en el modo de pago:
+						</label>
+						<div class="col-md-4">	
+							<label id="labelFormaPago1" class="badge bg-green" style="font-size: 14px;">
+								<i class="fa fa-money"></i>
+								Efectivo
+								<com:TActiveRadioButton ID="rdFormaPago1" Checked="true" GroupName="FormaPago" style="display:none;" Attributes.onchange="formapago(1)"/>
+							</label>
+							<label id="labelFormaPago2" class="badge bg-red" style="font-size: 14px;">
+								<i class="fa fa-credit-card"></i>
+								Tarjeta
+								<com:TActiveRadioButton ID="rdFormaPago2" GroupName="FormaPago" style="display:none;" Attributes.onchange="formapago(2)" />
+							</label>
+							<label id="labelFormaPago3" class="badge bg-red" style="font-size: 14px;">
+								<i class="fa fa-credit"></i>
+								Cheque
+								<com:TActiveRadioButton ID="rdFormaPago3" GroupName="FormaPago" style="display:none;" Attributes.onchange="formapago(3)" />
+							</label>
+							<label id="labelFormaPago4" class="badge bg-red" style="font-size: 14px;">
+								<i class="fa fa-briefcase"></i>
+								Traferencia
+								<com:TActiveRadioButton ID="rdFormaPago4" GroupName="FormaPago" style="display:none;" Attributes.onchange="formapago(4)" />
+							</label>
+							<label id="labelFormaPago5" class="badge bg-red" style="font-size: 14px;">
+								<i class="fa fa-cube"></i>
+								Otro
+								<com:TActiveRadioButton ID="rdFormaPago5" GroupName="FormaPago" style="display:none;" Attributes.onchange="formapago(5)" />
+							</label>
+						</div>
+						<div class="col-md-3">
+							<com:TActiveLinkButton  id="btnTerminarF"
+													CausesValidation="false"
+													CssClass="btn bg-green"
+													OnClick="btnTerminarVenta_OnClick" >
+										<i class="fa fa-shopping-cart"></i> SALE
+							</com:TActiveLinkButton>
+						</div>
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="row">
+						<div class="col-md-4">
+							<label>
+								Ticket se imprime automaticamente 
+								<com:TActiveCheckBox ID="ckTicketImprimir"
+													 AutoPostBack="true"
+													 OnCheckedChanged="ckTicketImprimir_OnCheckedChanged"/>
+							</label>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="ModalListaFunciones" class="modal fade" role="dialog">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-body">
+				<div class="box">
+					<div class="box-header with-border">
+						<div class="col-sm-12">
+							Lista de funciones
+						</div>
+					</div>
+					<div class="box-body table-responsive no-padding">
+						<com:TActiveRepeater ID="RpListaFunciones" DataKeyField="id_codigosreservados" OnItemDataBound="RpListaFunciones_DataBound">
+							<prop:HeaderTemplate>
+								<table class="table table-striped">
+									<tr>
+										<th style="width: 20px">Codigo</th>
+										<th>Descripcion</th>
+										<th>*</th>
+									</tr>
+							</prop:HeaderTemplate>
+							<prop:ItemTemplate>
+								<tr>
+									<td><com:TLiteral id="lcodigo" /></td>
+									<td><com:TLiteral id="ldescripcion" /></td>
+									<td>
+										<com:TActiveLinkButton  id="btnFunsion"
+																CausesValidation="false"
+																CssClass="btn btn-warning"
+																OnClick="Page.btnFunsion_OnClick"
+																Attributes.data-dismiss="modal" >
+											<prop:ClientSide OnLoading="Msg('Actualizando, por favor espere',true);"
+															 OnComplete="Msg('Listo',false);"
+															 OnException="Msg('Se a producido un error, solicite apoyo técnico',true);"/>
+											<i class="fa fa-check"></i>
+										</com:TActiveLinkButton>
+									</td>
+								</tr>
+							</prop:ItemTemplate>
+							<prop:FooterTemplate>
+								</table>
+							</prop:FooterTemplate>
+						</com:TActiveRepeater>
+					</div>
+					<!-- /.box-body -->
+					<div class="box-footer " style="text-align: right;">
+						<a class="btn btn-danger" data-dismiss="modal">
+							<i class="fa fa-close"></i>
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<com:TJuiDialog ID="ModalDepartamentos"
+					Options.Title="Buscar Producto"
+					Options.AutoOpen="false"
+					Options.Modal="true"
+					Options.Position="top center"
+					Options.Width="600">
+		<div class="box">
+			
+		</div>
+	</com:TJuiDialog>
+	<div id="ModalClientes" class="modal" role="dialog">
+		<div class="modal-dialog modal-gl">
+			<div class="modal-body">
+		<div class="box">
+			<div class="box-header with-border">
+				<div class="col-sm-9">
+					<com:TActiveTextBox ID="txtCliente"
+										CssClass="form-control"
+										Attributes.placeholder="Nombre del cliente"
+										Text=""
+										MaxLength="120"
+										AutoPostBack="false"
+										Attributes.autocomplete="off" />
+				</div>
+				<div class="col-sm-3">
+					<com:TActiveLinkButton  id="JbtnBuscarClienteNombre"
+											ValidationGroup="BuscarNombre"
+											CssClass="btn btn-success"
+											OnClick="JbtnBuscarClienteNombre_OnClick" >
+						<i class="fa fa-search"></i>
+					</com:TActiveLinkButton>
+					<a class="btn btn-danger" data-dismiss="modal">
+						<i class="fa fa-close"></i>
+					</a>
+				</div>
+			</div>
+			<!-- /.box-header -->
+			<div class="box-body">
+				<com:TActiveDataGrid ID="dgClientes"
+									 PageSize="10"
+									 DataKeyField="id_clientes"
+									 AutoGenerateColumns="false"
+									 CssClass="table table-bordered"
+									 AllowPaging="false"
+									 AllowCustomPaging="false"
+									 OnItemCreated="dgClientes_OnItemCreated">
+					<com:TBoundColumn HeaderText="Folio" DataField="id_clientes" />
+					<com:TBoundColumn HeaderText="Cliente" DataField="nombre" />
+					<com:TTemplateColumn HeaderText="Saldo" ID="rowSaldo">
+						<prop:ItemTemplate>
+							<com:TActiveLabel id="lSaldo" />
+						</prop:ItemTemplate>
+					</com:TTemplateColumn>
+					<com:TTemplateColumn HeaderText="Credito" ID="rowCreditoPermitido">
+						<prop:ItemTemplate>
+							<com:TActiveLabel id="lCredito" />
+						</prop:ItemTemplate>
+					</com:TTemplateColumn>
+					<com:TTemplateColumn HeaderText="*" ID="rowLinkClientes">
+						<prop:ItemTemplate>
+							<com:TActiveLinkButton Id="btnClickCliente"
+											 CausesValidation="false"
+											 cssclass="btn bg-purple"
+											 OnClick="Page.btnClickCliente_OnClick" >
+									<i class="fa fa-check"></i>
+							</com:TActiveLinkButton>
+						</prop:ItemTemplate>
+					</com:TTemplateColumn>
+				</com:TActiveDataGrid>
+			</div>
+			<!-- /.box-body -->
+			<div class="box-footer clearfix">
+				<com:TActiveLabel id="lcount_clientes" />
+			</div>
+		</div>
+			</div>
+		</div>
+	</div>
+	
+	<div id="ModalEditarVenta" class="modal" role="dialog">
+		<div class="modal-dialog modal-gl">
+			<div class="modal-body">
+				<div class="box">
+					<div class="box-header with-border">
+						<h3>
+							<b><com:TActiveLabel id="lNombreProducto" /></b>
+						</h3>
+						<div class="box-tools pull-right" data-toggle="tooltip" title="" data-original-title="Status">
+							<com:TActiveHiddenField Id="id_ventas_detalle" />
+							<div class="btn-group" data-toggle="btn-toggle">
+								<label id="lLista"></label>
+							</div>
+						</div>
+					</div>
+					<div class="box-body">
+						<table class="table table-bordered">
+							<tr>
+								<th>
+									Cantidad
+									<com:TRequiredFieldValidator
+										ValidationGroup="JEditarPrecio"
+										ControlToValidate="txtCantidad"
+										CssClass="glyphicon glyphicon-asterisk"
+										Text=" "
+										Display="Dynamic" />
+									<com:TCompareValidator
+										ValidationGroup="JEditarPrecio"
+										ControlToValidate="txtCantidad"
+										DataType="Float"
+										CssClass="glyphicon glyphicon-asterisk"
+										Text=" "
+										Display="Dynamic" />
+								</th>
+								<th>
+									Precio
+									<com:TRequiredFieldValidator
+										ValidationGroup="JEditarPrecio"
+										ControlToValidate="txtPrecioVendido"
+										CssClass="glyphicon glyphicon-asterisk"
+										Text=" "
+										Display="Dynamic" />
+									<com:TCompareValidator
+										ValidationGroup="JEditarPrecio"
+										ControlToValidate="txtPrecioVendido"
+										DataType="Float"
+										CssClass="glyphicon glyphicon-asterisk"
+										Text=" "
+										Display="Dynamic" />
+								</th>
+								<th>SubTotal</th>
+								<th style="text-align: right;">*</th>
+							</tr>
+							<tr>
+								<td>
+									<com:TActiveTextBox ID="txtCantidad"
+													AutoPostBack="false"
+													CssClass="form-control text-right"
+													Attributes.autocomplete="off"
+													Attributes.placeholder="Cantidad"
+													Attributes.onchange="sumar();"
+													Text=""
+													MaxLength="11" />
+								</td>
+								<td>
+									<com:TActiveTextBox ID="txtPrecioVendido"
+														AutoPostBack="false"
+														CssClass="form-control text-right"
+														Attributes.autocomplete="off"
+														Attributes.placeholder="Precio"
+														Attributes.onchange="sumar();"
+														Text=""
+														MaxLength="11" />
+								</td>
+								<td>
+									<com:TActiveTextBox ID="txtSubTotal"
+														AutoPostBack="false"
+														CssClass="form-control text-right"
+														Attributes.autocomplete="off"
+														Attributes.placeholder="Precio"
+														Attributes.onchange="subtotal();"
+														Text=""
+														MaxLength="11" />
+								</td>
+								<td width="100px">
+									<com:TActiveLinkButton  id="JbtnEditarPrecio"
+															ValidationGroup="JEditarPrecio"
+															CssClass="btn btn-success"
+															OnClick="JbtnEditarPrecio_OnClick" >
+										
+											<prop:ClientSide OnComplete="$('#ModalEditarVenta').modal('hide');"
+															 OnException="$('#ModalEditarVenta').modal('hide');"/>
+										<i class="fa fa-save"></i>
+									</com:TActiveLinkButton>
+									<a class="btn btn-danger" data-dismiss="modal">
+										<i class="fa fa-close"></i>
+									</a>
+								</td>
+							</tr>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<com:TJuiDialog ID="ModalAbonar"
+					Options.Title="Abonar a credito"
+					Options.AutoOpen="false"
+					Options.Modal="true"
+					Options.Position="top center"
+					Options.Width="850">
+		<div class="box">
+			<div class="box-header with-border">
+				<div class="col-sm-10">
+					
+				</div>
+			</div>
+			<!-- /.box-header -->
+			<div class="box-body">
+				<div class="form-group">
+					<div class="col-md-3">
+						Cliente:
+					</div>
+					<div class="col-md-6">
+						<com:TActiveTextBox ID="txtClienteCredito"
+										CssClass="form-control"
+										Attributes.placeholder="[Nombre del cliente]"
+										Text=""
+										MaxLength="120"
+										AutoPostBack="false"
+										Attributes.autocomplete="off" />
+					</div>
+					<div class="col-sm-3">
+						<com:TActiveLinkButton  id="JbtnBuscarCredito"
+												ValidationGroup="BuscarNombre"
+												CssClass="btn btn-default"
+												OnClick="JbtnBuscarCredito_OnClick" >
+							<i class="fa fa-search"></i>
+						</com:TActiveLinkButton>
+						<com:TActiveLinkButton  id="JbtnCerrarCredito"
+												CausesValidation="false"
+												CssClass="btn btn-danger"
+												OnClick="JbtnCerrarCredito_OnClick" >
+							<i class="fa fa-close"></i>
+						</com:TActiveLinkButton>
+					</div>
+				</div>
+			</div>
+			<div class="box-body">
+				<com:TActiveDataGrid ID="dgCredito"
+									 PageSize="10"
+									 DataKeyField="id_ventas"
+									 AutoGenerateColumns="false"
+									 CssClass="table table-bordered"
+									 AllowPaging="false"
+									 AllowCustomPaging="true"
+									 OnItemCreated="dgCredito_OnItemCreated">
+					<com:TBoundColumn HeaderText="Folio" DataField="id_ventas" />
+					<com:TBoundColumn HeaderText="Cliente" DataField="ms_clientes.nombre" />
+					<com:TTemplateColumn HeaderText="Credito" ID="rowCredito">
+						<prop:ItemTemplate>
+							<com:TActiveLabel id="lCredito" />
+						</prop:ItemTemplate>
+					</com:TTemplateColumn>
+					<com:TTemplateColumn HeaderText="*" ID="rowLinkCredito">
+						<prop:ItemTemplate>
+							<com:TActiveLinkButton Id="btnClickCredito"
+											 CausesValidation="false"
+											 cssclass="btn"
+											 OnClick="Page.btnClickCredito_OnClick" >
+									<i class="fa fa-fire"></i>
+							</com:TActiveLinkButton>
+						</prop:ItemTemplate>
+					</com:TTemplateColumn>
+				</com:TActiveDataGrid>
+			</div>
+			<com:TActivePanel id="TpAbono" cssclass="box-body form-horizontal">
+				<div class="form-group">
+					<div class="col-md-3">
+						Cliente:
+					</div>
+					<div class="col-md-6">
+						<com:TActiveLabel id="lClienteCredito"/>
+					</div>
+					<div class="col-sm-3">
+						<com:TActiveLabel id="lMontoDeuda"/>
+						<com:TActiveHiddenField Id="credito_monto" />
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-md-3">
+						Abono:
+					</div>
+					<div class="col-md-6">
+						<com:TActiveTextBox ID="txtAbomoCredito"
+										CssClass="form-control"
+										Attributes.placeholder="0.00"
+										Text=""
+										MaxLength="20"
+										AutoPostBack="false"
+										Attributes.autocomplete="off" />
+					</div>
+					<div class="col-sm-3">
+						<com:TActiveLinkButton  id="JbtnAbonarCredito"
+												CssClass="btn btn-default"
+												OnClick="JbtnAbonarCredito_OnClick" >
+							<i class="fa fa-save"></i>
+						</com:TActiveLinkButton>
+					</div>
+				</div>
+			</com:TActivePanel>
+			<!-- /.box-body -->
+			<div class="box-footer clearfix">
+				<com:TActiveLabel id="lcount_creditos" />
+			</div>
+			<com:TActiveLabel id="LbJSCredito"></com:TActiveLabel>
+		</div>
+	</com:TJuiDialog>
+	<div id="modalBuscarProductos" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog modal-gl">
+			<div class="modal-content">
+					<div class="modal-header">
+						<div class="col-sm-9">
+							<com:TActiveTextBox ID="txtNombres"
+												CssClass="form-control"
+												Attributes.placeholder="Nombre del producto"
+												Text=""
+												MaxLength="120"
+												AutoPostBack="false"
+												Attributes.autocomplete="off" />
+						</div>
+						<div class="col-sm-3">
+							<com:TActiveLinkButton  id="JbtnBuscarProductoNombre"
+													ValidationGroup="BuscarNombre"
+													CssClass="btn btn-success"
+													OnClick="JbtnBuscarProductoNombre_OnClick" >
+								<i class="fa fa-search"></i>
+							</com:TActiveLinkButton>
+							<a Class="btn btn-danger" data-dismiss="modal"  >
+								<i class="fa fa-close"></i>
+							</a>
+						</div>
+					</div>
+					<!-- /.box-header -->
+					<div class="modal-body">
+						<com:TActiveDataGrid ID="dgProductos"
+											 PageSize="8"
+											 DataKeyField="id_productos"
+											 AutoGenerateColumns="false"
+											 CssClass="table table-bordered"
+											 PagerStyle.Mode="Numeric"
+											 AllowPaging="true"
+											 AllowCustomPaging="true"
+											 PagerStyle.Position="TopAndBottom"
+											 PagerStyle.Visible="true"
+											 PagerStyle.NextPageText="Sig."
+											 PagerStyle.PrevPageText="Ant."
+											 PagerStyle.PageButtonCount="4";
+											 OnPageIndexChanged="dgProductos_changePage"
+											 OnPagerCreated="dgProductos_pagerCreated"
+											 OnItemCreated="dgProductos_OnItemCreated">
+							<com:TBoundColumn HeaderText="Codigo" DataField="ms_productos.codigo" />
+							<com:TBoundColumn HeaderText="Producto" DataField="ms_productos.nombre" />
+							<com:TTemplateColumn HeaderText="Inventario" ID="rowBart">
+								<prop:ItemTemplate>
+									<com:TLiteral id="lPorcentajeStock" /> <br />
+									<com:TLiteral id="lBartStock" />
+								</prop:ItemTemplate>
+							</com:TTemplateColumn>
+							<com:TTemplateColumn HeaderText="Precio" ID="rowPrecio">
+								<prop:ItemTemplate>
+									<com:TActiveLabel id="lprecio" />
+								</prop:ItemTemplate>
+							</com:TTemplateColumn>
+							<com:TTemplateColumn HeaderText="*" ID="rowLink">
+								<prop:ItemTemplate>
+									<com:TActiveLinkButton Id="btnClick"
+													 CausesValidation="false"
+													 cssclass="btn bg-purple"
+													 OnClick="Page.btnClick_OnClick" >
+											<i class="fa fa-check"></i>
+									</com:TActiveLinkButton>
+								</prop:ItemTemplate>
+							</com:TTemplateColumn>
+						</com:TActiveDataGrid>
+					</div>
+					<!-- /.box-body -->
+					<div class="modal-footer">
+						<com:TActiveLabel id="lcount_productos" />
+					</div>
+			</div>
+		</div>
+	</div>
+	<com:TClientScript>
+	$("#<%= $this->linecomando->ClientID %>").focus();
+	$("#<%= $this->linecomando->ClientID %>").keypress(
+		function(event) {
+			switch(event.keyCode)
+			{
+				case 13:
+					$("#<%= $this->btnProcesar->ClientID %>").click();
+					//anula el postback
+					return false;
+				break;
+			}
+		}
+	);
+	
+	function sumar(){
+		var a = $("#<%= $this->txtCantidad->ClientID %>").val();
+		var b = $("#<%= $this->txtPrecioVendido->ClientID %>").val();
+		var c = a * b;
+		$("#<%= $this->txtSubTotal->ClientID %>").val(c);
+	}
+	
+	function subtotal(){
+		var c = $("#<%= $this->txtSubTotal->ClientID %>").val();
+		var a = $("#<%= $this->txtCantidad->ClientID %>").val();
+		var b = 0;
+		if(a > 0){
+			b = c / a;
+		}
+		$("#<%= $this->txtPrecioVendido->ClientID %>").val(b.toFixed(2));
+	}
+	
+	//relog
+	function ceros_a(cantidad,cuantos_ceros){
+			cantidad += "";
+			for(i=cantidad.length;i < cuantos_ceros;i++){
+					cantidad = "0"+cantidad;
+			}
+			return cantidad;
+	}
+	
+	function hora_a(){
+		var inactividad = $("#<%= $this->inactividad->ClientID %>").attr("value");
+		inactividad = (inactividad * 1) + 1;
+		$("#<%= $this->inactividad->ClientID %>").attr("value",inactividad);
+		if(inactividad > 550){
+			$("#<%= $this->btnProcesar->ClientID %>").click();
+		}
+		var fecha = new Date();	
+		return ceros_a(fecha.getDate(),2) + "/" + ceros_a(fecha.getMonth()+1,2) + "/" + fecha.getFullYear() + " " + ceros_a(fecha.getHours(),2)
+					+ ":" + ceros_a(fecha.getMinutes(),2)
+					+ ":" + ceros_a(fecha.getSeconds(),2) ;
+					//+ " - " + inactividad;
+					
+	}
+	
+	function alerta(){
+		jQuery("#lTiempo").html(hora_a());
+	}
+	
+	function formapago(index){
+		for(i=1;i<=5;i++){
+			$("#labelFormaPago" + i).attr("class","badge bg-red");
+		}
+		$("#labelFormaPago"+index).attr("class","badge bg-green");
+		
+		$("#<%= $this->formadepago->ClientID %>").val(index);
+	}
+	
+	function mensaje(div,mensaje){
+		$("#" + div).html(mensaje);
+	}
+	
+	window.setInterval('alerta()',1000);
+	</com:TClientScript>
+</com:TContent>

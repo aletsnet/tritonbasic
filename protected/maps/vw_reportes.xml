@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<sqlMap namespace="Reportes">
+    <select id="vwTopArticulo" resultClass="array">
+        SELECT
+                a.id_inventarios,
+                c.codigo codigo,
+                c.nombre nombre,
+                SUM(a.cantidad) c
+        FROM
+                ct_ventas_detalle a
+        JOIN
+                ms_inventarios b
+            ON
+                a.id_inventarios = b.id_inventarios
+        JOIN
+                ms_productos c
+            ON
+                b.id_productos = c.id_productos
+        WHERE
+                fecha_movimiento BETWEEN #fechai# AND #fechaf#
+            AND
+                if(#nombre# != '%%', c.codigo like #nombre# OR c.nombre like #nombre# , true)
+        GROUP BY
+            a.id_inventarios
+        ORDER BY
+            c DESC
+        LIMIT #limite#
+    </select>
+    <select id="vwTopArticuloDia" resultClass="array">
+        SELECT
+                DATE_FORMAT(fecha_movimiento,'%d/%m/%y') f,
+                SUM(cantidad) t
+            FROM
+                ct_ventas_detalle
+        WHERE
+                id_inventarios = #idinventario#
+            AND
+                fecha_movimiento BETWEEN #fechai# AND #fechaf#
+        GROUP BY
+            f
+    </select>
+    <select id="vwTopArticuloSemana" resultClass="array">
+        SELECT
+                DATE_FORMAT(fecha_movimiento,'%V') f,
+                SUM(cantidad) t
+            FROM
+                ct_ventas_detalle
+        WHERE
+                id_inventarios = #idinventario#
+            AND
+                fecha_movimiento BETWEEN #fechai# AND #fechaf#
+        GROUP BY
+            f
+    </select>
+    <select id="vwTopArticuloMes" resultClass="array">
+        SELECT
+                DATE_FORMAT(fecha_movimiento,'%y/%m') f,
+                SUM(cantidad) t
+            FROM
+                ct_ventas_detalle
+        WHERE
+                id_inventarios = #idinventario#
+            AND
+                fecha_movimiento BETWEEN #fechai# AND #fechaf#
+        GROUP BY
+            f
+    </select>
+    <select id="vwTopArticuloAnio" resultClass="array">
+        SELECT
+                DATE_FORMAT(fecha_movimiento,'%y') f,
+                SUM(cantidad) t
+            FROM
+                ct_ventas_detalle
+        WHERE
+                id_inventarios = #idinventario#
+            AND
+                fecha_movimiento BETWEEN #fechai# AND #fechaf#
+        GROUP BY
+            f
+    </select>
+    <select id="vwTopVentasDia" resultClass="array">
+        SELECT
+                estatus,
+                DATE_FORMAT(fecha_termina,'%d/%m/%Y') f,
+                SUM(total) t
+        FROM
+                ms_ventas
+        WHERE
+                estatus = #estatus#
+            AND
+                fecha_termina BETWEEN #fechai# AND #fechaf#
+        GROUP BY
+                estatus, f
+        ORDER BY
+                estatus, f 
+    </select>
+    <select id="vwTopVentasSemana" resultClass="array">
+        SELECT
+                estatus,
+                DATE_FORMAT(fecha_termina,'%V') f,
+                SUM(total) t
+        FROM
+                ms_ventas
+        WHERE
+                estatus = #estatus#
+            AND
+                fecha_termina BETWEEN #fechai# AND #fechaf#
+        GROUP BY
+                estatus, f
+        ORDER BY
+                estatus, f 
+    </select>
+    <select id="vwTopVentasMes" resultClass="array">
+        SELECT
+                estatus,
+                DATE_FORMAT(fecha_termina,'%m/%Y') f,
+                SUM(total) t
+        FROM
+                ms_ventas
+        WHERE
+                estatus = #estatus#
+            AND
+                fecha_termina BETWEEN #fechai# AND #fechaf#
+        GROUP BY
+                estatus, f
+        ORDER BY
+                estatus, f 
+    </select>
+    <select id="vwTopVentasAnio" resultClass="array">
+        SELECT
+                estatus,
+                DATE_FORMAT(fecha_termina,'%Y') f,
+                SUM(total) t
+        FROM
+                ms_ventas
+        WHERE
+                estatus = #estatus#
+            AND
+                fecha_termina BETWEEN #fechai# AND #fechaf#
+        GROUP BY
+                estatus, f
+        ORDER BY
+                estatus, f 
+    </select>
+</sqlMap>
