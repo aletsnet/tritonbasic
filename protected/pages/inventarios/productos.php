@@ -401,8 +401,10 @@ class Productos extends TPage
                 $row->tipo             = $this->ChProducto1->checked;
                 $row->id_departamentos = $this->cmdDepartamento->Text;
 				//SAT
-				$row->claveprodserv    = $this->txtClaveProdServ->text;
-				$row->claveunidad      = $this->txtClaveUnidad->text;
+				if($this->txtClaveProdServ->text != "")
+					$row->claveprodserv    = $this->txtClaveProdServ->text;
+				if($this->txtClaveUnidad->text != "")
+					$row->claveunidad      = $this->txtClaveUnidad->text;
                 
 				$row->save();
                 $this->id_productos->value = $row->id_productos;
