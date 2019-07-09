@@ -10,7 +10,7 @@
     <modules>
         <module id="globalization" class="TGlobalization" Charset="UTF-8" Culture="es" />
         <module id="db" class="System.Data.TDataSourceConfig">
-            <database ConnectionString="mysql:host=localhost;dbname=triton_2018" username="alets" password="!Lumb3rj4ck" />
+            <database ConnectionString="mysql:host=localhost;dbname=triton_basic" username="user" password="" />
         </module>
         <module class="System.Data.ActiveRecord.TActiveRecordConfig" ConnectionID="db" />
         <module id="query" class="System.Data.SqlMap.TSqlMapConfig" EnableCache="false" ConfigFile="Application.query" ConnectionID="db" />

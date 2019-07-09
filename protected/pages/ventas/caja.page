@@ -728,6 +728,36 @@
 			</div>
 		</div>
 	</div>
+	<div id="modalNuevoCliente" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog modal-gl">
+			<div class="modal-content">
+				<div class="modal-header">
+					<div class="col-sm-9">
+						<h4>Nuevo Cliente</h4>
+					</div>
+					<div class="col-sm-3">
+						<com:TActiveLinkButton  id="btnClientSave"
+												ValidationGroup="NuevoCliente"
+												CssClass="btn btn-success"
+												OnClick="btnClientSave_OnClick" >
+							<i class="fa fa-search"></i>
+						</com:TActiveLinkButton>
+						<a Class="btn btn-danger" data-dismiss="modal"  >
+							<i class="fa fa-close"></i>
+						</a>
+					</div>
+				</div>
+				<!-- /.box-header -->
+				<div class="modal-body">
+						
+				</div>
+				<!-- /.box-body -->
+				<div class="modal-footer">
+					
+				</div>
+			</div>
+		</div>
+	</div>
 	<com:TClientScript>
 	$("#<%= $this->linecomando->ClientID %>").focus();
 	$("#<%= $this->linecomando->ClientID %>").keypress(
