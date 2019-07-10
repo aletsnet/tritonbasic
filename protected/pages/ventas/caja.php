@@ -215,13 +215,35 @@ class caja extends TPage
 	/**
 	 *Buscar Clientes
 	*/
+	public function btnNuevoCliente_OnClick($sender, $param){
+		$script = "<script> $('#modalNuevoCliente').modal('show');  </script>";
+		$this->lMesanje->Text = $script;
+	}
+	
+	public function btnClientSave_OnClick($sender, $param){
+		$row = LMsClientes::finder()->find(" borrado = 0 AND telefono = ? ", $this->txtTelefono->Text);
+        if(!($row instanceof LMsClientes)){
+			$row = new LMsClientes;
+			$row->telefono = $this->txtTelefono->Text;
+			$row->nombre = $this->txtNombre->Text;
+			$row->direccion = $this->txtDireccion->Text;
+			
+			$row->save();
+			$this->lCliente->Text    = $row->nombre;
+			$this->lDireccion->Text = $row->direccion;
+			$this->id_clientes->value= $row->id_clientes;
+		}
+		$script = "<script> $('#modalNuevoCliente').modal('hide');  </script>";
+		$this->lMesanje->Text = $script;
+	}
+	
 	public function btnBuscarClientes_OnClick($sender, $param){
 		$this->txtCliente->Text = $this->params->value;
 		//ModalClientes
 		//$this->ModalClientes->Open();
 		$script = "<script> $('#ModalClientes').modal('show');  </script>";
 		$this->lMesanje->Text = $script;
-		$where = " borrado = 0 AND tipo_cliente = 2 AND(nombre like :nombre OR id_clientes like :nombre )";
+		$where = " borrado = 0 AND tipo_cliente = 2 AND (telefono like :nombre OR nombre like :nombre OR id_clientes like :nombre )";
 		$ct_buscar = new TActiveRecordCriteria;
 		$ct_buscar->Parameters[':nombre'] = "%".trim($this->txtCliente->Text)."%";
 		$ct_buscar->Condition = $where;
@@ -252,7 +274,7 @@ class caja extends TPage
 	}
 	
 	public function JbtnBuscarClienteNombre_OnClick($sender, $param){
-		$where = " borrado = 0 AND (nombre like :nombre OR id_clientes like :nombre )";
+		$where = " borrado = 0 AND (telefono like :nombre OR nombre like :nombre OR id_clientes like :nombre )";
 		$ct_buscar = new TActiveRecordCriteria;
 		$ct_buscar->Parameters[':nombre'] = "%".trim($this->txtCliente->Text)."%";
 		$ct_buscar->Condition = $where;
@@ -269,6 +291,7 @@ class caja extends TPage
         if($row instanceof LMsClientes){
 			$this->lCliente->Text    = $row->nombre;
 			$this->id_clientes->value= $row->id_clientes;
+			$this->lDireccion->Text = $row->direccion;
 		}
 		//$this->linecomando->focus();
 		//$this->ListaActual($this->id_ventas->value);

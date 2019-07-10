@@ -50,15 +50,12 @@
 												 OnException="Msg('Se a producido un error, solicite apoyo técnico',true);"/>
 								<i class="fa fa-check"></i>
 							</com:TActiveLinkButton>
-							<com:TActiveLinkButton id="btnActualizar"
+							<com:TLinkButton id="btnActualizar"
 												   CssClass="btn btn-info"
 												   CausesValidation="false"
 												   OnClick="btnActualizar_OnClick" >
-								<prop:ClientSide OnLoading="Msg('Actualizando, por favor espere',true);"
-												 OnComplete="Msg('Listo',false);"
-												 OnException="Msg('Se a producido un error, solicite apoyo técnico',true);"/>
 								<i class="fa fa-refresh"></i>
-							</com:TActiveLinkButton>
+							</com:TLinkButton>
 							<com:TActiveLinkButton ValidationGroup="BuscarCodigo"
 												   CssClass="btn btn-success"
 												   CausesValidation="false"
@@ -97,6 +94,9 @@
 							<i class="fa fa-clock-o"></i> <label id="lTiempo"></label>
 						</div>
 					</div>
+				</div>
+				<div class="form-group">
+					<b><com:TActiveLabel id="lDireccion" /></b>
 				</div>
 				<div class="form-group">
 					<div class="row">
@@ -735,25 +735,92 @@
 					<div class="col-sm-9">
 						<h4>Nuevo Cliente</h4>
 					</div>
-					<div class="col-sm-3">
-						<com:TActiveLinkButton  id="btnClientSave"
-												ValidationGroup="NuevoCliente"
-												CssClass="btn btn-success"
-												OnClick="btnClientSave_OnClick" >
-							<i class="fa fa-search"></i>
-						</com:TActiveLinkButton>
+					<div class="col-sm-3 text-right">
 						<a Class="btn btn-danger" data-dismiss="modal"  >
 							<i class="fa fa-close"></i>
 						</a>
 					</div>
 				</div>
 				<!-- /.box-header -->
-				<div class="modal-body">
-						
+				<div class="modal-body form-horizontal">
+					<div class="form-group">
+						<label class="control-label col-sm-2">
+							<small>
+								<com:TRequiredFieldValidator
+														 ValidationGroup="NuevoCliente"
+														 ControlToValidate="txtTelefono"
+														 CssClass="fa fa-asterisk"
+														 Text=" "
+														 Display="Dynamic" />
+								Teléfono:
+							</small>
+						</label>
+						<div class="col-md-5">
+							<com:TActiveTextBox ID="txtTelefono"
+											CssClass="form-control"
+											Attributes.placeholder="ej. 7712396643"
+											Text=""
+											MaxLength="13"
+											AutoPostBack="false"
+											Attributes.autocomplete="off" />
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="control-label col-sm-2">
+							<small>
+								<com:TRequiredFieldValidator
+														 ValidationGroup="NuevoCliente"
+														 ControlToValidate="txtNombre"
+														 CssClass="fa fa-asterisk"
+														 Text=" "
+														 Display="Dynamic" />
+								Nombre:
+							</small>
+						</label>
+						<div class="col-md-10">
+							<com:TActiveTextBox ID="txtNombre"
+											CssClass="form-control"
+											Attributes.placeholder="ej. Alejandro López Ortiz"
+											Text=""
+											MaxLength="200"
+											AutoPostBack="false"
+											Attributes.autocomplete="off" />
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="control-label col-sm-2">
+							<small>
+								<com:TRequiredFieldValidator
+														 ValidationGroup="NuevoCliente"
+														 ControlToValidate="txtDireccion"
+														 CssClass="fa fa-asterisk"
+														 Text=" "
+														 Display="Dynamic" />
+								Dirección:
+							</small>
+						</label>
+						<div class="col-md-10">
+							<com:TActiveTextBox ID="txtDireccion"
+											CssClass="form-control"
+											TextMode="MultiLine"
+											Attributes.placeholder=" Calle, Colonia"
+											Text=""
+											MaxLength="5540"
+											AutoPostBack="false"
+											Attributes.autocomplete="off" />
+						</div>
+					</div>
 				</div>
 				<!-- /.box-body -->
 				<div class="modal-footer">
-					
+					<div class="form-group text-right">
+						<com:TActiveLinkButton  id="btnClientSave"
+												ValidationGroup="NuevoCliente"
+												CssClass="btn btn-success"
+												OnClick="btnClientSave_OnClick" >
+							<i class="fa fa-save"></i>
+						</com:TActiveLinkButton>
+					</div>
 				</div>
 			</div>
 		</div>
