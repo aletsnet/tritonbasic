@@ -47,7 +47,10 @@ class caja extends TPage
 			
         }
     }
-	
+	public function btnForm_OnClick($sender, $param){
+        
+    }
+
 	public function RpListaFunciones_DataBound($sender, $param){
 		$item=$param->Item;
         if($item->ItemType==='Item' || $item->ItemType==='AlternatingItem')
@@ -195,11 +198,11 @@ class caja extends TPage
 	public function btnVentaRecuperar_OnClick($sender, $param){
 		$index = ($this->params->value!=""?($this->params->value -1):0);
 		$id_corte = 0;
-		$row_corte = LMsCortes::finder()->find(" estatus = ? AND id_sucursal = ?", array(1, $this->User->idsucursales));
+		$row_corte = LMsCortes::finder()->find(" estatus = ? AND id_sucursal = ?", [1, $this->User->idsucursales]);
 		if($row_corte instanceof LMsCortes){
 			$id_corte = $row_corte->id_cortes;
 		}
-		$rows = LMsVentas::finder()->count(" id_cortes = ? AND estatus = ?", array($id_corte,2));
+		$rows = LMsVentas::finder()->count(" id_cortes = ? AND estatus = ?", [$id_corte,2]);
 		//Prado::log(TVarDumper::dump($rows,1),TLogger::NOTICE,$this->PagePath);
 		if($this->params->value <= $rows){
 			$keyid = $this->RpListaVentas->DataKeys[$index];
@@ -366,11 +369,12 @@ class caja extends TPage
 		//$row_corte = LMsCortes::finder()->find(" estatus = ? AND id_sucursal = ? ", array(1, $this->User->idsucursales));
 		//ticket
 		$row_ticket = LCtSucursales::finder()->find(" id_sucursales = ? ", array($this->User->idsucursales));
+		$compatirCorte = 0;
 		if($row_ticket instanceof LCtSucursales){
 			$this->ckTicketImprimir->Checked = $row_ticket->ticket_automatico;
 			$compatirCorte = $row_ticket->corte_compartido;
 		}
-		$row_corte = array();
+		$row_corte = [];
 		if(!$compatirCorte ){
 			$row_corte = LMsCortes::finder()->find(" estatus = ? AND id_sucursal = ? AND id_usuarios = ? ", array(1, $this->User->idsucursales, $this->User->idusuarios));
 			$this->lbModalidad->Text = "Modo corte por usuario";
@@ -387,7 +391,7 @@ class caja extends TPage
 			$row_corte->id_usuarios = $this->User->idusuarios;
 			$row_corte->fecha_registro = date("Y-m-d H:i:s");
 			$row_corte->fecha_inicio = date("Y-m-d H:i:s");
-			//$row_corte->fecha_final;
+			$row_corte->estatus = 1;
 			
 			$row_corte->save();
 			$id_corte = $row_corte->id_cortes;

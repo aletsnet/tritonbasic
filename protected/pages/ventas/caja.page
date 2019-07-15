@@ -4,6 +4,7 @@
 			<div class="box-header">
 				<i class="fa fa-barcode"></i>
 				<h3 class="box-title">Terminal de venta <small><com:TActiveLabel id="lbModalidad"></com:TActiveLabel></small></h3>
+				<com:TButton CausesValidation="false" OnClick="btnBuscar_OnClick" style="display: none;" />
 			</div>
 			<div class="box-body" role="form">
 				<div class="form-group">

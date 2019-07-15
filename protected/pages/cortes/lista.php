@@ -140,7 +140,8 @@ class lista extends TPage
                 $item->rowRetiro->lRetiro->Text     = "$ ".number_format($row->retiro_deposito,2);
                 
                 $catalogo6 = LBsCatalogosGenericos::finder()->find(" catalogo = ? AND valor = ?", array(6, $row->estatus));
-                $item->rowEstatus->lestatus->text = '<label class="'.$catalogo6->cssclass.'"><i class="'.$catalogo6->icon.'"></i> '. $catalogo6->opcion.'</label>';
+				if($catalogo6 instanceof LBsCatalogosGenericos)
+					$item->rowEstatus->lestatus->text = '<label class="'.$catalogo6->cssclass.'"><i class="'.$catalogo6->icon.'"></i> '. $catalogo6->opcion.'</label>';
                 
 				
 				$item->rowBotonos->linkTicket->NavigateUrl = $this->Service->constructUrl('cortes.ticket', array("ticket" => $row->id_cortes, "status" => "2"));

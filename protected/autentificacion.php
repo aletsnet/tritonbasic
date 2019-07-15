@@ -160,7 +160,8 @@ class autentificacion extends TDbUser
     }
     
 	public function Actividad($id_usuarios){
-		if($id_usuarios != ""){
+        $usuario = LBsUsuarios::finder()->find("id_usuarios = ? ", $id_usuarios);
+		if($usuario instanceof LBsUsuarios){
 			$ultima_actividad = LBsUsuariosActivos::finder()->find("id_usuarios = ? AND status = ?", $id_usuarios, 1);
 			if($ultima_actividad instanceof LBsUsuariosActivos){
 				//tiempo
