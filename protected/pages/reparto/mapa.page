@@ -221,7 +221,7 @@
 			codeAddress();
 		}
 	</script>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?async=2&key=AIzaSyCPEPJfTyCy7SJpWADL4VWdqx8HM5PShQ0&callback=myMap"></script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?async=2&key=&callback=myMap"></script>
 
     
 </com:TContent>
