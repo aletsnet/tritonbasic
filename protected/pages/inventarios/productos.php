@@ -767,9 +767,9 @@ class Productos extends TPage
 				$item->rowProducto->lCodigo->Text = $row->ms_productos->codigo;
 				$item->rowProducto->lProducto->Text = $row->ms_productos->nombre;
 				
-                $item->rowValor->lValor->value = $row->preciopublico;
+                $item->rowValor->lValor->Text = "$ ".number_format($row->preciopublico,2);
 				
-                $item->rowPrecioPublico->lPrecioPublico->value = $row->preciopublico;
+                $item->rowPrecioPublico->lPrecioPublico->Text = "$ ".number_format($row->preciopublico);
 				
                 $item->rowBart->lStock->Text = " <b>" . $row->stock . "</b> <small>" . $row->unidad."</small>";
 				
@@ -840,8 +840,8 @@ class Productos extends TPage
 				}
 				$item->rowDatosFiscales->lSatImpuestos->Text = $list;
 				
-				$item->rowValor->lValor->value                 = $valor;
-				$item->rowPrecioPublico->lPrecioPublico->value = $publico;
+				$item->rowValor->lValor->Text                 = " ".number_format($valor);
+				$item->rowPrecioPublico->lPrecioPublico->Text = "$ ".number_format($publico);
 				
 				
 			}

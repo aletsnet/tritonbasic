@@ -912,12 +912,12 @@
 						</com:TTemplateColumn>
 						<com:TTemplateColumn HeaderText="Valor" ID="rowValor">
 							<prop:ItemTemplate>
-								<com:TNumberFormat id="lValor" Type="currency" Culture="es_MX" Currency="$ " />
+								<com:TLabel id="lValor" />
 							</prop:ItemTemplate>
 						</com:TTemplateColumn>
 						<com:TTemplateColumn HeaderText="Importe" ID="rowPrecioPublico">
 							<prop:ItemTemplate>
-								<com:TNumberFormat id="lPrecioPublico" Type="currency" Culture="es_MX" Currency="$ "  /> 
+								<com:TLabel id="lPrecioPublico" /> 
 							</prop:ItemTemplate>
 							<prop:EditItemTemplate>
 								<com:TActiveTextBox id="txtPrecioPublico" />
