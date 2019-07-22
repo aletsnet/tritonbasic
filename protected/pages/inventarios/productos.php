@@ -40,7 +40,7 @@ class Productos extends TPage
 			$this->cmdServicios->DataSource = $Tipo;
 			$this->cmdServicios->dataBind();
 			
-			$DepatamentosB = LBsCatalogosGenericos::finder()->findAll(" catalogo = 18 AND activo = 1");
+			$DepatamentosB = LCtDepartamentos::finder()->findAll(" borrado = 0");
 			$this->cmdDepatamentosB->DataSource = $DepatamentosB;
 			$this->cmdDepatamentosB->dataBind();
 			
@@ -116,7 +116,11 @@ class Productos extends TPage
 				/*$this->cmdBodega2->DataSource = LCtBodegas::finder()->findAll(" id_sucursales = ? AND borrado = 0",$this->User->idsucursales);
 				$this->cmdBodega2->dataBind();
 				$this->cmdBodega2->SelectedIndex = 0;*/
+				/*if(!key_exists("inventario_buscar",$_SESSION)){
+					$_SESSION["inventario_buscar"] = "";
+				}
 				$this->txtBuscar->Text = $_SESSION["inventario_buscar"];
+				*/
 				
 				$this->dgTabla->VirtualItemCount = $this->getRowCount();
 				$this->dgTabla->DataSource=$this->getDataRows(0,$this->dgTabla->PageSize);
@@ -656,7 +660,7 @@ class Productos extends TPage
 			$this->txtClaveUnidad->text   = "";
 			$this->lSatUnidaded->text     = "";
 			
-			$this->txtBuscar->Text = $_SESSION["inventario_buscar"];
+			//$this->txtBuscar->Text = $_SESSION["inventario_buscar"];
 			$this->dgTabla->VirtualItemCount = $this->getRowCount();
 			$this->dgTabla->DataSource=$this->getDataRows(0,$this->dgTabla->PageSize);
 			$this->dgTabla->dataBind();
@@ -664,7 +668,7 @@ class Productos extends TPage
     }
     
 	public function btnBuscar_OnClick($sender, $param){
-		$_SESSION["inventario_buscar"] = $this->txtBuscar->Text;
+		//$_SESSION["inventario_buscar"] = $this->txtBuscar->Text;
 		$this->dgTabla->VirtualItemCount = $this->getRowCount();
 		$this->dgTabla->DataSource=$this->getDataRows(0,$this->dgTabla->PageSize);
 		$this->dgTabla->dataBind();
@@ -691,9 +695,7 @@ class Productos extends TPage
 	protected function getDataRows($offset,$rows)
     {
         $idsucursales = $this->User->idsucursales;
-		$tipo = 0;
-		if($this->cmdServicios->Text != " ")
-			$tipo = (int) $this->cmdServicios->Text;
+		$tipo = $this->cmdServicios->Text;
 		
         $Parametros = array("nombre"       => "%".$this->txtBuscar->Text."%",
 							"idbodegas"    => 1,
@@ -709,15 +711,13 @@ class Productos extends TPage
     protected function getRowCount()
     {
         $idsucursales = $this->User->idsucursales;
-		$tipo = 0;
-		if($this->cmdServicios->Text != " ")
-			$tipo = (int) $this->cmdServicios->Text;
+		$tipo = $this->cmdServicios->Text;
 		
         $Parametros = array("nombre"       => "%".$this->txtBuscar->Text."%",
 							"idbodegas"    => 1,
 							"tipo"         => $tipo,
                             "idsucursales" => $idsucursales,
-                            "departamentos"  => $this->cmdDepatamentosB->Text,);
+                            "departamentos"  => $this->cmdDepatamentosB->Text);
 		$var = $this->Application->Modules['query']->Client->queryForObject("vwInventarios_count",$Parametros);
 		$this->linkPdf->NavigateUrl = $this->Service->constructUrl('inventarios.productospdf',$Parametros);
 		$visible = $var > 0;

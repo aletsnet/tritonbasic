@@ -29,7 +29,8 @@ class productospdf extends TPage
             $Parametros = array("nombre" => "%".$this->request['nombre']."%",
                                 "idbodegas"  => $this->request['idbodegas'],
                                 "tipo"  => $tipo_producto,
-                                "idsucursales"  => $idsucursales);
+                                "idsucursales"  => $idsucursales,
+                                "departamentos"  => $this->request['departamentos']);
             $tabla = $this->Application->Modules['query']->Client->queryForList("vwInventarios_exportar",$Parametros);
             $rows = count($tabla);
             $documento_html = "";

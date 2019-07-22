@@ -771,8 +771,8 @@
 												 CssClass="form-control"
 												 AutoPostBack="true"
 												 OnSelectedIndexChanged="btnBuscar_OnClick"
-												 DataTextField="opcion"
-												 DataValueField="valor"
+												 DataTextField="nombre"
+												 DataValueField="id_departamentos"
 												 PromptText="Departamentos"
 												 PromptValue="0" >
 							<prop:ClientSide OnLoading="Msg('Por favor espere mientras se procesa la petición',true);"
