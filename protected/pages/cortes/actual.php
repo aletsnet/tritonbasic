@@ -205,8 +205,15 @@ class actual extends TPage
 			$this->RpListaVentas->DataSource = $rows_ventas;
 			$this->RpListaVentas->dataBind();
 			
+			//Ventas canceladas
+			$rows_departamentos = $rows_listaproductos = $this->Application->Modules['query']->Client->queryForList("vwDepartamentosVendidos",["idcorte" => $id_corte]);
+			$drows = count($rows_departamentos);
+			$this->SinDatosD->Visible = (!$drows > 0);
+			$this->rpDepartamentos->DataSource = $rows_departamentos;
+			$this->rpDepartamentos->dataBind();
+			
 			//link
-			$this->linkTicket->NavigateUrl = $this->Service->constructUrl('cortes.ticket', array("ticket" => $this->id_cortes->value));
+			$this->linkTicket->NavigateUrl = $this->Service->constructUrl('cortes.ticket', ["ticket" => $this->id_cortes->value , "departamentos" => $this->hdDesglose->value]);
 		}
 	}
     
@@ -232,9 +239,10 @@ class actual extends TPage
 		if($this->IsValid){
 			//$this->id_cortes->value
 			$rows_retiros = new LCtCorteRetiros;
-			$rows_retiros->id_cortes   = $this->id_cortes->value;
+			$rows_retiros->id_cortes = $this->id_cortes->value;
+			$rows_retiros->tipo = 1;
 			$rows_retiros->descripcion = $this->txtDescripcion->Text;
-			$rows_retiros->monto       = $this->txtRetiros->Text;
+			$rows_retiros->monto = $this->txtRetiros->Text;
 			$rows_retiros->save();
 			
 			$this->txtDescripcion->Text = "";
@@ -373,4 +381,31 @@ class actual extends TPage
 			}
 		}
     }
+	
+	public function rpDepartamentos_DataBound($sender, $param){
+		$item=$param->Item;
+        if($item->ItemType==='Item' || $item->ItemType==='AlternatingItem')
+        {
+			$row = (object) $item->Data;
+			if(isset($row->folio)){
+				$item->lFolio->Text = $row->folio;
+				$item->lNombre->Text = $row->nombre;
+				$item->lUnidades->Text = $row->unidades;
+				$item->lMonto->Text = "$ " . number_format($row->monto,2);
+			}
+		}
+	}
+	
+	public function lDesglose_onChange($sender, $param){
+		$l = "";
+		$list = $this->rpDepartamentos->items;
+		$keys = $this->rpDepartamentos->DataKeys;
+		foreach($list as $i => $element){
+			if($element->lDesglose->checked)
+				$l .= ($l != "" ? ",":"") . $keys[$element->itemIndex];
+		}
+		$this->hdDesglose->value = $l;
+		$this->linkTicket->NavigateUrl = $this->Service->constructUrl('cortes.ticket', ["ticket" => $this->id_cortes->value , "departamentos" => $this->hdDesglose->value]);
+	}
+	
 }

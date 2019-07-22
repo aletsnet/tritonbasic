@@ -63,94 +63,6 @@
 					<label class="control-label col-sm-2">
 						Foto del producto:
 					</label>
-					<com:TActivePanel id="camara" CssClass="col-lg-5" visible="false">
-						<link rel="stylesheet" href="css/app.css">
-						<!--- <script type="text/javascript" src="assets/js/webcam.min.js"></script> --->
-						<style>
-							#container {
-								margin: 0px auto;
-								width: 500px;
-								height: 375px;
-								border: 10px #333 solid;
-							}
-						</style>
-						<div id="container" >
-							<video autoplay="true" id="camara" class="col-lg-12" >
-							 
-							</video>
-							<canvas id="foto" width="500" height="375"></canvas>
-						</div>
-						<com:TClientScript>
-							//Nos aseguramos que estén definidas
-							//algunas funciones básicas
-							window.URL = window.URL || window.webkitURL;
-							navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia ||
-							function() {
-								alert('Su navegador no soporta navigator.getUserMedia().');
-							};
-							
-							//Este objeto guardará algunos datos sobre la cámara
-							window.datosVideo = {
-								'StreamVideo': null,
-								'url': null
-							}
-							
-							function inicia() {
-								//Pedimos al navegador que nos da acceso a 
-								//algún dispositivo de video (la webcam)
-								navigator.getUserMedia({
-									'audio': false,
-									'video': true
-								}, function(streamVideo) {
-									datosVideo.StreamVideo = streamVideo;
-									datosVideo.url = window.URL.createObjectURL(streamVideo);
-									jQuery('#camara').attr('src', datosVideo.url);
-							
-								}, function() {
-									alert('No fue posible obtener acceso a la cámara.');
-								});
-							
-							}
-							
-							function detener() {
-							
-								if (datosVideo.StreamVideo) {
-									datosVideo.StreamVideo.stop();
-									window.URL.revokeObjectURL(datosVideo.url);
-								}
-							
-							}
-							
-							function captura_foto() {
-								var oCamara, oFoto, oContexto, w, h;
-							
-								oCamara = jQuery('#camara');
-								oFoto = jQuery('#foto');
-								w = oCamara.width();
-								h = oCamara.height();
-								oFoto.attr({
-									'width': w,
-									'height': h
-								});
-								oContexto = oFoto[0].getContext('2d');
-								oContexto.drawImage(oCamara[0], 0, 0, w, h);
-								if(oCamara.paused || oCamara.ended) return false; // if no video, exit here
-								detener();
-								
-								//context.drawImage(v,0,0,w,h); // draw video feed to canvas
-								
-								var uri = oFoto[0].toDataURL("image/png"); // convert canvas to data URI
-								//console.log(uri); // uncomment line to log URI for testing
-								
-								//imgtag.src = uri; // add URI to IMG tag src
-								$("#<%= $this->imagetxt->ClientID %>").val(uri);
-								oFoto.hide();
-								jQuery("#<%= $this->btnCapturaCamara->ClientID %>").click();
-							}
-							
-							inicia();
-						</com:TClientScript>
-					</com:TActivePanel>
 					<com:TActivePanel id="imagenfija" CssClass="col-lg-3">
 						<div class="panel-image hide-panel-body" id="foto">
 							<com:TActiveImage ID="foto"
@@ -181,32 +93,6 @@
 							</b>
 							Subir Foto
 						</a>
-						<com:TActiveLinkButton  id="btnCamara"
-										  CssClass="btn bg-maroon margin"
-										  OnClick="BtnCamara" >
-							<b>
-								<i class="glyphicon glyphicon-facetime-video"></i>
-							</b>
-							Usar Cámara
-							<prop:ClientSide OnLoading="Msg('Por favor espere mientras se procesa la petición',true);"
-														 OnComplete="Msg('Listo',false);"
-														 OnException="Msg('Se a producido un error, solicite apoyo técnico',true);"/>
-						</com:TActiveLinkButton>
-						<com:TActiveHyperLink id="btnTomar"
-										CssClass="btn bg-olive margin"
-										visible="false"
-										Attributes.onclick="captura_foto();">
-							<b>
-								<i class="glyphicon glyphicon-ok"></i>
-							</b>
-							Tomar Foto
-						</com:TActiveHyperLink>
-						<com:TButton id="btnCapturaCamara"
-											   Text="Guardar Foto"
-											   OnClick="btnCapturaCamara"
-											   ValidationGroup="novalidado"
-											   style="display: none;" >
-						</com:TButton>
 					</div>
 				</div>
 				<div class="form-group">
@@ -371,33 +257,203 @@
 				</div>
 				<div class="form-group">
 					<label class="col-sm-2 control-label">
-						<com:TCustomValidator ValidationGroup="Captura"
-											  ControlToValidate="ChProducto1"
-											  CssClass="glyphicon glyphicon-asterisk"
-											  OnServerValidate="Validador_ChProducto"
-											  Text=" "
-											  ErrorMessage="Activo"
-											  Display="Dynamic" />
+						<com:TRequiredFieldValidator
+													 ValidationGroup="Captura"
+													 ControlToValidate="cmdTipoProducto"
+													 CssClass="glyphicon glyphicon-asterisk"
+													 Text=" "
+													 ErrorMessage="Tipo"
+													 Display="Dynamic" />
 						
 					</label>
 					<div class="col-sm-5">
-						<label>
-							<com:TActiveRadioButton ID="ChProducto1"
-													cssclass="flat-red"
-													GroupName="active"
-													AutoPostBack="false" />
-							Producto
-						</label>
-						<label>
-							<com:TActiveRadioButton ID="ChProducto0"
-													cssclass="flat-red"
-													GroupName="active"
-													AutoPostBack="false" />
-							Servicio
-						</label>
-						
+						<com:TActiveDropDownList ID="cmdTipoProducto"
+												 AutoPostBack="true"
+												 OnSelectedIndexChanged="cmdTipoProducto_OnChange"
+												 cssclass="form-control"
+												 DataTextField="opcion"
+												 DataValueField="valor"
+												 PromptText=" "
+												 PromptValue="0" />
 					</div>
 				</div>
+				<com:TActivePanel id="pnElementos" cssclass="form-group">
+					<div class="col-sm-8">
+						<table class="table">
+							<thead>
+								<tr>
+									<th class="col-sm-3">
+										Codigo
+									</th>
+									<th class="col-sm-6">
+										Nombre
+									</th>
+									<th class="col-sm-2">
+										Unidades
+									</th>
+									<th class="col-sm-1">
+										Tools
+									</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>
+										<div class="input-group">
+											<com:TRequiredFieldValidator ValidationGroup="AddProductoKit"
+																		 ControlToValidate="hdElementIdProductos"
+																		 CssClass="fa fa-asterisk"
+																		 Text=" "
+																		 Display="Dynamic" />
+											<com:TActiveTextBox ID="txtElementCodigo"
+																CssClass="form-control"
+																Attributes.placeholder="Codigo"
+																Text=""
+																MaxLength="50"
+																AutoPostBack="false"
+																Attributes.autocomplete="off" />
+											<com:TActiveHiddenField Id="hdElementIdProductos" />
+											<div class="input-group-btn">
+												<com:TActiveLinkButton  id="btnSearchProductoKit"
+																		CausesValidation="false"
+																		CssClass="btn btn-success"
+																		OnClick="btnSearchProductoKit_OnClick" >
+													<i class="fa fa-search"></i> 
+												</com:TActiveLinkButton>
+											</div>
+										</div>
+									</td>
+									<td>
+										<div class="input-group">
+											<com:TActiveTextBox ID="txtElementNombre"
+																CssClass="form-control"
+																Attributes.placeholder="Nombre del producto"
+																Text=""
+																MaxLength="50"
+																AutoPostBack="false"
+																Attributes.autocomplete="off" />
+											<div class="input-group-btn">
+												<com:TActiveLinkButton  id="btnSearchProductoKit2"
+																		CausesValidation="false"
+																		CssClass="btn btn-success"
+																		OnClick="btnSearchProductoKit2_OnClick" >
+													<i class="fa fa-search"></i> 
+												</com:TActiveLinkButton>
+											</div>
+										</div>
+									</td>
+									<td>
+										<com:TActiveTextBox ID="txtElementUnidades"
+															CssClass="form-control"
+															Attributes.placeholder="U."
+															Text=""
+															MaxLength="15"
+															AutoPostBack="false"
+															Attributes.autocomplete="off" />
+									</td>
+									<td>
+										<com:TActiveLinkButton  id="btnAddProductoKit"
+																ValidationGroup="AddProductoKit"
+																CssClass="btn btn-success"
+																OnClick="btnAddProductoKit_OnClick" >
+											<i class="fa fa-plus"></i> Añadir
+										</com:TActiveLinkButton>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<com:TActiveRepeater ID="rpSearchProduct" DataKeyField="id_productos" OnItemDataBound="rpSearchProduct_DataBound">
+							<prop:HeaderTemplate>
+								<table class="table"><thead>
+								<tr>
+									<th class="col-sm-3">
+										
+									</th>
+									<th class="col-sm-6">
+										
+									</th>
+									<th class="col-sm-2">
+										
+									</th>
+									<th class="col-sm-1">
+										<com:TActiveLinkButton  id="btnCloseProductoKit"
+																CausesValidation="false"
+																CssClass="btn btn-danger"
+																OnClick="page.btnCloseProductoKit_OnClick" >
+											<i class="fa fa-close"></i> Cerrar
+										</com:TActiveLinkButton>
+									</th>
+								</tr>
+							</thead>
+								<tbody>
+							</prop:HeaderTemplate>
+							<prop:ItemTemplate>
+								<tr>
+									<td>
+										<com:TLabel id="lCodigo" />
+									</td>
+									<td>
+										<com:TLabel id="lNombre" />
+									</td>
+									<td>
+										<com:TActiveLinkButton  id="btnElegirProductoKit"
+																CausesValidation="false"
+																CssClass="btn btn-success"
+																OnClick="page.btnElegirProductoKit_OnClick" >
+											<i class="fa fa-check"></i> Elegir
+										</com:TActiveLinkButton>
+									</td>
+								</tr>
+							</prop:ItemTemplate>
+							<prop:FooterTemplate>
+								</tbody>
+								</table>
+							</prop:FooterTemplate>
+						</com:TActiveRepeater>
+						<com:TActiveRepeater ID="rpListProduct" DataKeyField="id_producto_kit" OnItemDataBound="rpListProduct_DataBound">
+							<prop:HeaderTemplate>
+								<table class="table">
+								<tbody>
+							</prop:HeaderTemplate>
+							<prop:ItemTemplate>
+								<tr>
+									<td class="col-sm-3">
+										<com:TLabel id="lCodigo" />
+									</td>
+									<td class="col-sm-6">
+										<com:TLabel id="lNombre" />
+									</td>
+									<td class="col-sm-2">
+										<com:TLabel id="lUnidades" />
+									</td>
+									<td class="col-sm-1">
+										<com:TActiveLinkButton  id="btnQuitProductoKit"
+																CausesValidation="false"
+																CssClass="btn btn-danger"
+																OnClick="page.btnQuitProductoKit_OnClick" >
+											<i class="fa fa-trash"></i> Quitar
+										</com:TActiveLinkButton>
+									</td>
+								</tr>
+							</prop:ItemTemplate>
+							<prop:FooterTemplate>
+								</tbody>
+								</table>
+							</prop:FooterTemplate>
+						</com:TActiveRepeater>
+						<com:TActivePanel id="pnNoSearcProduct">
+							<table class="table">
+							<tbody>
+								<tr>
+									<td>
+										No hay datos que mostrar
+									</td>
+								</tr>
+							</tbody>
+							</table>
+						</com:TActivePanel>
+					</div>
+				</com:TActivePanel> 
 				<div class="form-group">
 					<label class="col-sm-2 control-label">
 						<com:TRangeValidator ValidationGroup="Captura"
@@ -459,13 +515,6 @@
 				</div>
 				<div class="form-group">
 					<label class="col-sm-2 control-label">
-						<com:TRequiredFieldValidator
-													 ValidationGroup="Captura"
-													 ControlToValidate="txtStock"
-													 CssClass="glyphicon glyphicon-asterisk"
-													 Text=" "
-													 ErrorMessage="Existencias"
-													 Display="Dynamic" />
 						<com:TRangeValidator ValidationGroup="Captura"
 											 EnableClientScript="false"
 											 ControlToValidate="txtStock"
@@ -715,27 +764,34 @@
 			<com:TPanel id="Buscador" cssclass="box-body form-horizontal">
 				<div class="form-group">
 					<label class="col-sm-2 control-label">
-						Almacen / Bodega:
+						
 					</label>
 					<div class="col-sm-3">
-						<com:TActiveDropDownList ID="cmdBodega2"
-										   AutoPostBack="false"
-										   cssclass="form-control"
-										   DataTextField="bodega"
-										   DataValueField="id_bodegas"/>
-						
-					</div>
-					<div class="col-sm-3">
-						<com:TActiveDropDownList ID="cmdServicios"
-												 cssclass="form-control"
+						<com:TActiveDropDownList ID="cmdDepatamentosB"
+												 CssClass="form-control"
 												 AutoPostBack="true"
-												 OnSelectedIndexChanged="btnBuscar_OnClick">
+												 OnSelectedIndexChanged="btnBuscar_OnClick"
+												 DataTextField="opcion"
+												 DataValueField="valor"
+												 PromptText="Departamentos"
+												 PromptValue="0" >
 							<prop:ClientSide OnLoading="Msg('Por favor espere mientras se procesa la petición',true);"
 														 OnComplete="Msg('Listo',false);"
 														 OnException="Msg('Se a producido un error, solicite apoyo técnico',true);"/>
-							<com:TListItem Value=" " Text="Mostrar Todo" />
-							<com:TListItem Value="1" Text="Productos" Selected="true" />
-							<com:TListItem Value="0" Text="Servicios" />
+						</com:TActiveDropDownList>
+					</div>
+					<div class="col-sm-3">
+						<com:TActiveDropDownList ID="cmdServicios"
+												 CssClass="form-control"
+												 AutoPostBack="true"
+												 OnSelectedIndexChanged="btnBuscar_OnClick"
+												 DataTextField="opcion"
+												 DataValueField="valor"
+												 PromptText="Mostrar todo"
+												 PromptValue="0" >
+							<prop:ClientSide OnLoading="Msg('Por favor espere mientras se procesa la petición',true);"
+														 OnComplete="Msg('Listo',false);"
+														 OnException="Msg('Se a producido un error, solicite apoyo técnico',true);"/>
 						</com:TActiveDropDownList>
 					</div>
 					<div class="col-sm-4">

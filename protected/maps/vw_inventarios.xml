@@ -21,6 +21,8 @@
             AND
                 if(#tipo# != '',p.tipo = #tipo#, true)
             AND
+                if(#departamentos# != '',id_departamentos = #departamentos#, true)
+            AND
                 ( p.nombre like #nombre# OR p.codigo LIKE #nombre#)
             AND
                 p.id_productos <![CDATA[ > ]]> 1
@@ -48,6 +50,8 @@
             AND
                 if(#tipo# != '',p.tipo = #tipo#, true)
             AND
+                if(#departamentos# != '',id_departamentos = #departamentos#, true)
+            AND
                 ( p.nombre like #nombre# OR p.codigo LIKE #nombre#)
             AND
                 p.id_productos <![CDATA[ > ]]> 1
@@ -72,6 +76,8 @@
                 if(#idbodegas# != '',m.id_bodegas = #idbodegas#,true)
             AND
                 if(#tipo# != '',p.tipo = #tipo#, true)
+            AND
+                if(#departamentos# != '',id_departamentos = #departamentos#, true)
             AND
                 ( p.nombre like #nombre# OR p.codigo LIKE #nombre#)
             AND

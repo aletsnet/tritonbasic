@@ -15,8 +15,8 @@ class tcpdfpa extends TCPDF {
 						<img src="favicon/ms-icon-150x150.png" width="64px" />
 					</td>
 					<td width="80%">
-						<h4>Comite Directivo Estatal del Partido Revolucionario Institucional Hidalgo</h4>
-						<label>Sistema de Gestion 2018</label>
+						<h4>'.$this->titulo.'</h4>
+						<label>'.$this->subtitulo.'</label>
 					</td>
 				</tr>
 			</table>';
@@ -28,11 +28,11 @@ class tcpdfpa extends TCPDF {
         // Position at 15 mm from bottom
         $this->SetY(-15);
 		// Set font
-        $this->SetFont('helvetica', 'I', 5);
+        $this->SetFont('helvetica', 'I', 8);
 		$html = '<table width="100%" border="0" cellspacing="0" cellpadding="0" >
 				<tr>
 					<td align="right" >
-						<small>Sistema de Gestion 2018 - Coordinación de Informática</small>
+						<small>Sistema Tritón - megatec.mx</small>
 					</td>
 				</tr>
 			</table>';

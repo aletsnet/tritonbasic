@@ -212,8 +212,22 @@ class ticket extends TPage
                 <td class="lcampo">
                     ['.$row_venta->id_clientes.']: '.$row_venta->ms_clientes->nombre.'
                 </td>
-            </tr>
-            <tr>
+            </tr>';
+			if($row_venta->tipo_venta == 3){
+				$html .= '<tr>
+					<td class="lcampo">
+						Teléfono: '.$row_venta->ms_clientes->telefono.'
+					</td>
+				</tr>
+				<tr>
+					<td class="lcampo">
+						'.$row_venta->ms_clientes->direccion.' <br />
+						
+						'.$row_venta->ms_clientes->referencia.'
+					</td>
+				</tr>';
+			}
+            $html .= '<tr>
                 <td style="text-align: center;">
                     --------------------------------------------------
                 </td>
@@ -293,8 +307,8 @@ class ticket extends TPage
 		}
         $html .= "
         <script>
-		window.print();
-		window.close();
+		//window.print();
+		//window.close();
 		
         </script>
     </body>

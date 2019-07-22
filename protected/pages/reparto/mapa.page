@@ -1,0 +1,227 @@
+<com:TContent ID="Main">
+	<div class="col-md-12">
+		<div class="box box-primary">
+			<div class="box-header">
+				<i class="fa fa-barcode"></i>
+				<h3 class="box-title"></h3>
+				<com:TButton CausesValidation="false" OnClick="btnBlack_OnClick" style="display: none;" />
+			</div>
+			<div class="box-body form-horizontal" role="form">
+				<div class="form-group">
+					<div class="col-md-3">
+						<h3>Lista de reparto</h3>
+					</div>
+					<div class="col-md-9">
+						<h3>Mapa</h3>
+						<com:TActiveLabel id="jsMap" />
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-md-3">
+						<com:TActiveRepeater ID="rpListVentas" DataKeyField="id_ventas" OnItemDataBound="rpListVentas_DataBound">
+							<prop:HeaderTemplate>
+								<table class="table">
+									<thead>
+										<tr>
+											<td class="col-sm-3">
+												Teléfono
+											</td>
+											<td class="col-sm-6">
+												Nombre
+											</td>
+											<td class="col-sm-1">
+												*
+											</td>
+										</tr>
+									</thead>
+								<tbody>
+							</prop:HeaderTemplate>
+							<prop:ItemTemplate>
+								<tr>
+									<td class="col-sm-3">
+										<com:TLabel id="lTelefono" />
+									</td>
+									<td class="col-sm-6">
+										<com:TLabel id="lNombre" />
+									</td>
+									<td class="col-sm-1">
+										<com:TActiveLinkButton  id="btnMostrar"
+																CausesValidation="false"
+																CssClass="btn btn-success"
+																OnClick="page.btnMostrar_OnClick" >
+											<i class="fa fa-motorcycle"></i> Mostrar
+										</com:TActiveLinkButton>
+									</td>
+								</tr>
+							</prop:ItemTemplate>
+							<prop:FooterTemplate>
+								</tbody>
+								</table>
+							</prop:FooterTemplate>
+						</com:TActiveRepeater>
+						<com:TActivePanel id="pnNoSearcProduct">
+							<table class="table">
+								<thead>
+									<tr>
+										<td class="col-sm-3">
+											Teléfono
+										</td>
+										<td class="col-sm-6">
+											Nombre
+										</td>
+										<td class="col-sm-1">
+											*
+										</td>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td colspan="3">
+											No hay datos que mostrar
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</com:TActivePanel>
+					</div>
+					<div class="col-md-9">
+						<div class="box-body pad table-responsive">
+							<div id="pnBuscarMap" class="form-group" style="display: none">
+								<div class="col-md-3">
+									<com:TActiveLabel id="lNombre" Text="" CssClass="form-control" /> <br />
+									<com:TActiveLabel id="lTelefono" Text="" CssClass="form-control" />
+									<com:TActiveHiddenField Id="hdidventas" />
+									<com:TActiveHiddenField Id="hdidclientes" />
+									<com:TActiveHiddenField Id="hdGeoreferencia" Value="20.0842392,-98.368274" />
+								</div>
+								<div class="col-md-3">
+									<com:TActiveTextBox id="txtDireccion"
+														CssClass="form-control"
+														TextMode="MultiLine"/>
+									<label id="lubicacion"></label>
+								</div>
+								<div class="col-md-3">
+									<com:TActiveTextBox id="txtReferencia"
+														CssClass="form-control"
+														TextMode="MultiLine"/>
+								</div>
+								<div class="col-md-3">
+									<a id="btnMapCal" class="btn bg-orange" ><i class="fa fa-map-signs"></i> Buscar</a> <br />
+									<com:TActiveLinkButton  id="btnSave"
+															CausesValidation="false"
+															CssClass="btn btn-success"
+															OnClick="btnSave_OnClick" >
+										<i class="fa fa-save"></i> Guardar
+									</com:TActiveLinkButton>  <br />
+									<com:TActiveLinkButton  id="btnEntregado"
+															CausesValidation="false"
+															CssClass="btn btn-success"
+															OnClick="btnEntregado_OnClick"
+															Attributes.onclick = 'if(!confirm("¿Una vez entregado, ya no se mostrar en lista, ok para contunuar?")) return false;'>
+										<i class="fa fa-plus"></i> Entregado
+									</com:TActiveLinkButton>
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="col-md-12">
+									<div id="map" style="height: 600px;">
+										
+									</div>
+								</div>
+							<div class="form-group">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script>
+		
+		function myMap() {
+			var pathIcon='image/';
+			var mapOptions = {
+				center: {lat: 20.084, lng:-98.368},
+				zoom: 14,
+				scrollwheel: false,
+				mapTypeId: google.maps.MapTypeId.ROADMAP
+			}
+			var map = new google.maps.Map(document.getElementById("map"), mapOptions);
+			markers = [];
+
+			geocoder  = new google.maps.Geocoder();
+			geocoder2 = new google.maps.Geocoder();
+			
+			var iconmarck ={
+                url: 'image/ping_map.png',
+                scaledSize: new google.maps.Size(64, 64),
+                origin: new google.maps.Point(0, 0)
+            };
+			
+			var repartomarck ={
+                url: 'image/marker.svg',
+                scaledSize: new google.maps.Size(64, 64),
+                origin: new google.maps.Point(0, 0)
+            };
+			
+			function codeAddress() {
+				var address = document.getElementById("<%= $this->txtDireccion->ClientID %>").value;
+				var ubicacion = document.getElementById("<%= $this->hdGeoreferencia->ClientID %>").value;
+				if(address == ""){
+					address = 'Tulancingo de Soto';
+				}
+				geocoder.geocode( { 'address': address}, function(results, status) {
+					if (status == 'OK') {
+						if(ubicacion == ""){
+							map.setCenter(results[0].geometry.location);
+							var marker = new google.maps.Marker({ map: map, position: results[0].geometry.location , icon: iconmarck});
+							markers.push(marker);
+						}else{
+							var latlng = ubicacion.split(",");
+							map.setCenter(new google.maps.LatLng(latlng[0],latlng[1]));
+							var marker = new google.maps.Marker({ map: map,position:new google.maps.LatLng(latlng[0],latlng[1]), icon: iconmarck });
+							markers.push(marker);
+						}
+					}
+				});
+			}
+			
+			map.addListener('dblclick', function(event) {
+				
+					
+					var lat = event.latLng.lat();
+					var lng = event.latLng.lng();
+					
+					for (var i = 0; i < markers.length; i++) {
+						markers[i].setMap(null);
+					}
+					document.getElementById("<%= $this->hdGeoreferencia->ClientID %>").value = lat + "," + lng;
+					
+					
+					//map.setCenter(new google.maps.LatLng(latlng[0],latlng[1]));
+					var marker = new google.maps.Marker({ map: map,position:new google.maps.LatLng(lat,lng), icon: iconmarck });
+					markers.push(marker);
+				
+			});
+			
+			$("#btnMapCal").click(function(event) {
+				var address = document.getElementById("<%= $this->txtDireccion->ClientID %>").value;
+				if(address != ""){
+					geocoder.geocode( { 'address': "Hidalgo, " + address}, function(results, status) {
+						if (status == 'OK') {
+							map.setCenter(results[0].geometry.location);
+							var marker = new google.maps.Marker({ map: map, position: results[0].geometry.location, icon: iconmarck });
+							markers.push(marker);
+						} else {
+							$("#lubicacion").html("Imposible determinar la ubicacion");
+						}
+					});
+				}
+			});
+			
+			codeAddress();
+		}
+	</script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?async=2&key=AIzaSyCPEPJfTyCy7SJpWADL4VWdqx8HM5PShQ0&callback=myMap"></script>
+
+    
+</com:TContent>

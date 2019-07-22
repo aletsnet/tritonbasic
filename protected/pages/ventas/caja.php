@@ -26,6 +26,11 @@ class caja extends TPage
         }
         if(!$this->IsPostBack)
         {
+			//tipo de venta
+			$Tipo = LBsCatalogosGenericos::finder()->findAll(" catalogo = 17 AND activo = 1");
+			$this->cmdTipoVenta->DataSource = $Tipo;
+			$this->cmdTipoVenta->dataBind();
+			
 			//cliente 1
 			$this->id_clientes->value = 1;
 			
@@ -230,11 +235,19 @@ class caja extends TPage
 			$row->telefono = $this->txtTelefono->Text;
 			$row->nombre = $this->txtNombre->Text;
 			$row->direccion = $this->txtDireccion->Text;
-			
+			$row->referencia = $this->txtReferencia->Text;
+			$row->tipo_cliente = 2;
 			$row->save();
+			
 			$this->lCliente->Text    = $row->nombre;
-			$this->lDireccion->Text = $row->direccion;
+			$this->lDireccion->Text = $row->direccion . " - " . $row->referencia;
 			$this->id_clientes->value= $row->id_clientes;
+			
+			$row_venta = LMsVentas::finder()->find(" id_ventas = ?",[$this->id_ventas->value]);
+			if($row_venta instanceof LMsVentas){
+				$row_venta->id_clientes = $row->id_clientes;
+				$row_venta->save();
+			}
 		}
 		$script = "<script> $('#modalNuevoCliente').modal('hide');  </script>";
 		$this->lMesanje->Text = $script;
@@ -294,7 +307,13 @@ class caja extends TPage
         if($row instanceof LMsClientes){
 			$this->lCliente->Text    = $row->nombre;
 			$this->id_clientes->value= $row->id_clientes;
-			$this->lDireccion->Text = $row->direccion;
+			$this->lDireccion->Text = $row->direccion . " - " . $row->referencia;;
+			
+			$row_venta = LMsVentas::finder()->find(" id_ventas = ?",[$this->id_ventas->value]);
+			if($row_venta instanceof LMsVentas){
+				$row_venta->id_clientes = $row->id_clientes;
+				$row_venta->save();
+			}
 		}
 		//$this->linecomando->focus();
 		//$this->ListaActual($this->id_ventas->value);
@@ -363,7 +382,13 @@ class caja extends TPage
 		$this->linecomando->Text = "";
 		//Prado::log(TVarDumper::dump($countcomandos,1),TLogger::NOTICE,$this->PagePath);
 	}
-	
+	public function cmdTipoVenta_OnClick($sender, $param){
+		$row_venta = LMsVentas::finder()->find(" id_ventas = ?", [$this->id_ventas->value]);
+		if($row_venta instanceof LMsVentas){
+			$row_venta->tipo_venta = $this->cmdTipoVenta->Text;
+			$row_venta->save();
+		}
+	}
 	public function IniciarTerminalVenta(){
 		$id_corte = 0;
 		//$row_corte = LMsCortes::finder()->find(" estatus = ? AND id_sucursal = ? ", array(1, $this->User->idsucursales));
@@ -408,11 +433,13 @@ class caja extends TPage
 		$row_venta = LMsVentas::finder()->find(" id_cortes = ? AND estatus = ? AND id_usuarios = ?", array($id_corte,1,$this->User->idusuarios));
 		if($row_venta instanceof LMsVentas){
 			$this->lCliente->Text    = $row_venta->ms_clientes->nombre;
+			$this->lDireccion->Text = $row_venta->ms_clientes->direccion . " - " . $row_venta->ms_clientes->referencia;
 			$this->lTotal->Text      = "$ ".number_format($row_venta->total, 2);
 			$this->lDescuento->Text  = ($row_venta->descuento * 100)." %";
 			$this->id_clientes->value= $row_venta->id_clientes;
 			$this->id_ventas->value  = $row_venta->id_ventas;
 			$this->lfolioventa->Text = $row_venta->id_ventas;
+			$this->cmdTipoVenta->Text = $row_venta->tipo_venta;
 		}else{
 			$row_venta = new LMsVentas;
 			$row_venta->id_cortes = $id_corte;
@@ -420,13 +447,16 @@ class caja extends TPage
 			$row_venta->id_usuarios = $this->User->idusuarios;
 			$row_venta->id_clientes = 1;
 			$row_venta->fecha_inicio = date("Y-m-d H:i:s");
+			$row_venta->tipo_venta = 1;
 			$row_venta->save();
 			$this->lCliente->Text    = $row_venta->ms_clientes->nombre;
+			$this->lDireccion->Text = $row_venta->ms_clientes->direccion . " - " . $row_venta->ms_clientes->referencia;
 			$this->lTotal->Text      = "$ ".number_format($row_venta->total, 2);
 			$this->lDescuento->Text  = ($row_venta->descuento * 100)." %";
 			$this->id_clientes->value= $row_venta->id_clientes;
 			$this->id_ventas->value  = $row_venta->id_ventas;
 			$this->lfolioventa->Text = $row_venta->id_ventas;
+			$this->cmdTipoVenta->Text = $row_venta->tipo_venta;
 		}
 		
 		//lista de venta
@@ -540,6 +570,7 @@ class caja extends TPage
 							"idbodegas"    => $this->cmdBodega->Text,
 							"tipo"         => $tipo,
                             "idsucursales"  => $idsucursales,
+							"departamentos" => 0,
 							"rows"        => $rows,
 							"offset"      => $offset);
 		$tabla = $this->Application->Modules['query']->Client->queryForList("vwInventarios",$Parametros);
@@ -560,6 +591,7 @@ class caja extends TPage
         $Parametros = array("nombre"       => "%".$this->txtNombres->Text."%",
 							"idbodegas"    => $this->cmdBodega->Text,
 							"tipo"         => $tipo,
+							"departamentos" => 0,
                             "idsucursales" => $idsucursales);
 		$var = $this->Application->Modules['query']->Client->queryForObject("vwInventarios_count",$Parametros);
         return $var;

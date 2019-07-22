@@ -17,6 +17,12 @@ class productospdf extends TPage
         {
             //$this->request['param']
             $idsucursales = $this->User->idsucursales;
+            $Tipo = LBsCatalogosGenericos::finder()->findAll(" catalogo = 18 AND activo = 1");
+            $lTipos = [];
+            foreach($Tipo as $itipo => $ltipo){
+               $lTipos[$ltipo->valor] = $ltipo;
+            }
+            
             
             $tipo_producto = $this->request['tipo'];
             
@@ -60,13 +66,13 @@ class productospdf extends TPage
                                                 <td style="width:12%; background-color: '.$color_row.'; font-size: 60%;">
                                                     '.$row->ms_productos->codigo.'
                                                 </td>
-                                                <td style="width:10%; background-color: '.$color_row.'; font-size: 75%;">
-                                                    '.($row->ms_productos->tipo?'Producto':'Servicio').'
+                                                <td style="width:10%; background-color: '.$color_row.'; font-size: 60%;">
+                                                    '.$lTipos[$row->ms_productos->tipo].'
                                                 </td>
-                                                <td style="width:25%; background-color: '.$color_row.'; font-size: 75%;">
+                                                <td style="width:25%; background-color: '.$color_row.'; font-size: 60%;">
                                                      '.$row->ms_productos->nombre.'
                                                 </td>
-                                                <td style="width:20%; background-color: '.$color_row.'; font-size: 75%;">
+                                                <td style="width:20%; background-color: '.$color_row.'; font-size: 60%;">
                                                      '.$row->ms_productos->ct_departamentos->nombre.'
                                                 </td>
                                                 <td style="width:10%; background-color: '.$color_row.'; text-align: right; font-size: 65%;">
@@ -108,7 +114,7 @@ class productospdf extends TPage
             // L => Vertical , H => Horizontal
             $pdf = new tcpdfpa('H', PDF_UNIT, 'LETTER', true, 'UTF-8', false);
             $pdf->titulo = $this->User->lsucursal;
-			$pdf->subtitulo = $this->Application->Parameters["LemaTienda"];
+			$pdf->subtitulo = $this->Application->Parameters["lproyect"];
             // set document information
             $pdf->SetCreator(PDF_CREATOR);
             $pdf->SetAuthor('AletsNet');

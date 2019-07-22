@@ -567,6 +567,50 @@
 								</table>
 							</com:TActivePanel>
 						</div>
+						<div class="form-group">
+							<i class="fa fa-shopping-cart"></i>
+							<label>Resumen departamentos</label>
+						</div>
+						<div class="form-group">
+							<com:TActiveHiddenField Id="hdDesglose" />
+							<com:TActiveRepeater ID="rpDepartamentos" DataKeyField="folio" OnItemDataBound="rpDepartamentos_DataBound">
+								<prop:HeaderTemplate>
+									<table class="table table-striped">
+										<tr>
+											<th>Folio</th>
+											<th>Departamento</th>
+											<th>Unidades</th>
+											<th>Monto</th>
+											<th>*</th>
+										</tr>
+								</prop:HeaderTemplate>
+								<prop:ItemTemplate>
+									<tr>
+										<td> <com:TLabel id="lFolio" /></td>
+										<td> <com:TLabel id="lNombre" /></td>
+										<td> <com:TLabel id="lUnidades" /> </td>
+										<td> <com:TLabel id="lMonto" /> </td>
+										<td> <com:TActiveCheckBox id="lDesglose" OnCheckedChanged="page.lDesglose_onChange"/> </td>
+									</tr>
+								</prop:ItemTemplate>
+								<prop:FooterTemplate>
+									</table>
+								</prop:FooterTemplate>
+							</com:TActiveRepeater>
+							<com:TActivePanel id="SinDatosD" >
+								<table class="table table-bordered">
+									<tr>
+										<th>Folio</th>
+										<th>Nombre</th>
+										<th>Unidades</th>
+										<th>Monto</th>
+									</tr>
+									<tr>
+										<td colspan="4">No hay elementos que mostrar</td>
+									</tr>
+								</table>
+							</com:TActivePanel>
+						</div>
 					</div>
 				</div>
 			</div>

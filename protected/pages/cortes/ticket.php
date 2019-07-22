@@ -306,8 +306,75 @@ class ticket extends TPage
 				$html_productos .= '</table>';
 			}
 			
+			$html_departamentos = "";
+			$Parametros = ["idcorte" => $id_cortes];
+			$listDesglose = explode(",",$this->request['departamentos']);
+			$desglose = [];
+			foreach($listDesglose as $d => $v){ $desglose[$v] = $v; }
+			
+			$rows_departamentos = $this->Application->Modules['query']->Client->queryForList("vwDepartamentosVendidos",$Parametros);
+			$lrows = count($rows_departamentos);
+			if($lrows > 0){
+				$html_departamentos .= '<table cellpadding="0" border="0" style="width: 100%;">
+					<tr>
+						<th class="campo" style="width: 10%;">
+							#
+						</th>
+						<th class="campo" style="">
+							Dep.
+						</th>
+						<th class="campo" style="width: 20%;">
+							U.
+						</th>
+						<th class="campo" style="width: 20%;">
+							$
+						</th>
+					</tr>';
+				$c = 0;
+				//$deparamento = (object) [];
+				foreach($rows_departamentos as $id => $vd){
+					$deparamento = (object) $vd;
+					$html_departamentos .= '<tr>
+						<td class="ccampos" style="width: 15%;">
+							'.$deparamento->folio.'
+						</td>
+						<td class="lcampos" style="">
+							'.$deparamento->nombre.'
+						</td>
+						<td class="ccampos" style="">
+							'.$deparamento->unidades.'
+						</td>
+						<td class="rcampos" style="width: 25%;">
+							'."$ ".number_format($deparamento->monto,2).'
+						</td>
+					</tr>';
+					if(key_exists($deparamento->folio,$desglose)){
+						$rows_desglose = $this->Application->Modules['query']->Client->queryForList("vwDepartamentosDesglose",["idcorte" => $id_cortes, "folio" => $deparamento->folio]);
+						foreach($rows_desglose as $idesglose => $element){
+							$element = (object) $element;
+							$html_departamentos .= '<tr>
+								<td class="ccampos" style="width: 15%;">
+									
+								</td>
+								<td class="lcampos" style="">
+									'.$element->folio.'-'.$element->nombre.'
+								</td>
+								<td class="ccampos" style="">
+									'.$element->unidades.'
+								</td>
+								<td class="rcampos" style="width: 25%;">
+									'."$ ".number_format($element->monto,2).'
+								</td>
+							</tr>';
+						}
+					}
+				}
+				$html_departamentos .= '</table>';
+			}
+			
+			
             $html .= '
-        <table cellpadding="0" border="0" style="width: 300px;">
+        <table cellpadding="0" border="0" style="width: 250px;">
             <tr>
                 <td class="campo">
                      <img src="'.$sucursal->ticket_logo.'" alt="Logo" height="128" /> 
@@ -563,6 +630,17 @@ class ticket extends TPage
             </tr>
             <tr>
                 <td style="text-align: center;" class="campo">
+                    Departamentos 
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    '.$html_departamentos.'
+                </td>
+            </tr>';
+			/*
+            <tr>
+                <td style="text-align: center;" class="campo">
                     Productos 
                 </td>
             </tr>
@@ -570,7 +648,8 @@ class ticket extends TPage
                 <td>
                     '.$html_productos.'
                 </td>
-            </tr>
+            </tr>*/
+			$html .= '
             <tr>
                 <td class="campo">
 					&nbsp; <br />

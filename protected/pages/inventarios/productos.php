@@ -1,10 +1,14 @@
 <?php
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+
 class Productos extends TPage
 {
 	public $i = 0;
 	public $j = 0;
 	public $perimiso_actualizar = false;
 	public $importe = 0;
+	public $editKit = false;
 	
 	public function onInit($param){
 		$this->master->titulo->Text = "Productos y servicios";
@@ -29,6 +33,17 @@ class Productos extends TPage
         }
         if(!$this->IsPostBack)
         {
+			$Tipo = LBsCatalogosGenericos::finder()->findAll(" catalogo = 18 AND activo = 1");
+			$this->cmdTipoProducto->DataSource = $Tipo;
+			$this->cmdTipoProducto->dataBind();
+			
+			$this->cmdServicios->DataSource = $Tipo;
+			$this->cmdServicios->dataBind();
+			
+			$DepatamentosB = LBsCatalogosGenericos::finder()->findAll(" catalogo = 18 AND activo = 1");
+			$this->cmdDepatamentosB->DataSource = $DepatamentosB;
+			$this->cmdDepatamentosB->dataBind();
+			
 			if( $this->request['e']=='e'){
 				$row  = LMsInventarios::finder()->find("borrado = 0 AND id_inventarios = ?", $this->request['p']);
 				//Prado::log(TVarDumper::dump($row,1),TLogger::NOTICE,$this->PagePath);
@@ -51,8 +66,7 @@ class Productos extends TPage
 					$this->txtCodigo->Text = $row->ms_productos->codigo;
 					$this->txtNombre->Text = $row->ms_productos->nombre;
 					$this->txtDescripcion->Text = $row->ms_productos->descripcion;
-					$this->ChProducto1->checked = $row->ms_productos->tipo;
-					$this->ChProducto0->checked = !$row->ms_productos->tipo;
+					$this->cmdTipoProducto->Text = $row->ms_productos->tipo;
 					$this->cmdDepartamento->Text = $row->ms_productos->id_departamentos;
 					$this->cmdBodega->text = $row->id_bodegas;
 					$this->id_productos->value = $row->ms_productos->id_productos;
@@ -81,6 +95,14 @@ class Productos extends TPage
 					$this->rpImpuesto->DataSource = $impuesto;
 					$this->rpImpuesto->dataBind();
 				}
+				$tipoe = $this->cmdTipoProducto->Text;
+				$tipo = ($tipoe == 2 || $tipoe == 3 || $tipoe == 4 );
+				$this->pnElementos->visible = $tipo;
+				if($tipo){
+					$rows = LCtProductoKit::finder()->findAll(" id_productos_main = ? ", [$this->id_productos->value]);
+					$this->rpListProduct->DataSource = $rows;
+					$this->rpListProduct->dataBind();
+				}
 				
 				$this->tpanelAviso->visible = false;
 				$this->Formulario->visible = true;
@@ -91,9 +113,10 @@ class Productos extends TPage
 				$this->tpanelAviso->visible = false;
 				$this->Formulario->visible = false;
 				
-				$this->cmdBodega2->DataSource = LCtBodegas::finder()->findAll(" id_sucursales = ? AND borrado = 0",$this->User->idsucursales);
+				/*$this->cmdBodega2->DataSource = LCtBodegas::finder()->findAll(" id_sucursales = ? AND borrado = 0",$this->User->idsucursales);
 				$this->cmdBodega2->dataBind();
-				$this->cmdBodega2->SelectedIndex = 0;
+				$this->cmdBodega2->SelectedIndex = 0;*/
+				$this->txtBuscar->Text = $_SESSION["inventario_buscar"];
 				
 				$this->dgTabla->VirtualItemCount = $this->getRowCount();
 				$this->dgTabla->DataSource=$this->getDataRows(0,$this->dgTabla->PageSize);
@@ -112,11 +135,136 @@ class Productos extends TPage
 		//Prado::log(TVarDumper::dump($this,1),TLogger::NOTICE,$this->PagePath);
 	}
 	
+	public function btnSearchProductoKit_OnClick($sender, $param){
+		$this->rpSearchProduct->DataSource = [];
+		$this->rpSearchProduct->dataBind();
+		
+		$this->editKit = false;
+		$rows = LMsProductos::finder()->findAll(" borrado = 0 AND codigo = ? ", $this->txtElementCodigo->Text);
+		$nrows = count($rows);
+		$this->pnNoSearcProduct->Visible = ($nrows < 1);
+		if($nrows == 1){
+			$this->hdElementIdProductos->Value = $rows[0]->id_productos;
+			$this->txtElementNombre->Text = $rows[0]->nombre;
+			$this->txtElementUnidades->Text = "1";
+		}else{
+			$this->rpSearchProduct->DataSource = $rows;
+			$this->rpSearchProduct->dataBind();
+		}
+	}
+	
+	public function btnSearchProductoKit2_OnClick($sender, $param){
+		$this->rpSearchProduct->DataSource = [];
+		$this->rpSearchProduct->dataBind();
+		
+		$this->editKit = false;
+		$rows = LMsProductos::finder()->findAll(" borrado = 0 AND nombre like ? ", "%".$this->txtElementNombre->Text."%");
+		$nrows = count($rows);
+		$this->pnNoSearcProduct->Visible = ($nrows < 1);
+		if($nrows == 1){
+			$this->hdElementIdProductos->Value = $rows[0]->id_productos;
+			$this->txtElementNombre->Text = $rows[0]->nombre;
+			$this->txtElementUnidades->Text = "1";
+		}else{
+			
+			$this->rpSearchProduct->DataSource = $rows;
+			$this->rpSearchProduct->dataBind();
+		}
+		//Prado::log(TVarDumper::dump($rows,1),TLogger::NOTICE,"debug");
+	}
+	
+	public function btnCloseProductoKit_OnClick($sender, $param){
+		$this->rpSearchProduct->DataSource = [];
+		$this->rpSearchProduct->dataBind();
+		$this->rpListProduct->DataSource = [];
+		$this->rpListProduct->dataBind();
+	}
+	public function btnAddProductoKit_OnClick($sender, $param){
+		if($this->IsValid)
+        {
+			$this->editKit = true;
+			$row = LCtProductoKit::finder()->findAll(" id_productos_main = ? AND id_producto_ingrediente = ?", [$this->id_productos->value, $this->hdElementIdProductos->Value]);
+			if(!($row instanceof LCtProductoKit)){
+				$kit = new LCtProductoKit;
+				$kit->id_productos_main = $this->id_productos->value;
+				$kit->id_producto_ingrediente = $this->hdElementIdProductos->Value;
+				$kit->cantidad = $this->txtElementUnidades->Text;
+				$kit->save();
+			}
+			$rows = LCtProductoKit::finder()->findAll(" id_productos_main = ? ", [$this->id_productos->value]);
+			$this->rpListProduct->DataSource = $rows;
+			$this->rpListProduct->dataBind();
+			
+			$this->hdElementIdProductos->Value = "";
+			$this->txtElementCodigo->Text = "";
+			$this->txtElementNombre->Text = "";
+			$this->txtElementUnidades->Text = "";
+		}
+	}
+	
+	public function btnQuitProductoKit_OnClick($sender, $param){
+		$item = $sender->namingContainer;
+		$keys = $this->rpListProduct->DataKeys;
+		//Prado::log(TVarDumper::dump($keys[$item->itemIndex],1),TLogger::NOTICE,$this->PagePath);
+		$row  = LCtProductoKit::finder()->find("id_producto_kit = ?", $keys[$item->itemIndex]);
+        if($row instanceof LCtProductoKit){
+            //$row->borrado = 1;
+            $row->delete();
+        }
+        
+        $rows = LCtProductoKit::finder()->findAll(" id_productos_main = ? ", [$this->id_productos->value]);
+		$this->rpListProduct->DataSource = $rows;
+		$this->rpListProduct->dataBind();
+	}
+	
+	public function rpSearchProduct_DataBound($sender, $param){
+		$item=$param->Item;
+        if($item->ItemType==='Item' || $item->ItemType==='AlternatingItem')
+        {
+			$row = $item->Data;
+            if($row instanceof LMsProductos){
+                $item->lCodigo->Text = $row->codigo;
+                $item->lNombre->Text = $row->nombre;
+            }
+        }
+	}
+	
+	public function btnElegirProductoKit_OnClick($sender, $param){
+		$item = $sender->namingContainer;
+		$keys = $this->rpSearchProduct->DataKeys;
+		//Prado::log(TVarDumper::dump($keys[$item->itemIndex],1),TLogger::NOTICE,$this->PagePath);
+		$row  = LMsProductos::finder()->find("id_productos = ?", $keys[$item->itemIndex]);
+		if($row instanceof LMsProductos){
+			$this->hdElementIdProductos->Value = $row->id_productos;
+			$this->txtElementCodigo->Text = $row->codigo;
+			$this->txtElementNombre->Text = $row->nombre;
+			$this->txtElementUnidades->Text = 1;
+        }
+		$this->rpSearchProduct->DataSource = [];
+		$this->rpSearchProduct->dataBind();
+	}
+	
+	public function rpListProduct_DataBound($sender, $param){
+		$item=$param->Item;
+        if($item->ItemType==='Item' || $item->ItemType==='AlternatingItem')
+        {
+			$row = $item->Data;
+            if($row instanceof LCtProductoKit){
+                $item->lCodigo->Text = $row->ms_productos->codigo;
+                $item->lNombre->Text = $row->ms_productos->nombre;
+                $item->lUnidades->Text = $row->cantidad;
+            }
+        }
+	}
+	
     public function btnBuscar_Producto_OnClick($sender, $param){
         if($this->IsValid)
         {
             $row = LMsProductos::finder()->find(" borrado = 0 AND codigo = ? ", $this->txtCodigo->Text);
             if($row instanceof LMsProductos){
+				$this->codigoactivo->Text = '<label class="btn btn-danger"><i class="fa fa-close"></i></label>';
+				$this->codigovalido->value = "";
+				/*
 				$this->codigoactivo->Text = '<label class="btn btn-success"><i class="fa fa-check"></i></label>';
 				$this->codigovalido->value = "1";
 				
@@ -127,7 +275,7 @@ class Productos extends TPage
                 }
                 $this->txtNombre->Text = $row->nombre;
                 $this->txtDescripcion->Text = $row->descripcion;
-                $this->{'ChProducto'.$row->tipo}->checked = true;
+				$this->cmdTipoProducto->Text = $row->tipo;
                 $this->cmdDepartamento->Text = $row->id_departamentos;
 				$rox = LMsInventarios::finder()->find(" borrado = 0 AND id_productos = ? ", $row->id_productos);
 				if($rox instanceof LMsInventarios){
@@ -139,6 +287,7 @@ class Productos extends TPage
 					$this->txtStock->text = $rox->stock;
 					$this->txtUnidad->text = $rox->unidad;
 				}
+				*/
             }else{
 				$codigo = LCtCodigosreservados::finder()->find(" borrado = 0 AND codigo = ? ", $this->txtCodigo->Text);
 				if($codigo instanceof LCtCodigosreservados){
@@ -157,6 +306,11 @@ class Productos extends TPage
         $this->RpDepartamento->DataSource = LCtDepartamentos::finder()->findAll(" borrado = 0 ");
         $this->RpDepartamento->dataBind();
     }
+	
+	public function cmdTipoProducto_OnChange($sender, $param){
+		$tipo = ($sender->text == 2 || $sender->text == 3 || $sender->text == 4 );
+		$this->pnElementos->visible = $tipo;
+	}
     
     public function btnBorrar_departamentos_OnClick($sender, $param){
         $item = $sender->namingContainer;
@@ -239,8 +393,7 @@ class Productos extends TPage
 		$this->txtCodigo->Text            = "";
 		$this->txtNombre->Text            = "";
 		$this->txtDescripcion->Text       = "";
-		$this->ChProducto1->checked       = false;
-		$this->ChProducto0->checked       = false;
+		$this->cmdTipoProducto->Text = 1;
 		$this->id_productos->value        = "";
 		$this->id_inventarios->value      = "";
 		$this->txtPrecioAdquisicion->text = "";
@@ -265,6 +418,9 @@ class Productos extends TPage
 		$this->txtClaveUnidad->text   = "";
 		$this->lSatUnidaded->text     = "";
 		
+		$tipoe = $this->cmdTipoProducto->Text;
+		$tipo = ($tipoe == 2 || $tipoe == 3 || $tipoe == 4 );
+		$this->pnElementos->visible = $tipo;
         //$this->id_productos->value = "";
         //$this->id_inventarios->value = "";
         //$this->txtNombre->text = "";
@@ -296,8 +452,7 @@ class Productos extends TPage
             $this->txtCodigo->Text = $row->ms_productos->codigo;
             $this->txtNombre->Text = $row->ms_productos->nombre;
             $this->txtDescripcion->Text = $row->ms_productos->descripcion;
-            $this->ChProducto1->checked = $row->ms_productos->tipo;
-            $this->ChProducto0->checked = !$row->ms_productos->tipo;
+            $this->cmdTipoProducto->Text = $row->ms_productos->tipo;
             $this->cmdDepartamento->Text = $row->ms_productos->id_departamentos;
             $this->cmdBodega->text = $row->id_bodegas;
             $this->id_productos->value = $row->ms_productos->id_productos;
@@ -321,6 +476,14 @@ class Productos extends TPage
 				$this->txtClaveUnidad->text   = $row->ms_productos->claveunidad;
 				$this->lSatUnidaded->text     = $row->ms_productos->sat_unidades->nombre;
 			}
+		}
+		$tipoe = $this->cmdTipoProducto->Text;
+		$tipo = ($tipoe == 2 || $tipoe == 3 || $tipoe == 4 );
+		$this->pnElementos->visible = $tipo;
+		if($tipo){
+			$rows = LCtProductoKit::finder()->findAll(" id_productos_main = ? ", [$this->id_productos->value]);
+			$this->rpListProduct->DataSource = $rows;
+			$this->rpListProduct->dataBind();
 		}
 		
 		$this->tpanelAviso->visible = false;
@@ -380,7 +543,7 @@ class Productos extends TPage
                 }
                 $row->nombre           = $this->txtNombre->Text;
                 $row->descripcion      = $this->txtDescripcion->Text;
-                $row->tipo             = $this->ChProducto1->checked;
+                $row->tipo             = $this->cmdTipoProducto->Text;
                 $row->id_departamentos = $this->cmdDepartamento->Text;
 				//SAT
 				if($this->txtClaveProdServ->text != "")
@@ -398,7 +561,7 @@ class Productos extends TPage
                 $row->codigo           = $this->txtCodigo->Text;
                 $row->nombre           = $this->txtNombre->Text;
                 $row->descripcion      = $this->txtDescripcion->Text;
-                $row->tipo             = $this->ChProducto1->checked;
+                $row->tipo             = $this->cmdTipoProducto->Text;
                 $row->id_departamentos = $this->cmdDepartamento->Text;
 				//SAT
 				if($this->txtClaveProdServ->text != "")
@@ -420,8 +583,8 @@ class Productos extends TPage
                 $row2->precioadquisicion = (double) $this->txtPrecioAdquisicion->text;
                 $row2->preciopublico = (double) $this->txtPrecioPublico->text;
                 $row2->stock = $this->txtStock->text;
-				if($this->txtMinimo->text != ""){ $row2->minimo_stock = $this->txtMinimo->text; }
-				if($this->txtMaximo->text != ""){ $row2->maximo_stock = $this->txtMaximo->text; }
+				if($this->txtMinimo->text != ""){ $row2->minimo_stock = 1; }
+				if($this->txtMaximo->text != ""){ $row2->maximo_stock = ($this->txtStock->text < 1? 10: $this->txtStock->text); }
                 $row2->unidad = $this->txtUnidad->text;
                 $row2->save();
                 $this->id_productos->value = $row->id_productos;
@@ -433,8 +596,8 @@ class Productos extends TPage
                 $row2->precioadquisicion = (double) $this->txtPrecioAdquisicion->text;
                 $row2->preciopublico = (double) $this->txtPrecioPublico->text;
                 $row2->stock = $this->txtStock->text;
-				if($this->txtMinimo->text != ""){ $row2->minimo_stock = $this->txtMinimo->text; }
-				if($this->txtMaximo->text != ""){ $row2->maximo_stock = $this->txtMaximo->text; }
+				if($this->txtMinimo->text != ""){ $row2->minimo_stock = 1; }
+				if($this->txtMaximo->text != ""){ $row2->maximo_stock = ($this->txtStock->text < 1? 10: $this->txtStock->text); }
                 $row2->unidad = $this->txtUnidad->text;
                 $row2->save();
             }
@@ -473,8 +636,7 @@ class Productos extends TPage
             $this->txtCodigo->Text = "";
 			$this->txtNombre->Text = "";
             $this->txtDescripcion->Text = "";
-            $this->ChProducto0->checked = false;
-            $this->ChProducto1->checked = false;
+            $this->cmdTipoProducto->Text = 1;
             $this->cmdDepartamento->Text = "";
             //$this->cmdBodega->text = ;
             $this->id_productos->value = "";
@@ -494,6 +656,7 @@ class Productos extends TPage
 			$this->txtClaveUnidad->text   = "";
 			$this->lSatUnidaded->text     = "";
 			
+			$this->txtBuscar->Text = $_SESSION["inventario_buscar"];
 			$this->dgTabla->VirtualItemCount = $this->getRowCount();
 			$this->dgTabla->DataSource=$this->getDataRows(0,$this->dgTabla->PageSize);
 			$this->dgTabla->dataBind();
@@ -501,6 +664,7 @@ class Productos extends TPage
     }
     
 	public function btnBuscar_OnClick($sender, $param){
+		$_SESSION["inventario_buscar"] = $this->txtBuscar->Text;
 		$this->dgTabla->VirtualItemCount = $this->getRowCount();
 		$this->dgTabla->DataSource=$this->getDataRows(0,$this->dgTabla->PageSize);
 		$this->dgTabla->dataBind();
@@ -532,9 +696,10 @@ class Productos extends TPage
 			$tipo = (int) $this->cmdServicios->Text;
 		
         $Parametros = array("nombre"       => "%".$this->txtBuscar->Text."%",
-							"idbodegas"    => $this->cmdBodega2->Text,
+							"idbodegas"    => 1,
 							"tipo"         => $tipo,
                             "idsucursales"  => $idsucursales,
+                            "departamentos" => $this->cmdDepatamentosB->Text,
 							"rows"        => $rows,
 							"offset"      => $offset);
 		$tabla = $this->Application->Modules['query']->Client->queryForList("vwInventarios",$Parametros);
@@ -549,9 +714,10 @@ class Productos extends TPage
 			$tipo = (int) $this->cmdServicios->Text;
 		
         $Parametros = array("nombre"       => "%".$this->txtBuscar->Text."%",
-							"idbodegas"    => $this->cmdBodega2->Text,
+							"idbodegas"    => 1,
 							"tipo"         => $tipo,
-                            "idsucursales" => $idsucursales);
+                            "idsucursales" => $idsucursales,
+                            "departamentos"  => $this->cmdDepatamentosB->Text,);
 		$var = $this->Application->Modules['query']->Client->queryForObject("vwInventarios_count",$Parametros);
 		$this->linkPdf->NavigateUrl = $this->Service->constructUrl('inventarios.productospdf',$Parametros);
 		$visible = $var > 0;
@@ -593,8 +759,10 @@ class Productos extends TPage
 				
 				if($row->ms_productos->foto != "")
 					$item->rowImagen->foto->ImageUrl = $row->ms_productos->foto;
-					
-				$item->rowServicios->lTipo->Text = ($row->ms_productos->tipo? 'Producto' : 'Servicio');
+				
+				$Tipo = LBsCatalogosGenericos::finder()->find(" catalogo = 18 AND valor = ?", [$row->ms_productos->tipo]);
+				if($Tipo instanceof LBsCatalogosGenericos)
+				$item->rowServicios->lTipo->Text = $Tipo->opcion;
 				
 				$item->rowProducto->lCodigo->Text = $row->ms_productos->codigo;
 				$item->rowProducto->lProducto->Text = $row->ms_productos->nombre;
@@ -609,6 +777,7 @@ class Productos extends TPage
 				$gcss = array(1 => "bg-red", 2 => "bg-yellow", 3 => "bg-green" );
 				$css_estatus = $css[3];
 				$css_gestatus = $gcss[3];
+				$max_stock = ($row->maximo_stock > 0 ? $row->maximo_stock : 1);
 				$porcentaje = round(($row->stock / $row->maximo_stock) * 100) ;
 				if($porcentaje < 50){
 					$css_estatus = $css[2];
@@ -752,38 +921,6 @@ class Productos extends TPage
 		//Prado::log(TVarDumper::dump($param,2),TLogger::NOTICE,$this->PagePath);
     }
 	
-	public function BtnCamara($sender,$param){
-        $this->camara->visible = true;
-        $this->imagenfija->visible = false;
-        $this->btnTomar->visible = true;
-        $this->btnCamara->visible = false;
-    }
-	
-	public function btnCapturaCamara($sender,$param){
-		$nombrearchivo = "Perfil".rand(1,200).rand(201,500).date('dmyhisA').".png";
-		$urldestino = 'docs/avatar/';
-		$rawData = $this->imagetxt->value;//$_POST['imgBase64'];
-		//Prado::log(TVarDumper::dump($this->imagetxt->value,1),TLogger::NOTICE,$this->PagePath);
-		if($rawData != ""){
-			$filteredData = explode(',', $rawData);
-			$unencoded = base64_decode($filteredData[1]);
-			$fp = fopen($urldestino.$nombrearchivo, 'w');
-			fwrite($fp, $unencoded);
-			fclose($fp);
-			$this->file->value = $urldestino.$nombrearchivo;
-			//$_SESSION['foto'] = "imagen/fotos/".$nombrearchivo;
-			$this->foto->ImageUrl = $this->file->value;
-			$this->camara->visible = false;
-		}
-		
-		//$this->file->value = $nombrearchivo;
-        //$this->foto->ImageUrl = $this->imagetxt->value; //$this->file->value;
-        //$this->camara->visible = false;
-        $this->imagenfija->visible = true;
-        $this->btnTomar->visible = false;
-        $this->btnCamara->visible = true;
-    }
-	
 	public function fileUploaded($sender,$param)
     {
         if($sender->HasFile)
@@ -796,13 +933,7 @@ class Productos extends TPage
                     copy($sender->LocalName,"docs/avatar/".$nombrearchivo);
                 }
                 $this->file->value = "docs/avatar/".$nombrearchivo;
-                //$_SESSION['foto'] = "docs/avatar/".$nombrearchivo;
                 $this->foto->ImageUrl = $this->file->value;
-                //$this->leyenda->text = "Se Guardado correctamente el archivo";
-                //$this->leyenda->CssClass = "show_correct";
-				$this->imagenfija->visible = true;
-				$this->btnTomar->visible = false;
-				$this->btnCamara->visible = true;
             }
         }else{
             switch($sender->ErrorCode){
@@ -839,17 +970,18 @@ class Productos extends TPage
 		if($this->cmdServicios->Text != " ")
 			$tipo = (int) $this->cmdServicios->Text;
 		
-		$Parametros = array("nombre" => "%".$this->txtBuscar->Text."%",
-							"idbodegas"  => $this->cmdBodega2->Text,
-							"tipo"  => $tipo,
-                            "idsucursales"  => $idsucursales);
+        $Parametros = array("nombre"       => "%".$this->txtBuscar->Text."%",
+							"idbodegas"    => 1,
+							"tipo"         => $tipo,
+                            "idsucursales" => $idsucursales,
+                            "departamentos"  => $this->cmdDepatamentosB->Text,);
 		$tabla = $this->Application->Modules['query']->Client->queryForList("vwInventarios_exportar",$Parametros);
 		$rows = count($tabla);
 		
-		Prado::using('Application.modulos.PHPExcel');
+		
 		// Create new PHPExcel object
 		//echo date('H:i:s') , " Create new PHPExcel object" ;
-		$objPHPExcel = new PHPExcel();
+		$objPHPExcel = new Spreadsheet();
 		
 		// Establecer propiedades
 		$fecha_t = date("d m Y H i s");
@@ -902,7 +1034,7 @@ class Productos extends TPage
 		header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 		header('Content-Disposition: attachment;filename="ListaUsuarios'.$fecha.'.xlsx"');
 		header('Cache-Control: max-age=0');
-		$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+		$objWriter = new Xlsx($objPHPExcel, 'Excel2007');
 		$objWriter->save('php://output');
 		
 		Prado::log("[".$this->User->idusuarios.

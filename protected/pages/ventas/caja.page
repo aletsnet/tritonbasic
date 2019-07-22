@@ -4,9 +4,9 @@
 			<div class="box-header">
 				<i class="fa fa-barcode"></i>
 				<h3 class="box-title">Terminal de venta <small><com:TActiveLabel id="lbModalidad"></com:TActiveLabel></small></h3>
-				<com:TButton CausesValidation="false" OnClick="btnBuscar_OnClick" style="display: none;" />
+				<com:TButton CausesValidation="false" OnClick="btnForm_OnClick" style="display: none;" />
 			</div>
-			<div class="box-body" role="form">
+			<div class="box-body form-horizontal" role="form">
 				<div class="form-group">
 					<com:TActiveLabel id="lMesanje" />
 				</div>
@@ -70,7 +70,6 @@
 					</div>
 				</div>
 				<div class="form-group">
-					<div class="row">
 						<div class="col-md-6">
 							<h4>
 								Cliente: <b><com:TActiveLabel id="lCliente" /></b>
@@ -94,28 +93,40 @@
 						<div class="col-md-2">
 							<i class="fa fa-clock-o"></i> <label id="lTiempo"></label>
 						</div>
+				</div>
+				<div class="form-group">
+					<div class="col-md-3">
+						<small>
+						<com:TActiveDropDownList ID="cmdTipoVenta"
+												 CssClass="form-control"
+												 AutoPostBack="true"
+												 OnSelectedIndexChanged="cmdTipoVenta_OnClick"
+												 DataTextField="opcion"
+												 DataValueField="valor" >
+							<prop:ClientSide OnLoading="Msg('Por favor espere mientras se procesa la petición',true);"
+														 OnComplete="Msg('Listo',false);"
+														 OnException="Msg('Se a producido un error, solicite apoyo técnico',true);"/>
+						</com:TActiveDropDownList>
+						</small>
+					</div>
+					<div class="col-md-9">
+						<b><com:TActiveLabel id="lDireccion" /></b>
 					</div>
 				</div>
 				<div class="form-group">
-					<b><com:TActiveLabel id="lDireccion" /></b>
-				</div>
-				<div class="form-group">
-					<div class="row">
 						<label class="col-md-4">
 							Venta:
 							<com:TActiveLabel id="lid_cortes" />-<com:TActiveLabel id="lfolioventa" />
 							- Productos: <com:TActiveLabel id="lnproductos" />
 						</label>
 						<div class="col-md-5">
-							<com:TActiveLabel id="lExtra" />
+							<com:TActiveLabel id="lExtra" text=" " />
 						</div>
 						<div class="col-md-3">
 							<label >Ticket's pendientes</label>
 						</div>
-					</div>
 				</div>
 				<div class="form-group">
-					<div class="row">
 						<div class="col-md-9">						
 							<com:TActiveHiddenField Id="id_cortes" />
 							<com:TActiveButton id="btnProcesar" CausesValidation="false" OnClick="btnProcesar_OnClick" style="display: none;">
@@ -234,7 +245,7 @@
 								</prop:FooterTemplate>
 							</com:TActiveRepeater>
 							<com:TActivePanel id="ListaVentaBacia" >
-								<table class="table table-bordered">
+								<table class="table table-striped">
 									<tr>
 										<th style="width: 10px">#</th>
 										<th>Venta</th>
@@ -245,8 +256,7 @@
 									</tr>
 								</table>
 							</com:TActivePanel>
-						</div>
-					</div>
+						</div>	
 				</div>
 				<div class="form-group">
 					<div class="row">
@@ -805,6 +815,23 @@
 											CssClass="form-control"
 											TextMode="MultiLine"
 											Attributes.placeholder=" Calle, Colonia"
+											Text=""
+											MaxLength="5540"
+											AutoPostBack="false"
+											Attributes.autocomplete="off" />
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="control-label col-sm-2">
+							<small>
+								Referencia:
+							</small>
+						</label>
+						<div class="col-md-10">
+							<com:TActiveTextBox ID="txtReferencia"
+											CssClass="form-control"
+											TextMode="MultiLine"
+											Attributes.placeholder=" Descripción de la casa y/o de como llegar"
 											Text=""
 											MaxLength="5540"
 											AutoPostBack="false"
