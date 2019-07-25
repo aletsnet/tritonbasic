@@ -2,12 +2,13 @@
 
 class mapa extends TPage
 {
+	public $script = "";
 	
 	public function onInit($param){
 		$this->master->titulo->Text = "Reparto";
 		$this->master->subtitulo->Text = "Servicio de reparto";
         $this->title = "Servicio de reparto";
-		
+		$this->script = '<script async defer src="https://maps.googleapis.com/maps/api/js?async=2&key='.$this->Application->Parameters["keymaps"].'&callback=myMap"></script>';
 		//Prado::log(TVarDumper::dump($this->autopostback,1),TLogger::NOTICE,$this->PagePath);
 	}
 	
@@ -59,7 +60,7 @@ class mapa extends TPage
 			$this->txtDireccion->Text = $row->ms_clientes->direccion;
             $this->txtReferencia->Text = $row->ms_clientes->referencia;
         }
-        $this->jsMap->Text = '<script> $("#pnBuscarMap").show(); $("#btnMapCal").click(); </script>';
+        $this->jsMap->Text = '<script> console.log("Venta: '.$row->id_ventas.'"); $("#pnBuscarMap").show(); $("#btnMapView").click(); </script>';
     }
     
     public function btnSave_OnClick($sender, $param){

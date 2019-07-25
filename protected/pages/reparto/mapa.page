@@ -166,10 +166,14 @@
 			function codeAddress() {
 				var address = document.getElementById("<%= $this->txtDireccion->ClientID %>").value;
 				var ubicacion = document.getElementById("<%= $this->hdGeoreferencia->ClientID %>").value;
-				if(address == ""){
-					address = 'Tulancingo de Soto';
-				}
-				geocoder.geocode( { 'address': address}, function(results, status) {
+				//console.log("xD");
+				console.log(ubicacion);
+				var latlngStr = ubicacion.split(",");
+				var latlng = {lat: parseFloat(latlngStr[0]), lng: parseFloat(latlngStr[1])};
+
+				
+				
+				geocoder.geocode( { 'location': latlng}, function(results, status) {
 					if (status == 'OK') {
 						if(ubicacion == ""){
 							map.setCenter(results[0].geometry.location);
@@ -206,7 +210,26 @@
 			$("#btnMapCal").click(function(event) {
 				var address = document.getElementById("<%= $this->txtDireccion->ClientID %>").value;
 				if(address != ""){
-					geocoder.geocode( { 'address': "Hidalgo, " + address}, function(results, status) {
+					geocoder.geocode( { 'address': "" + address}, function(results, status) {
+						if (status == 'OK') {
+							map.setCenter(results[0].geometry.location);
+							var marker = new google.maps.Marker({ map: map, position: results[0].geometry.location, icon: iconmarck });
+							markers.push(marker);
+						} else {
+							$("#lubicacion").html("Imposible determinar la ubicacion");
+						}
+					});
+				}
+			});
+			
+			$("#btnMapView").click(function(event) {
+				var ubicacion = document.getElementById("<%= $this->hdGeoreferencia->ClientID %>").value;
+				
+				console.log(ubicacion);
+				var latlngStr = ubicacion.split(",");
+				var latlng = {lat: parseFloat(latlngStr[0]), lng: parseFloat(latlngStr[1])};
+				if(ubicacion != ""){
+					geocoder.geocode( { 'location': latlng}, function(results, status) {
 						if (status == 'OK') {
 							map.setCenter(results[0].geometry.location);
 							var marker = new google.maps.Marker({ map: map, position: results[0].geometry.location, icon: iconmarck });
@@ -221,7 +244,7 @@
 			codeAddress();
 		}
 	</script>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?async=2&key=&callback=myMap"></script>
-
+    
+	<%= $this->script %>
     
 </com:TContent>
