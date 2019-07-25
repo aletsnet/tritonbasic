@@ -26,8 +26,12 @@ class ticket extends TPage
 		<!-- Ionicons -->
 		<link rel="stylesheet" href="plugins/ionicons-2.0.1/css/ionicons.min.css">
         <style>
+		html{
+			 font: normal 11px Console;
+		}
         table{
-            width: 250px;
+            width: 180px;
+			font: normal 11px Console;
         }
         .fecha{
             font: italic bold 10px Georgia, serif;
@@ -163,10 +167,10 @@ class ticket extends TPage
 			}
 			
             $html .= '
-        <table cellpadding="0" border="0" style="width: 300px;">
+        <table cellpadding="0" border="0" style="width: 250px;">
             <tr>
                 <td class="campo">
-                     <img src="'.$sucursal->ticket_logo.'" alt="Logo" height="128" /> 
+                     <img src="'.$sucursal->ticket_logo.'" alt="Logo" height="64px" /> 
                 </td>
             </tr>
             <tr>
@@ -212,22 +216,8 @@ class ticket extends TPage
                 <td class="lcampo">
                     ['.$row_venta->id_clientes.']: '.$row_venta->ms_clientes->nombre.'
                 </td>
-            </tr>';
-			if($row_venta->tipo_venta == 3){
-				$html .= '<tr>
-					<td class="lcampo">
-						Teléfono: '.$row_venta->ms_clientes->telefono.'
-					</td>
-				</tr>
-				<tr>
-					<td class="lcampo">
-						'.$row_venta->ms_clientes->direccion.' <br />
-						
-						'.$row_venta->ms_clientes->referencia.'
-					</td>
-				</tr>';
-			}
-            $html .= '<tr>
+            </tr>
+            <tr>
                 <td style="text-align: center;">
                     --------------------------------------------------
                 </td>
@@ -307,8 +297,8 @@ class ticket extends TPage
 		}
         $html .= "
         <script>
-		//window.print();
-		//window.close();
+		window.print();
+		window.close();
 		
         </script>
     </body>
