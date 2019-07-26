@@ -26,6 +26,9 @@ class mapa extends TPage
         }
         if(!$this->IsPostBack)
         {
+			$this->linkRefresh->NavigateUrl = $this->Service->constructUrl('reparto.mapa');
+			$this->hdGeoreferencia->value = $this->Application->Parameters["mapslocal"];
+			
             $rows = LMsVentas::finder()->findAll(" estatus = 3 AND tipo_venta=3 ");
             $this->rpListVentas->DataSource = $rows;
             $this->rpListVentas->dataBind();
@@ -54,13 +57,14 @@ class mapa extends TPage
 		if($row instanceof LMsVentas){
             $this->hdidventas->value = $row->id_ventas;
             $this->hdidclientes->value = $row->id_clientes;
+			$this->lfolio->Text = "Folio: " . $row->id_ventas;
 			$this->lNombre->Text = $row->ms_clientes->nombre;
             $this->lTelefono->Text = $row->ms_clientes->telefono;
             $this->hdGeoreferencia->Value = $row->ms_clientes->geo_referencia;
 			$this->txtDireccion->Text = $row->ms_clientes->direccion;
             $this->txtReferencia->Text = $row->ms_clientes->referencia;
         }
-        $this->jsMap->Text = '<script> console.log("Venta: '.$row->id_ventas.'"); $("#pnBuscarMap").show(); ubicar(); </script>';
+        $this->jsMap->Text = '<script> console.log("Venta: '.$row->id_ventas.'"); $("#pnBuscarMap").show(); mapmarks = "'.$row->ms_clientes->geo_referencia.'";  $("#btnMapMarck").click(); </script>';
     }
     
     public function btnSave_OnClick($sender, $param){
@@ -90,6 +94,16 @@ class mapa extends TPage
         $this->jsMap->Text = '<script> console.log("Venta: '.$row->id_ventas.'"); $("#pnBuscarMap").hide(); </script>';
     }
     
+	
+    public function btnCancelar_OnClick($sender, $param){
+        
+        $rows = LMsVentas::finder()->findAll(" estatus = 3 AND tipo_venta=3 ");
+        $this->rpListVentas->DataSource = $rows;
+        $this->rpListVentas->dataBind();
+        $this->pnNoSearcProduct->Visible = (count($rows) < 1);
+        
+        $this->jsMap->Text = '<script> console.log("Venta: -"); $("#pnBuscarMap").hide(); </script>';
+    }
     public function btnBlack_OnClick($sender, $param){
         
     }
