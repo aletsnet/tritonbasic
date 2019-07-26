@@ -222,7 +222,7 @@
 				}
 			});
 			
-			$("#btnMapView").click(function(event) {
+			function ubicar() {
 				var ubicacion = document.getElementById("<%= $this->hdGeoreferencia->ClientID %>").value;
 				
 				console.log(ubicacion);
@@ -239,7 +239,7 @@
 						}
 					});
 				}
-			});
+			}
 			
 			codeAddress();
 		}

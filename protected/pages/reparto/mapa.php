@@ -60,7 +60,7 @@ class mapa extends TPage
 			$this->txtDireccion->Text = $row->ms_clientes->direccion;
             $this->txtReferencia->Text = $row->ms_clientes->referencia;
         }
-        $this->jsMap->Text = '<script> console.log("Venta: '.$row->id_ventas.'"); $("#pnBuscarMap").show(); $("#btnMapView").click(); </script>';
+        $this->jsMap->Text = '<script> console.log("Venta: '.$row->id_ventas.'"); $("#pnBuscarMap").show(); ubicar(); </script>';
     }
     
     public function btnSave_OnClick($sender, $param){
@@ -87,7 +87,7 @@ class mapa extends TPage
         $this->rpListVentas->dataBind();
         $this->pnNoSearcProduct->Visible = (count($rows) < 1);
         
-        $this->jsMap->Text = '<script> $("#pnBuscarMap").hide(); </script>';
+        $this->jsMap->Text = '<script> console.log("Venta: '.$row->id_ventas.'"); $("#pnBuscarMap").hide(); </script>';
     }
     
     public function btnBlack_OnClick($sender, $param){
