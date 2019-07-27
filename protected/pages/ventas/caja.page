@@ -127,7 +127,7 @@
 						</div>
 				</div>
 				<div class="form-group">
-						<div class="col-md-9">						
+						<div class="col-md-9 table-responsive">						
 							<com:TActiveHiddenField Id="id_cortes" />
 							<com:TActiveButton id="btnProcesar" CausesValidation="false" OnClick="btnProcesar_OnClick" style="display: none;">
 								<prop:ClientSide OnLoading="Msg('Por favor espere mientras se procesa la petición',true);"
@@ -136,17 +136,20 @@
 							</com:TActiveButton>
 							<com:TActiveRepeater ID="RpListaCompra" DataKeyField="id_ventas_detalle" OnItemDataBound="RpListaCompra_DataBound">
 								<prop:HeaderTemplate>
-									<table class="table table-striped">
-										<tr>
-											<th style="width: 10px">#</th>
-											<th>Codigo</th>
-											<th>Producto</th>
-											<th>Precio</th>
-											<th>Cant. </th>
-											<th>Desc. %</th>
-											<th>SubTotal</th>
-											<th>*</th>
-										</tr>
+									<table class="table table-bordered">
+										<thead>
+											<tr>
+												<th style="width: 10px">#</th>
+												<th>Codigo</th>
+												<th>Producto</th>
+												<th>Precio</th>
+												<th>Cant. </th>
+												<th>Desc. %</th>
+												<th>SubTotal</th>
+												<th>*</th>
+											</tr>
+										</thead>
+										<tbody>
 								</prop:HeaderTemplate>
 								<prop:ItemTemplate>
 									<tr>
@@ -180,13 +183,22 @@
 											</com:TActiveLinkButton>
 										</td>
 									</tr>
-								</prop:ItemTemplate>
-								<prop:FooterTemplate>
-									<tr>
-										<td colspan="8" style="text-align: right;">
-											<h4>Total: <b><com:TLiteral id="total" /></b></h4>
+									<tr >
+										<td colspan="8">
+											<com:TActiveLabel id="lPaquetes" />
+											<com:TActiveHiddenField Id="listKit" />
 										</td>
 									</tr>
+								</prop:ItemTemplate>
+								<prop:FooterTemplate>
+										</tbody>
+										<tfoot>
+											<tr>
+												<td colspan="8" style="text-align: right;">
+													<h4>Total: <b><com:TLiteral id="total" /></b></h4>
+												</td>
+											</tr>
+										</tfoot>
 									</table>
 								</prop:FooterTemplate>
 							</com:TActiveRepeater>
@@ -207,10 +219,10 @@
 								</table>
 							</com:TActivePanel>
 						</div>
-						<div class="col-md-3">
+						<div class="col-md-3 table-responsive">
 							<com:TActiveRepeater ID="RpListaVentas" DataKeyField="id_ventas" OnItemDataBound="RpListaVentas_DataBound">
 								<prop:HeaderTemplate>
-									<table class="table table-striped">
+									<table class="table ">
 										<tr>
 											<th style="width: 10px">#</th>
 											<th class="text-center">Venta</th>
@@ -854,6 +866,7 @@
 		</div>
 	</div>
 	<com:TClientScript>
+		
 	$("#<%= $this->linecomando->ClientID %>").focus();
 	$("#<%= $this->linecomando->ClientID %>").keypress(
 		function(event) {
@@ -928,4 +941,5 @@
 	
 	window.setInterval('alerta()',1000);
 	</com:TClientScript>
+	<com:TClientScript ScriptUrl=<%~ caja.js %> />
 </com:TContent>

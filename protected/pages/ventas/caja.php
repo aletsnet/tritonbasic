@@ -83,6 +83,15 @@ class caja extends TPage
 	}
 	
 	public function btnTerminarVenta_OnClick($sender, $param){
+		$list = $this->RpListaCompra;
+		$keyids = $this->RpListaCompra->DataKeys;
+		$nList = [];
+		foreach($list->items as $ilist => $element ){
+			$key = $keyids[$ilist];
+			$nList[$key] = $element->listKit->value;
+		}
+		
+		
 		$row = LMsVentas::finder()->find(" id_ventas = ? ",array($this->id_ventas->value));
 		if($row instanceof LMsVentas){
 			$efectivo = $this->params->value;
@@ -97,9 +106,42 @@ class caja extends TPage
 				foreach($rows_ventasdetalle as $i => $row_ventasdetalle){
 					$inventario = $row_ventasdetalle->ms_inventarios;
 					if($inventario instanceof LMsInventarios){
-						if($inventario->ms_productos->tipo == 1){
-							$inventario->stock = $inventario->stock - $row_ventasdetalle->cantidad;
-							$inventario->save();
+						if($inventario->ms_productos->tipo > 0 || $inventario->ms_productos->tipo < 4){
+							//lista de elementos
+							$rows_kit = LCtProductoKit::finder()->findAll(" id_productos_main = ? ",[$inventario->id_productos]);
+							$nelements = count($rows_kit);
+							if($nelements > 0){
+								$elementos = explode(",",$nList[$row_ventasdetalle->id_ventas_detalle]);
+								foreach($elementos as $ii => $vv){ $lelements[$vv] = $vv;}
+								foreach($rows_kit as $kiti => $kitv){
+									if($inventario->ms_productos->tipo == 3){
+										if(key_exists($kitv->id_producto_ingrediente,$lelements)){
+											$rows_kit2 = LCtProductoKit::finder()->findAll(" id_productos_main = ? ",$ve);
+											$nelements2 = count($rows_kit2);
+											if($nelements2 > 0){
+												foreach($rows_kit2 as $kit2i => $kit2v){
+													$row_inventario = LMsInventarios::finder()->find(" id_productos = ? AND id_bodegas = ? AND borrado = 0 ",[$rows_kit2->id_producto_ingrediente, $this->cmdBodega->text]);
+													$inventario->stock = $inventario->stock - $rows_kit2->cantidad;
+													$inventario->save();
+												}
+											}else{
+												$row_inventario = LMsInventarios::finder()->find(" id_productos = ? AND id_bodegas = ? AND borrado = 0 ",[$kitv->id_producto_ingrediente, $this->cmdBodega->text]);
+												$inventario->stock = $inventario->stock - $kitv->cantidad;
+												$inventario->save();
+											}
+										}
+										*/
+									}else{
+										$row_inventario = LMsInventarios::finder()->find(" id_productos = ? AND id_bodegas = ? AND borrado = 0 ",[$kitv->id_producto_ingrediente, $this->cmdBodega->text]);
+										$inventario->stock = $inventario->stock - $kitv->cantidad;
+										$inventario->save();
+										//Prado::log(TVarDumper::dump($kitv,1),TLogger::NOTICE,"Debug");
+									}
+								}
+							}else{
+								$inventario->stock = $inventario->stock - $row_ventasdetalle->cantidad;
+								$inventario->save();
+							}
 						}
 						
 						if($inventario->id_inventarios == 1){
@@ -146,7 +188,7 @@ class caja extends TPage
 						$row->descuento = $descuento;
 						$row->subtotal  = $subtotal;
 						$row->total     = $total;
-						$row->estatus   = 3;
+						//$row->estatus   = 3;
 						$row->fecha_termina = date("Y-m-d H:i:s");
 						$row->modo_pago = $this->formadepago->value;
 						$row->save();
@@ -701,7 +743,19 @@ class caja extends TPage
 				$subtotal = (float) $row->precio_vendido * $row->cantidad; // - ($row->precio_publico * $row->descuento))* $row->cantidad;
 				$this->total_venta += (float) $subtotal;
 				$item->subtotal->Text = "$ ".number_format($subtotal,2);
-				//Prado::log(TVarDumper::dump($row,1) . $this->total_venta,TLogger::NOTICE,$this->PagePath);
+				if($row->ms_inventarios->ms_productos->tipo == 3){
+					$rows_kit = LCtProductoKit::finder()->findAll(" id_productos_main = ? ",[$row->ms_inventarios->id_productos]);
+					$list = "";
+					$elements = "";
+					foreach($rows_kit as $i => $v){
+						$productos = $v->ms_productos;
+						$list .= '<div class="col-md-3"><label> <input class="listkit" type="checkbox" checked="checked" onChange="addList(this,\''.$item->listKit->ClientID.'\');" id="'.$productos->id_productos.''.$productos->codigo.'" value="'.$productos->id_productos.'"> '.$productos->nombre.'</label></div>';
+						$elements .= ($elements!=""?",":"").$productos->id_productos;
+						//Prado::log(TVarDumper::dump($v->ms_productos,2) . $this->total_venta,TLogger::NOTICE,"debug");
+					}
+					$item->listKit->value = $elements;
+					$item->lPaquetes->Text = $list;
+				}
 			}
 		}
 		if($item->ItemType === 'Footer'){

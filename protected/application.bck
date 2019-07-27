@@ -55,5 +55,7 @@
         <parameter id="idsucursal" value="1" />
         <parameter id="idcontrato" value="" />
         <parameter id="keycontrato" value="" />
+        <parameter id="keymaps" value="" />
+        <parameter id="mapslocal" value="20.084163,-98.368409" />
 	</parameters>
 </application>

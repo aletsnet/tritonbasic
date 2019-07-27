@@ -18,7 +18,7 @@ class LCtProductoKit extends TActiveRecord
 
 	public static $RELATIONS = array (
 		'ms_productosmain' => array(self::BELONGS_TO, 'LMsProductos', 'id_productos_main'),
-		'ms_productos' => array(self::BELONGS_TO, 'LMsProductos', 'id_producto_ingrediente')
+		'ms_productos' => array(self::BELONGS_TO, 'LMsProductos', 'id_producto_ingrediente',)
 	);
 
 	public function __toString() {
