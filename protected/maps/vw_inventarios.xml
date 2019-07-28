@@ -85,4 +85,66 @@
         ORDER BY
             p.nombre asc
     </select>
+    <select id="vwInventarioCorte" resultClass="Array">
+        SELECT
+            id_inventarios,
+            sum(cantidad) cantidad
+        FROM
+                ct_ventas_detalle a
+        INNER JOIN
+                ms_ventas b
+            ON
+                a.id_ventas = b.id_ventas
+        WHERE
+                b.id_cortes = #idcorte#
+            AND
+                a.id_inventarios = #idinventario#
+    </select>
+    <select id="vwMovimientosInventariosCorte" resultClass="Array">
+        SELECT
+            b.tipo_movimiento,
+            id_inventarios,
+            sum(cantidad) cantidad
+        FROM
+                ct_movimientos_inventarios a
+        INNER JOIN
+                ms_movimientos b
+            ON
+                a.id_movimientos = b.id_movimientos
+        WHERE
+                b.id_cortes = #idcorte#
+            AND
+                a.id_inventarios = #idinventario#
+        GROUP BY
+            b.tipo_movimiento
+    </select>
+    <select id="vwListaInventario" resultClass="LMsInventarios">
+        SELECT
+            a.*
+        FROM
+            ms_inventarios a
+        INNER JOIN
+                ms_productos b
+            ON
+                b.id_productos = a.id_productos
+        WHERE
+            a.borrado = 0 AND b.borrado =0 AND b.id_departamentos > 1 AND b.tipo =1 
+        ORDER BY
+            b.nombre
+    </select>
+    <select id="vwListaCorteInventario" resultClass="LCtCorteInventario">
+        SELECT
+            a.*
+        FROM
+            ct_corte_inventario a
+        INNER JOIN
+                ms_productos b
+            ON
+                b.id_productos = a.id_productos
+        WHERE
+            b.borrado =0 AND id_cortes= #idcorte#
+        ORDER BY
+            b.id_departamentos asc,
+            b.nombre asc
+    </select>
 </sqlMap>

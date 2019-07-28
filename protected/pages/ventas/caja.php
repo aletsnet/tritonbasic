@@ -2,6 +2,7 @@
 class caja extends TPage
 {
 	public $i = 0;
+	Public $j = 0;
 	public $perimiso_actualizar = false;
 	public $total_venta = 0.0 ;
 	
@@ -116,25 +117,42 @@ class caja extends TPage
 								foreach($rows_kit as $kiti => $kitv){
 									if($inventario->ms_productos->tipo == 3){
 										if(key_exists($kitv->id_producto_ingrediente,$lelements)){
-											$rows_kit2 = LCtProductoKit::finder()->findAll(" id_productos_main = ? ",$ve);
+											$rows_kit2 = LCtProductoKit::finder()->findAll(" id_productos_main = ? ",$kitv->id_producto_ingrediente);
 											$nelements2 = count($rows_kit2);
 											if($nelements2 > 0){
 												foreach($rows_kit2 as $kit2i => $kit2v){
-													$row_inventario = LMsInventarios::finder()->find(" id_productos = ? AND id_bodegas = ? AND borrado = 0 ",[$rows_kit2->id_producto_ingrediente, $this->cmdBodega->text]);
-													$inventario->stock = $inventario->stock - $rows_kit2->cantidad;
-													$inventario->save();
+													$inventario1 = LMsInventarios::finder()->find(" id_productos = ? AND id_bodegas = ? AND borrado = 0 ",[$kit2v->id_producto_ingrediente, $this->cmdBodega->text]);
+													$inventario1->stock = $inventario1->stock - $kit2v->cantidad;
+													$inventario1->save();
 												}
 											}else{
-												$row_inventario = LMsInventarios::finder()->find(" id_productos = ? AND id_bodegas = ? AND borrado = 0 ",[$kitv->id_producto_ingrediente, $this->cmdBodega->text]);
-												$inventario->stock = $inventario->stock - $kitv->cantidad;
-												$inventario->save();
+												$inventario2 = LMsInventarios::finder()->find(" id_productos = ? AND id_bodegas = ? AND borrado = 0 ",[$kitv->id_producto_ingrediente, $this->cmdBodega->text]);
+												if($inventario2 instanceof LMsInventarios){
+													$inventario2->stock = $inventario2->stock - $kitv->cantidad;
+													$inventario2->save();
+												}else{
+													Prado::log("Err: ".$kitv->id_producto_ingrediente." codigo:".$inventario->ms_productos->codigo ,TLogger::NOTICE,"Debug");
+												}
 											}
 										}
-										*/
 									}else{
+										$rows_kit2 = LCtProductoKit::finder()->findAll(" id_productos_main = ? ",$kitv->id_producto_ingrediente);
+										$nelements2 = count($rows_kit2);
+										if($nelements2 > 0){
+											foreach($rows_kit2 as $kit2i => $kit2v){
+												$inventario3 = LMsInventarios::finder()->find(" id_productos = ? AND id_bodegas = ? AND borrado = 0 ",[$rows_kit2->id_producto_ingrediente, $this->cmdBodega->text]);
+												$inventario3->stock = $inventario3->stock - $rows_kit2->cantidad;
+												$inventario3->save();
+											}
+										}else{
+											$inventario4 = LMsInventarios::finder()->find(" id_productos = ? AND id_bodegas = ? AND borrado = 0 ",[$kitv->id_producto_ingrediente, $this->cmdBodega->text]);
+											$inventario4->stock = $inventario4->stock - $kitv->cantidad;
+											$inventario4->save();
+										}
+										/*
 										$row_inventario = LMsInventarios::finder()->find(" id_productos = ? AND id_bodegas = ? AND borrado = 0 ",[$kitv->id_producto_ingrediente, $this->cmdBodega->text]);
 										$inventario->stock = $inventario->stock - $kitv->cantidad;
-										$inventario->save();
+										$inventario->save();*/
 										//Prado::log(TVarDumper::dump($kitv,1),TLogger::NOTICE,"Debug");
 									}
 								}
@@ -188,7 +206,7 @@ class caja extends TPage
 						$row->descuento = $descuento;
 						$row->subtotal  = $subtotal;
 						$row->total     = $total;
-						//$row->estatus   = 3;
+						$row->estatus   = 3;
 						$row->fecha_termina = date("Y-m-d H:i:s");
 						$row->modo_pago = $this->formadepago->value;
 						$row->save();
@@ -226,13 +244,17 @@ class caja extends TPage
 	
 	
 	public function btnVentaEspera_OnClick($sender, $param){
-		
+		$descripcion = $this->params->value;
 		$row_venta = LMsVentas::finder()->find(" id_ventas = ?", array($this->id_ventas->value));
 		if($row_venta instanceof LMsVentas){
+			if($descripcion == ""){
+				$descripcion = "Folio: " . $this->id_ventas->value;
+			}
 			$rows_ventasdetalle = LCtVentasDetalle::finder()->findAll(" id_ventas = ? AND borrado = 0",$row_venta->id_ventas);
 			$crows = count($rows_ventasdetalle);
 			if($crows > 0){
 				$row_venta->estatus = 2;
+				$row_venta->descripcion = $descripcion;
 				$row_venta->save();
 			}else{
 				$this->lMesanje->Text = '<div class="callout callout-warning"><h5><i class="icon fa fa-warning"></i> Es necesario almenos un articulo</h5> </div>';
@@ -243,7 +265,7 @@ class caja extends TPage
 	}
 	
 	public function btnVentaRecuperar_OnClick($sender, $param){
-		$index = ($this->params->value!=""?($this->params->value -1):0);
+		$index = (int) $this->params->value - 1;
 		$id_corte = 0;
 		$row_corte = LMsCortes::finder()->find(" estatus = ? AND id_sucursal = ?", [1, $this->User->idsucursales]);
 		if($row_corte instanceof LMsCortes){
@@ -252,11 +274,16 @@ class caja extends TPage
 		$rows = LMsVentas::finder()->count(" id_cortes = ? AND estatus = ?", [$id_corte,2]);
 		//Prado::log(TVarDumper::dump($rows,1),TLogger::NOTICE,$this->PagePath);
 		if($this->params->value <= $rows){
-			$keyid = $this->RpListaVentas->DataKeys[$index];
-			$row_venta = LMsVentas::finder()->find(" id_ventas = ?", array($keyid));
-			if($row_venta instanceof LMsVentas){
-				$row_venta->estatus = 1;
-				$row_venta->save();
+			if(count($this->RpListaVentas->DataKeys) > $index){
+				$keyid = $this->RpListaVentas->DataKeys[$index];
+				$row_venta = LMsVentas::finder()->find(" id_ventas = ?", array($keyid));
+				if($row_venta instanceof LMsVentas){
+					$row_venta->estatus = 1;
+					$row_venta->save();
+				}
+			}else{
+				$script = '<div class="callout callout-warning"><h5><i class="icon fa fa-warning"></i> Falta en numero de la venta en espera</h5> </div>';
+				$this->lMesanje->Text = $script;
 			}
 		}
 		$this->IniciarTerminalVenta();
@@ -374,49 +401,31 @@ class caja extends TPage
 	public function btnProcesar_OnClick($sender, $param){
 		$this->lMesanje->Text = '';
 		$textcomando = trim($this->linecomando->Text);
+		$pos = strpos($textcomando, " ");
+		$codigo = substr($textcomando, 0, $pos);
+		$params = substr($textcomando, $pos);
+		
+		//Prado::log(TVarDumper::dump($pos),TLogger::NOTICE,$this->PagePath);
 		if($textcomando != ""){
-			$arraycomandos = explode(" ", $textcomando);
-			$countcomandos = count($arraycomandos);
-			switch($countcomandos){
-				case 1:
-					$row_codigo = $this->BuscarFuncion($arraycomandos[0]);
-					if($row_codigo instanceof LCtCodigosreservados){
-						$funcion = $row_codigo->funcion;
-						$this->{$funcion}(null,null);
-					}else{
-						$this->AgregarListaVenta($arraycomandos[0]);
-					}
-					break;
-				case 2:
-					$row_codigo = $this->BuscarFuncion($arraycomandos[0]);
-					if($row_codigo instanceof LCtCodigosreservados){
-						$this->params->value = $arraycomandos[1];
-						$funcion = $row_codigo->funcion;
-						$this->{$funcion}(null,null);
-					}else{
-						$this->AgregarListaVenta($arraycomandos[1],$arraycomandos[0]);
-					}
-					break;
-				default:
-					$row_codigo = $this->BuscarFuncion($arraycomandos[0]);
-					$texto = "";
-					$i = 0;
-					foreach($arraycomandos as $i => $v){
-						if($i > 0){
-							$texto .= " ".$v;
-						}
-						$i++;
-					}
-					if($row_codigo instanceof LCtCodigosreservados){
-						$this->params->value = $texto;
-						$funcion = $row_codigo->funcion;
-						$this->{$funcion}(null,null);
-					}else{
-						$this->AgregarListaVenta($arraycomandos[1],$arraycomandos[0]);
-					}
-					break;
+			if($pos){
+				$row_codigo = $this->BuscarFuncion($codigo);
+				if($row_codigo instanceof LCtCodigosreservados){
+					$this->params->value = trim($params);
+					$funcion = $row_codigo->funcion;
+					$this->{$funcion}(null,null);
+				}else{
+					$this->AgregarListaVenta($codigo,$params);
+				}
+			}else{
+				$row_codigo = $this->BuscarFuncion($textcomando);
+				if($row_codigo instanceof LCtCodigosreservados){
+					$this->params->value = "";
+					$funcion = $row_codigo->funcion;
+					$this->{$funcion}(null,null);
+				}else{
+					$this->AgregarListaVenta($textcomando);
+				}
 			}
-			//$this->IniciarTerminalVenta();
 		}
 		//$this->ListaActual($this->id_ventas->value);
 		$this->IniciarTerminalVenta();
@@ -540,10 +549,10 @@ class caja extends TPage
 			$row_inventario = LMsInventarios::finder()->find(" id_productos = ? AND id_bodegas = ? AND borrado = 0 ",array($row->id_productos, $this->cmdBodega->text));
 			if($row_inventario instanceof LMsInventarios){
 				$row_ventasdetalle = LCtVentasDetalle::finder()->find(" id_ventas = ? AND id_inventarios = ?",array($this->id_ventas->value,$row_inventario->id_inventarios));
-				if($row_ventasdetalle instanceof LCtVentasDetalle){
+				/*if($row_ventasdetalle instanceof LCtVentasDetalle){
 					$row_ventasdetalle->cantidad = $row_ventasdetalle->cantidad + $cantidad;
 					$row_ventasdetalle->save();
-				}else{
+				}else{*/
 					$row_ventasdetalle = new LCtVentasDetalle;
 					$row_ventasdetalle->id_ventas = $this->id_ventas->value;
 					$row_ventasdetalle->id_inventarios = $row_inventario->id_inventarios;
@@ -555,7 +564,7 @@ class caja extends TPage
 					$row_ventasdetalle->fecha_movimiento = date("Y-m-d H:i:s");
 					//$row_ventasdetalle->borrado
 					$row_ventasdetalle->save();
-				}
+				//}
 			}else{
 				$this->lMesanje->Text = '<div class="callout callout-warning"><h5><i class="icon fa fa-warning"></i> Articulo no esta en este almacen</h5> </div>';
 			}
@@ -573,8 +582,9 @@ class caja extends TPage
 	
 	public function BuscarProducto(){
 		$this->txtNombres->Text = $this->params->value;
+		
 		//$this->ModalDepartamentos->Open();
-		$script = "<script> $('#modalBuscarProductos').modal('show');  </script>";
+		$script = "<script> console.log('token: ". rand() ."'); $('#modalBuscarProductos').modal('show');  </script>";
 		$this->lMesanje->Text = $script;
 		
 		$this->dgProductos->VirtualItemCount = $this->dgProductos_RowCount();
@@ -843,20 +853,24 @@ class caja extends TPage
 	*/
 	public function RpListaVentas_DataBound($sender, $param){
 		$item=$param->Item;
+		//Prado::log(TVarDumper::dump($item->ItemType,1),TLogger::NOTICE,$this->PagePath);
+		if($item->ItemType==='Header'){
+			$this->j = 0;
+		}
         if($item->ItemType==='Item' || $item->ItemType==='AlternatingItem')
         {
 			$row = $item->Data;
 			if($row instanceof LMsVentas){
 				$time = strtotime($row->fecha_inicio);
-				$this->i ++;
-				$item->lj->text = $this->i;
+				$this->j ++;
+				$item->lj->text = $this->j; 
 				$total = 0;
 				$row_detalle = LCtVentasDetalle::finder()->findAll(" id_ventas = ?", $row->id_ventas);
 				foreach($row_detalle as $detalle){
 					$total += ($detalle->precio_vendido * $detalle->cantidad);
 				}
 				
-				$item->lventas->Text = '$ ' . number_format($total,2);//date('h:i a',$time);
+				$item->lventas->Text = $row->descripcion .' <br /> $ ' . number_format($total,2);//date('h:i a',$time);
 				$item->btnBorrar_Ventas->Attributes->onclick='if(!confirm(\'¿Confirme la cancelación de esta venta '.date('h:i a',$time).' ?\')) return false;';
 				$item->linkTicket->NavigateUrl = $this->Service->constructUrl('ventas.ticket', array("ticket" => $row->id_ventas));
 				//Prado::log(TVarDumper::dump($row,1),TLogger::NOTICE,$this->PagePath);

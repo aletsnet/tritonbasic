@@ -587,8 +587,12 @@ class Productos extends TPage
                 $row2->precioadquisicion = (double) $this->txtPrecioAdquisicion->text;
                 $row2->preciopublico = (double) $this->txtPrecioPublico->text;
                 $row2->stock = $this->txtStock->text;
-				if($this->txtMinimo->text != ""){ $row2->minimo_stock = 1; }
-				if($this->txtMaximo->text != ""){ $row2->maximo_stock = ($this->txtStock->text < 1? 10: $this->txtStock->text); }
+				if($this->txtMinimo->text == ""){ $row2->minimo_stock = 1; }
+				if($this->txtMaximo->text == ""){
+					$row2->maximo_stock = ($this->txtStock->text < 1? 10: $this->txtStock->text);
+				}else{
+					$row2->maximo_stock = $this->txtMaximo->Text;
+				}
                 $row2->unidad = $this->txtUnidad->text;
                 $row2->save();
                 $this->id_productos->value = $row->id_productos;
@@ -600,8 +604,12 @@ class Productos extends TPage
                 $row2->precioadquisicion = (double) $this->txtPrecioAdquisicion->text;
                 $row2->preciopublico = (double) $this->txtPrecioPublico->text;
                 $row2->stock = $this->txtStock->text;
-				if($this->txtMinimo->text != ""){ $row2->minimo_stock = 1; }
-				if($this->txtMaximo->text != ""){ $row2->maximo_stock = ($this->txtStock->text < 1? 10: $this->txtStock->text); }
+				if($this->txtMinimo->text == ""){ $row2->minimo_stock = 1; }
+				if($this->txtMaximo->text == ""){
+					$row2->maximo_stock = ($this->txtStock->text < 1? 10: $this->txtStock->text);
+				}else{
+					$row2->maximo_stock = $this->txtMaximo->Text;
+				}
                 $row2->unidad = $this->txtUnidad->text;
                 $row2->save();
             }

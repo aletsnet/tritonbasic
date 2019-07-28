@@ -140,13 +140,15 @@ class actual extends TPage
 			$this->lPagosCredito->Text  = "$ " . number_format($row_corte->aportado_creditos,2);
 			
 			//efectivo
-			$row_corte->efectivo     = $cEfectivo;
+			if($row_corte->efectivo == 0){
+				$row_corte->efectivo     = $cEfectivo;
+			}
 			$row_corte->tarjeta      = $cTarjeta;
 			$row_corte->cheque       = $cCheque;
 			$row_corte->trasferencia = $cTrasferencia;
 			$row_corte->otro         = $cOtro;
 			
-			$this->lEfectivo->Text     = "$ " . number_format($cEfectivo,2);
+			$this->lEfectivo->Text     = number_format($row_corte->efectivo,2);
 			$this->lTarjeta->Text      = "$ " . number_format($cTarjeta,2);
 			$this->lCheque->Text       = "$ " . number_format($cCheque,2);
 			$this->lTrasferencia->Text = "$ " . number_format($cTrasferencia,2);
@@ -155,6 +157,9 @@ class actual extends TPage
 			//$this->lEfectivo->Text    = $row_corte->efectivo;
 			$row_corte->total        = $row_corte->inicio_caja + $row_corte->ventas_realizadas + $row_corte->aportado_creditos + $row_corte->entradas_adicionales - $row_corte->gastos_realizados;
 			$this->lTotal->Text       = "$ " . number_format($row_corte->total,2);
+			$row_corte->diferencia_efectivo    = $row_corte->efectivo - $row_corte->total;
+			$this->lDiferencia->Text = "$ " . number_format($row_corte->diferencia_efectivo ,2);
+			$this->total->value = $row_corte->total;
 			//$row_corte->diferencia    = $row_corte->total - ($row_corte->efectivo + $row_corte->bauchers + $row_corte->vales);
 			//$this->lDiferencia->Text  = $row_corte->diferencia;
 			
@@ -212,11 +217,82 @@ class actual extends TPage
 			$this->rpDepartamentos->DataSource = $rows_departamentos;
 			$this->rpDepartamentos->dataBind();
 			
+			//actualiza lista de inventario
+			$this->ActualizarCorteInventario($this->id_cortes->value);
+			
 			//link
 			$this->linkTicket->NavigateUrl = $this->Service->constructUrl('cortes.ticket', ["ticket" => $this->id_cortes->value , "departamentos" => $this->hdDesglose->value]);
+			$this->linkInventario->NavigateUrl = $this->Service->constructUrl('inventarios.corte', ["ticket" => $this->id_cortes->value ]);
 		}
 	}
     
+	public function ActualizarCorteInventario($id){
+		$id_cortes = $id;
+		$row_corte = LMsCortes::finder()->find(" id_cortes = ? ", $id_cortes);
+		$dbnet = $this->Application->Modules['query']->Client;
+		if($row_corte instanceof LMsCortes){
+			$rows_inventarios = $dbnet->queryForList("vwListaInventario");
+			foreach($rows_inventarios as $index_inventario => $row_inventario){
+				$inicia = 0;
+				$abasto = 0;
+				$mermas = 0;
+				$ventas = 0;
+				$actual = 0;
+				//total de ventas
+				$params = ["idcorte" => $id_cortes,
+						   "idinventario" => $row_inventario->id_inventarios];
+				$rows_listaproductos = $dbnet->queryForObject("vwInventarioCorte",$params);
+				if(count($rows_listaproductos) > 0){
+					$ventas = $rows_listaproductos['cantidad'];
+				}
+				//movimientos
+				$params = ["idcorte" => $id_cortes,
+						   "idinventario" => $row_inventario->id_inventarios];
+				$rows_listaMovimientos = $dbnet->queryForList("vwMovimientosInventariosCorte",$params);
+				if(count($rows_listaMovimientos)){
+					foreach($rows_listaMovimientos as $imovimiento => $rowMovimiento){
+						$obj = (object) $rowMovimiento;
+						switch($obj->tipo_movimiento){
+							case 1:
+								$abasto = $obj->cantidad;
+								break;
+							case 2:
+								$mermas = $obj->cantidad;
+								break;
+							case 3:
+								
+								break;
+						}
+					}
+				}
+				
+				//$rows_ventasdetalle = LCtVentasDetalle::finder()->findAll(" id_ventas = ? ",array($id_ventas));
+				//actualizar lista de inventario del corte
+				$row_invcorte = LCtCorteInventario::finder()->find(" id_cortes = ? AND id_inventario = ? ", [$id_cortes, $row_inventario->id_inventarios]);
+				if($row_invcorte instanceof LCtCorteInventario){
+					//$row_invcorte->inicia = $inicia;
+					$row_invcorte->abasto = $abasto;
+					$row_invcorte->merma = $mermas;
+					$row_invcorte->venta = $ventas;
+					$row_invcorte->termina = $row_inventario->stock;
+					$row_invcorte->save();
+				}else{
+					$inicia = $row_inventario->stock;// + ($abasto + $ventas - $mermas);
+					$row_invcorte = new LCtCorteInventario;
+					$row_invcorte->id_cortes = $id_cortes;
+					$row_invcorte->id_inventario = $row_inventario->id_inventarios;
+					$row_invcorte->id_productos = $row_inventario->id_productos;
+					$row_invcorte->inicia = $inicia;
+					$row_invcorte->abasto = $abasto;
+					$row_invcorte->merma = $mermas;
+					$row_invcorte->venta = $ventas;
+					$row_invcorte->termina = $row_inventario->stock;
+					$row_invcorte->save();
+				}
+			}
+		}
+	}
+	
 	public function btnGuardar_OnClick($sender, $param){
 		if($this->IsValid){
 			$row_corte = LMsCortes::finder()->find(" estatus = 1 AND id_cortes = ? ", $this->id_cortes->value);
@@ -225,8 +301,11 @@ class actual extends TPage
 				$id_corte = $row_corte->id_cortes;
 				$efectivo = $row_corte->inicio_caja + $row_corte->aportado_creditos + $row_corte->efectivo + $row_corte->entradas_adicionales - $row_corte->gastos_realizados;
 				$row_corte->encaja          = (double) $this->lEnCaja->Text;
-				$row_corte->retiro_deposito = $efectivo - $row_corte->encaja;
+				$row_corte->total = (double) $efectivo;
 				$row_corte->observaciones   = $this->txtObservaciones->Text;
+				$row_corte->efectivo = (double) $this->lEfectivo->Text;
+				$row_corte->retiro_deposito = $row_corte->efectivo - $row_corte->encaja;
+				$row_corte->diferencia_efectivo = $row_corte->efectivo - $row_corte->total;
 				$row_corte->save();
 				$this->MostrarCorteActual();
 			}else{

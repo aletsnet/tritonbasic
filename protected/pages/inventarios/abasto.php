@@ -1,4 +1,6 @@
 <?php
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 //Prado::using('System.Util.TVarDumper');
  
 class abasto extends TPage
@@ -34,11 +36,45 @@ class abasto extends TPage
             $this->cmdBodega2->dataBind();
 			$this->cmdBodega2->SelectedIndex = 0;
 			
+			$id_corte = 0;
+			//$row_corte = LMsCortes::finder()->find(" estatus = ? AND id_sucursal = ? ", array(1, $this->User->idsucursales));
+			//ticket
+			$row_ticket = LCtSucursales::finder()->find(" id_sucursales = ? ", array($this->User->idsucursales));
+			$compatirCorte = 0;
+			if($row_ticket instanceof LCtSucursales){
+				$compatirCorte = $row_ticket->corte_compartido;
+			}
+			$row_corte = [];
+			if(!$compatirCorte ){
+				$row_corte = LMsCortes::finder()->find(" estatus = ? AND id_sucursal = ? AND id_usuarios = ? ", array(1, $this->User->idsucursales, $this->User->idusuarios));
+				
+			}else{
+				$row_corte = LMsCortes::finder()->find(" estatus = ? AND id_sucursal = ? ", array(1, $this->User->idsucursales));
+				
+			}
+			
+			if($row_corte instanceof LMsCortes){
+				$id_corte = $row_corte->id_cortes;
+			}else{
+				$row_corte = new LMsCortes;
+				$row_corte->id_sucursal = $this->User->idsucursales;
+				$row_corte->id_usuarios = $this->User->idusuarios;
+				$row_corte->fecha_registro = date("Y-m-d H:i:s");
+				$row_corte->fecha_inicio = date("Y-m-d H:i:s");
+				$row_corte->estatus = 1;
+				
+				$row_corte->save();
+				$id_corte = $row_corte->id_cortes;
+			}
+			$this->id_cortes->value = $id_corte;
+			
 			//$this->cmdBodega2->Text = 1;
             
             $this->dgTabla->VirtualItemCount = $this->getRowCount();
             $this->dgTabla->DataSource=$this->getDataRows(0,$this->dgTabla->PageSize);
             $this->dgTabla->dataBind();
+			
+			
         }
     }
     
@@ -145,6 +181,9 @@ class abasto extends TPage
         $this->id_productos->value = "";
         $this->id_inventarios->value = "";
         $this->txtNombre->text = "";
+		$this->txtDescripcion->Text = "";
+		$this->id_movimientos->value = "";
+		$this->filexls->value = "";
         //$this->txtCargo->text = "";
     }
 	
@@ -297,6 +336,7 @@ class abasto extends TPage
 	public function btnGuardarMovimiento_OnClick($sender, $param){
         $idsucursales = $this->User->idsucursales;
 		$id_movimientos = $this->id_movimientos->value;
+		$id_cortes = $this->id_cortes->value;
 		if($this->IsValid)
         {
 			$row = LMsMovimientos::finder()->find(" borrado = 0 AND id_movimientos = ? ", $id_movimientos);
@@ -306,6 +346,7 @@ class abasto extends TPage
 				$row->id_usuarios = $this->User->idusuarios;
 				$row->id_sucursales = $idsucursales;
 				$row->id_bodegas = $this->cmdBodega->Text;
+				$row->id_cortes = $id_cortes;
 				$row->tipo_movimiento = 1;
 				$row->descripcion = $this->txtDescripcion->Text;
 				//$row->fecha_registro;
@@ -322,6 +363,7 @@ class abasto extends TPage
 				$row->id_usuarios = $this->User->idusuarios;
 				$row->id_sucursales = $idsucursales;
 				$row->id_bodegas = $this->cmdBodega->Text;
+				$row->id_cortes = $id_cortes;
 				$row->tipo_movimiento = 1;
 				$row->descripcion = $this->txtDescripcion->Text;
 				$row->fecha_registro = date('Y-m-d H:i:s');
@@ -334,8 +376,81 @@ class abasto extends TPage
 				$this->linkpdf->NavigateUrl = $this->Service->constructUrl('inventarios.listaabastopdf', array("lista" => $row->id_movimientos));
 			}
 			
+			if($this->id_movimientos->value != ""){
+				if($this->filexls->value != ""){
+					$archivo = $this->filexls->value;
+					$inputFileType = PhpOffice\PhpSpreadsheet\IOFactory::identify($archivo);
+					$objReader = PhpOffice\PhpSpreadsheet\IOFactory::createReader($inputFileType);
+					$objPHPExcel = $objReader->load($archivo);
+					$sheet = $objPHPExcel->getSheet(0); 
+					$highestRow = $sheet->getHighestRow(); 
+					$highestColumn = $sheet->getHighestColumn();
+					//Prado::log(TVarDumper::dump($highestRow,1),TLogger::NOTICE,$this->PagePath);
+					for ($row = 2; $row <= $highestRow; $row++){
+						$codigo = trim($sheet->getCell("A".$row)->getValue());
+						$nombre = trim($sheet->getCell("B".$row)->getValue());
+						$precio = trim($sheet->getCell("C".$row)->getValue());
+						$cantidad = trim($sheet->getCell("D".$row)->getValue());
+						$idproductos = 0;
+						$idinventarios = 0;
+						if($codigo != ""){
+							//buscar el codigo del producto
+							$row_productos = LMsProductos::finder()->find(" codigo = ? AND borrado = 0", $codigo);
+							if($row_productos instanceof LMsProductos){
+								$idproductos = $row_productos->id_productos;
+							}else{
+								Prado::log("Nuevo: ".$codigo,TLogger::NOTICE,"Debug");
+								$row_productos = new LMsProductos;
+								$row_productos->codigo = $codigo;
+								$row_productos->nombre = $nombre;
+								$row_productos->id_departamentos = 1;
+								$row_productos->tipo = 1;
+								$row_productos->save();
+								$idproductos = $row_productos->id_productos;
+							}
+							
+							
+							//busca el inventario
+							$row_inventario = LMsInventarios::finder()->find(" borrado = 0 AND id_sucursales = ? AND id_bodegas = ? AND id_productos = ?", [1,1,$idproductos]);
+							if($row_inventario instanceof LMsInventarios){
+								$idinventarios = $row_inventario->id_inventarios;
+								if($precio!=""){
+									$precio = $row_inventario->preciopublico;
+								}
+							}else{
+								Prado::log("Nuevo: ".$idproductos,TLogger::NOTICE,"Debug");
+								$row_inventario = new LMsInventarios;
+								$row_inventario->id_sucursales = 1;
+								$row_inventario->id_bodegas = 1;
+								$row_inventario->id_productos = $idproductos;
+								$row_inventario->preciopublico = (float) $precio;
+								$row_inventario->stock = 0;
+								$row_inventario->save();
+								$idinventarios = $row_inventario->id_inventarios;
+							}
+							//Prado::log(TVarDumper::dump($row_inventario,1),TLogger::NOTICE,"Debug");
+							//crear registro de movimiento
+							$row_detalle = new LCtMovimientosInventarios;
+							$row_detalle->id_movimientos = $this->id_movimientos->value;
+							$row_detalle->id_inventarios = $idinventarios;
+							$row_detalle->cantidad = (float) $cantidad;
+							if($precio > 0){
+								$row_detalle->preciopublico = (float) $precio;
+							}
+							
+							$row_detalle->save();
+							//Prado::log(TVarDumper::dump($row_detalle,1),TLogger::NOTICE,"Debug");
+						}
+					}
+
+				}
+			}
+			
 			$this->mostrarPanel(3);
 			//$this->Buscador->visible = true;
+			$this->btnAgregar->visible = true;
+			$this->btnProcesar->visible = true;
+			$this->linkpdf->visible = true;
 			
 			$this->dgTablaDetalle->VirtualItemCount = $this->getRowCount_Detalle();
 			$this->dgTablaDetalle->DataSource=$this->getDataRows_Detalle(0,$this->dgTablaDetalle->PageSize);
@@ -438,7 +553,7 @@ class abasto extends TPage
     {
         $keyid = $this->dgTabla->DataKeys[$param->Item->ItemIndex];
 		//$row = LMsVisitas::finder()->findByPk();
-		$row = LMsMovimientos::finder()->find(" borrado = 0 AND id_inventarios = ? ", $keyid);
+		$row = LMsMovimientos::finder()->find(" borrado = 0 AND id_movimientos = ? ", $keyid);
         $row->borrado = 1;
         $row->save();
         $this->dgTabla->DataSource=$this->getDataRows(0,$this->dgTabla->PageSize);
@@ -448,7 +563,7 @@ class abasto extends TPage
 		Prado::log("[".$this->User->idusuarios.
                        "][".$this->User->idusuarios."][IP:".
                        $_SERVER['REMOTE_ADDR'].
-                       "][Elimino id_inventario: ".$keyid."]",
+                       "][Elimino movimiento: ".$keyid."]",
                        TLogger::NOTICE,
                        $this->PagePath);
 		
@@ -562,20 +677,21 @@ class abasto extends TPage
     {
         $idsucursales = $this->User->idsucursales;
 		$idbodega = $this->cmdBodega2->Text;
+		$id_cortes = $this->id_cortes->value;
 		
-		$where = " borrado = 0 AND tipo_movimiento = 1 AND id_sucursales = :id_sucursales AND id_bodegas = :id_bodegas";
+		$where = " borrado = 0 AND tipo_movimiento = 1 AND id_sucursales = :id_sucursales AND id_bodegas = :id_bodegas AND id_cortes = :id_cortes";
 		$ct_buscar = new TActiveRecordCriteria;
 		$ct_buscar->Parameters[':id_sucursales'] = $idsucursales;
 		$ct_buscar->Parameters[':id_bodegas'] = $idbodega;
-		/*if($this->txtBuscar->text != ""){
-			$where .= " AND ( nombre LIKE :buscar
-						OR user LIKE :buscar )";
+		$ct_buscar->Parameters[':id_cortes'] = $id_cortes;
+		if($this->txtBuscar->text != ""){
+			$where .= " AND descripcion LIKE :buscar ";
 			$ct_buscar->Parameters[':buscar'] = "%".$this->txtBuscar->text."%";
 			//$Parametros['buscar'] = "%".$this->txtBuscar->text."%";
-		}*/
+		}
 		
 		$ct_buscar->Condition = $where;
-		$ct_buscar->OrdersBy['fecha_movimiento'] = 'asc';
+		$ct_buscar->OrdersBy['id_movimientos'] = 'desc';
         $ct_buscar->Limit = $rows;
         $ct_buscar->Offset = $offset;
 		
@@ -587,23 +703,29 @@ class abasto extends TPage
     {
         $idsucursales = $this->User->idsucursales;
 		$idbodega = $this->cmdBodega2->Text;
+		$id_cortes = $this->id_cortes->value;
 		
-		$where = " borrado = 0 AND tipo_movimiento = 1 AND id_sucursales = :id_sucursales AND id_bodegas = :id_bodegas";
+		$where = " borrado = 0 AND tipo_movimiento = 1 AND id_sucursales = :id_sucursales AND id_bodegas = :id_bodegas AND id_cortes = :id_cortes";
 		$ct_buscar = new TActiveRecordCriteria;
 		$ct_buscar->Parameters[':id_sucursales'] = $idsucursales;
 		$ct_buscar->Parameters[':id_bodegas'] = $idbodega;
+		$ct_buscar->Parameters[':id_cortes'] = $id_cortes;
 		$Parametros = array();
-		/*if($this->txtBuscar->text != ""){
-			$where .= " AND ( nombre LIKE :buscar
-						OR user LIKE :buscar )";
+		$Parametros['id_sucursales'] = $idsucursales;
+		$Parametros['id_bodegas'] = $idbodega;
+		$Parametros['id_cortes'] = $id_cortes;
+		$Parametros['tipo'] = 1;
+		
+		if($this->txtBuscar->text != ""){
+			$where .= " AND descripcion LIKE :buscar ";
 			$ct_buscar->Parameters[':buscar'] = "%".$this->txtBuscar->text."%";
-			//$Parametros['buscar'] = "%".$this->txtBuscar->text."%";
-		}*/
+			$Parametros['buscar'] = $this->txtBuscar->text;
+		}
 		
 		$ct_buscar->Condition = $where;
         $var = LMsMovimientos::finder()->count($ct_buscar);
 		
-		$this->linkPdf->NavigateUrl = $this->Service->constructUrl('inventarios.productospdf',$Parametros);
+		$this->linkPdf->NavigateUrl = $this->Service->constructUrl('inventarios.movimientospdf',$Parametros);
 		$visible = $var > 0;
 		$this->tpDatos->Visible = $visible;
 		$this->tpSinDatos->Visible = !$visible;
@@ -781,6 +903,48 @@ class abasto extends TPage
         $this->btnCamara->visible = true;
     }
 	
+	public function fileUpxls($sender, $param){
+		if($sender->HasFile)
+        {
+            $nombrearchivo = "";
+            if($sender->FileName!=""){
+				if(is_file($sender->LocalName)){
+					$original = explode(".",$sender->FileName);
+					$nombrearchivo = "fileAbasto".rand(1,200).rand(201,500).date('dmyhisA').".".$original[count($original)-1];
+					copy($sender->LocalName,"docs/files/".$nombrearchivo);
+				}
+				$this->filexls->value = "docs/files/".$nombrearchivo;
+			}
+		}else{
+			switch($sender->ErrorCode){
+                case 0:
+                    //
+                    break;
+                case 1:
+                    $this->leyenda->text = 'El archivo excede el tamaño de 2MB';
+                    $this->leyenda->CssClass = "error";
+                    break;
+                case 2:
+                    $this->leyenda->text = 'El archivo excede el tamaño de 2MB';
+                    $this->leyenda->CssClass = "error";
+                    break;
+                case 3:
+                    $this->leyenda->text = 'Temporalmente no disponible';
+                    $this->leyenda->CssClass = "error";
+                    break;
+                case 4:
+                    $this->leyenda->text = ' ';
+                    $this->leyenda->CssClass = "error";
+                    break;
+                default:
+                    $this->leyenda->text = 'Error:'.$sender->ErrorCode;
+                    $this->leyenda->CssClass = "error";
+                    break;
+            }
+		}
+	
+	}
+	
 	public function fileUploaded($sender,$param)
     {
         if($sender->HasFile)
@@ -914,43 +1078,50 @@ class abasto extends TPage
 	
 	public function btnExportarXLS_OnClick($sender,$param){
 		$idsucursales = $this->User->idsucursales;
+		$idbodega = $this->cmdBodega2->Text;
+		$id_cortes = $this->id_cortes->value;
 		
-		$tipo_producto = $this->CbProductos->checked;
-		$mayor =  $this->CbMayorCero->checked ;
-		$cero =  $this->CbInventarioCero->checked ;
+		$where = " borrado = 0 AND tipo_movimiento = 1 AND id_sucursales = :id_sucursales AND id_bodegas = :id_bodegas AND id_cortes = :id_cortes";
+		$ct_buscar = new TActiveRecordCriteria;
+		$ct_buscar->Parameters[':id_sucursales'] = $idsucursales;
+		$ct_buscar->Parameters[':id_bodegas'] = $idbodega;
+		$ct_buscar->Parameters[':id_cortes'] = $id_cortes;
+		if($this->txtBuscar->text != ""){
+			$where .= " AND descripcion LIKE :buscar ";
+			$ct_buscar->Parameters[':buscar'] = "%".$this->txtBuscar->text."%";
+			//$Parametros['buscar'] = "%".$this->txtBuscar->text."%";
+		}
 		
-		$Parametros = array("nombre" => "%".$this->txtBuscar->Text."%",
-							"idbodegas"  => $this->cmdBodega2->Text,
-							"tipo"  => $tipo_producto,
-							"mayor"  => $mayor,
-							"cero"  => $cero,
-                            "idsucursales"  => $idsucursales);
-		$tabla = $this->Application->Modules['query']->Client->queryForList("vwInventarios_exportar",$Parametros);
+		$ct_buscar->Condition = $where;
+		$ct_buscar->OrdersBy['id_movimientos'] = 'desc';
+		
+        $tabla = LMsMovimientos::finder()->findAll($ct_buscar);
 		$rows = count($tabla);
 		
-		Prado::using('Application.modulos.PHPExcel');
+		$tipos = [1=>"Abasto", 2=>"Mermas", 3=>"Total"];
+		//Prado::using('Application.modulos.PHPExcel');
 		// Create new PHPExcel object
 		//echo date('H:i:s') , " Create new PHPExcel object" ;
-		$objPHPExcel = new PHPExcel();
+		$objPHPExcel = new Spreadsheet();
 		
 		// Establecer propiedades
 		$fecha_t = date("d m Y H i s");
 		$objPHPExcel->getProperties()
 					->setCreator("AletsNet")
 					->setLastModifiedBy("AletsNet")
-					->setTitle("Triton - Inventarios")
-					->setSubject("Inventario")
-					->setDescription("Inventario")
+					->setTitle("Triton - Movimientos")
+					->setSubject("Movimientos")
+					->setDescription("Movimientos")
 					->setKeywords("Triton, TPV, TPV 2017")
-					->setCategory("El sistema 2017");
+					->setCategory("El sistema 2019");
 		
 		// Agregar Informacion
 		$objPHPExcel->setActiveSheetIndex(0)
 					->setCellValue('A1', '#')
-					->setCellValue('B1', 'Codigo')
-					->setCellValue('C1', 'Tipo')
-					->setCellValue('D1', 'Producto / Servicio')
-					->setCellValue('E1', 'Apartado / Departamento')
+					->setCellValue('B1', 'Descripción')
+					->setCellValue('C1', 'Fecha')
+					->setCellValue('D1', 'Articulos')
+					->setCellValue('E1', 'Estatus')
 					->setCellValue('F1', 'P. Adquirido')
 					->setCellValue('G1', 'P. Publico')
 					->setCellValue('H1', 'Existencia')
@@ -958,22 +1129,31 @@ class abasto extends TPage
 		$a = 1;
 		//Prado::log('-'.TVarDumper::dump($tabla,1),TLogger::NOTICE,$this->PagePath);
 		foreach($tabla as $i => $row){
+			$where2 = " borrado = 0 AND id_movimientos = :id_movimientos ";
+			$ct_buscar2 = new TActiveRecordCriteria;
+			$ct_buscar2->Parameters[':id_movimientos'] = $row->id_movimientos;
+			$ct_buscar2->Condition = $where2;
+			$nregistros = LCtMovimientosInventarios::finder()->count($ct_buscar2);
+			
+			$lestatus = "";
+			$catalogo2 = LBsCatalogosGenericos::finder()->find("catalogo = ? AND valor = ?",[2,$row->estatus]);
+			if($catalogo2 instanceof LBsCatalogosGenericos){
+				$lestatus = $catalogo2->opcion;
+			}else{
+				$lestatus = "N/C";
+			}
 			$a ++;
 			//$tiempovisita = $this->User->tiempotrascurrio($row->fecha_cita,($row->fecha_atencion != '' ? $row->fecha_atencion : date('Y-m-d H:i:s')));
 			//Prado::log('-'.TVarDumper::dump($tiempovisita,1),TLogger::NOTICE,$this->PagePath);
 			$objPHPExcel->setActiveSheetIndex(0)
 						->setCellValue('A'.$a, $a-1)
-						->setCellValue('B'.$a, $row->ms_productos->codigo)
-						->setCellValue('C'.$a, ($row->ms_productos->tipo?'Producto':'Servicio'))
-						->setCellValue('D'.$a, $row->ms_productos->nombre)
-						->setCellValue('E'.$a, $row->ms_productos->ct_departamentos->nombre)
-						->setCellValue('F'.$a, $row->precioadquisicion)
-						->setCellValue('G'.$a, $row->preciopublico)
-						->setCellValue('H'.$a, $row->stock)
-						->setCellValue('I'.$a, $row->unidad);
+						->setCellValue('B'.$a, $row->descripcion)
+						->setCellValue('C'.$a, $this->User->fecha($row->fecha_registro))
+						->setCellValue('D'.$a, $nregistros)
+						->setCellValue('E'.$a, $lestatus);
 		}
 		// Renombrar Hoja
-		$objPHPExcel->getActiveSheet()->setTitle('Usuarios del sistema Triton');
+		$objPHPExcel->getActiveSheet()->setTitle('Movimientos '.$tipos[1]);
 		
 		// Establecer la hoja activa, para que cuando se abra el documento se muestre primero.
 		$objPHPExcel->setActiveSheetIndex(0);
@@ -984,7 +1164,7 @@ class abasto extends TPage
 		header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 		header('Content-Disposition: attachment;filename="ListaUsuarios'.$fecha.'.xlsx"');
 		header('Cache-Control: max-age=0');
-		$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+		$objWriter = new Xlsx($objPHPExcel, 'Excel2007');
 		$objWriter->save('php://output');
 		
 		Prado::log("[".$this->User->idusuarios.

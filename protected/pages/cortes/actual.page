@@ -84,7 +84,7 @@
 								Efectivo:
 							</label>
 							<div class="col-sm-3" style="text-align: right;">
-								<com:TActiveLabel id="lEfectivo" />
+								<com:TActiveTextBox id="lEfectivo" cssclass="form-control text-right" />
 							</div>
 						</div>
 						<div class="form-group" style="">
@@ -133,6 +133,14 @@
 							</label>
 							<div class="col-sm-3" style="text-align: right;">
 								<com:TActiveLabel id="lTotal" />
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3" style="text-align: right;">
+								Diferencia:
+							</label>
+							<div class="col-sm-3" style="text-align: right;">
+								<com:TActiveLabel id="lDiferencia" />
 							</div>
 						</div>
 						<div class="form-group">
@@ -189,6 +197,11 @@
 													   OnClick="btnGuardar_OnClick" >
 										<i class="fa fa-save"></i> 
 								</com:TLinkButton>
+								<com:TActiveHyperLink id="linkInventario"
+													  CssClass="btn bg-red"
+													  Target="_blank" >
+									<i class="icon fa fa-file-pdf-o"></i>
+								</com:TActiveHyperLink>
 							</div>
 							<div class="col-sm-6" style="text-align: right;">
 								<com:TActiveLinkButton Id="btnTerminar"
@@ -619,4 +632,10 @@
 	<com:TActiveHiddenField Id="total" />
 	<com:TActiveHiddenField Id="retiro" />
 	<com:TActiveHiddenField Id="efectivo" />
+	<script>
+		var idefectivo = "<%= $this->lEfectivo->ClientID %>";
+		var idtotal = "<%= $this->total->ClientID %>";
+		var iddiferencia = "<%= $this->lDiferencia->ClientID %>";
+	</script>
+	<com:TClientScript ScriptUrl=<%~ actual.js %> />
 </com:TContent>

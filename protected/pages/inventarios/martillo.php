@@ -3,7 +3,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 //Prado::using('System.Util.TVarDumper');
  
-class mermas extends TPage
+class martillo extends TPage
 {
 	public $i = 0;
 	public $j = 0;
@@ -11,13 +11,13 @@ class mermas extends TPage
 	
 	public function onInit($param){
 		$this->master->titulo->Text = "Movimientos";
-		$this->master->subtitulo->Text = "Mermas a inventario";
-        $this->title = "Movimientos - Mermas";
+		$this->master->subtitulo->Text = "Actualizar inventario";
+        $this->title = "Movimientos - Actualizar";
 	}
 	
     public function onLoad($param)
     {
-		$v = $this->User->ServicioActivo("10");
+		$v = $this->User->ServicioActivo("21");
 		//$this->perimiso_actualizar = $this->User->ServicioActivo(23);
         if(!($v)){
 			Prado::log(
@@ -347,7 +347,7 @@ class mermas extends TPage
 				$row->id_sucursales = $idsucursales;
 				$row->id_bodegas = $this->cmdBodega->Text;
 				$row->id_cortes = $id_cortes;
-				$row->tipo_movimiento = 2;
+				$row->tipo_movimiento = 3;
 				$row->descripcion = $this->txtDescripcion->Text;
 				//$row->fecha_registro;
 				$row->fecha_movimiento = $this->User->fecha($this->txtFechaMovimiento->Text);
@@ -364,7 +364,7 @@ class mermas extends TPage
 				$row->id_sucursales = $idsucursales;
 				$row->id_bodegas = $this->cmdBodega->Text;
 				$row->id_cortes = $id_cortes;
-				$row->tipo_movimiento = 2;
+				$row->tipo_movimiento = 3;
 				$row->descripcion = $this->txtDescripcion->Text;
 				$row->fecha_registro = date('Y-m-d H:i:s');
 				$row->fecha_movimiento = $this->User->fecha($this->txtFechaMovimiento->Text);
@@ -679,7 +679,7 @@ class mermas extends TPage
 		$idbodega = $this->cmdBodega2->Text;
 		$id_cortes = $this->id_cortes->value;
 		
-		$where = " borrado = 0 AND tipo_movimiento = 2 AND id_sucursales = :id_sucursales AND id_bodegas = :id_bodegas AND id_cortes = :id_cortes";
+		$where = " borrado = 0 AND tipo_movimiento = 3 AND id_sucursales = :id_sucursales AND id_bodegas = :id_bodegas AND id_cortes = :id_cortes";
 		$ct_buscar = new TActiveRecordCriteria;
 		$ct_buscar->Parameters[':id_sucursales'] = $idsucursales;
 		$ct_buscar->Parameters[':id_bodegas'] = $idbodega;
@@ -705,7 +705,7 @@ class mermas extends TPage
 		$idbodega = $this->cmdBodega2->Text;
 		$id_cortes = $this->id_cortes->value;
 		
-		$where = " borrado = 0 AND tipo_movimiento = 2 AND id_sucursales = :id_sucursales AND id_bodegas = :id_bodegas AND id_cortes = :id_cortes";
+		$where = " borrado = 0 AND tipo_movimiento = 3 AND id_sucursales = :id_sucursales AND id_bodegas = :id_bodegas AND id_cortes = :id_cortes";
 		$ct_buscar = new TActiveRecordCriteria;
 		$ct_buscar->Parameters[':id_sucursales'] = $idsucursales;
 		$ct_buscar->Parameters[':id_bodegas'] = $idbodega;
@@ -714,7 +714,7 @@ class mermas extends TPage
 		$Parametros['id_sucursales'] = $idsucursales;
 		$Parametros['id_bodegas'] = $idbodega;
 		$Parametros['id_cortes'] = $id_cortes;
-		$Parametros['tipo'] = 2;
+		$Parametros['tipo'] = 3;
 		
 		if($this->txtBuscar->text != ""){
 			$where .= " AND descripcion LIKE :buscar ";
@@ -1081,7 +1081,7 @@ class mermas extends TPage
 		$idbodega = $this->cmdBodega2->Text;
 		$id_cortes = $this->id_cortes->value;
 		
-		$where = " borrado = 0 AND tipo_movimiento = 2 AND id_sucursales = :id_sucursales AND id_bodegas = :id_bodegas AND id_cortes = :id_cortes";
+		$where = " borrado = 0 AND tipo_movimiento = 3 AND id_sucursales = :id_sucursales AND id_bodegas = :id_bodegas AND id_cortes = :id_cortes";
 		$ct_buscar = new TActiveRecordCriteria;
 		$ct_buscar->Parameters[':id_sucursales'] = $idsucursales;
 		$ct_buscar->Parameters[':id_bodegas'] = $idbodega;
@@ -1153,7 +1153,7 @@ class mermas extends TPage
 						->setCellValue('E'.$a, $lestatus);
 		}
 		// Renombrar Hoja
-		$objPHPExcel->getActiveSheet()->setTitle('Movimientos '.$tipos[2]);
+		$objPHPExcel->getActiveSheet()->setTitle('Movimientos '.$tipos[3]);
 		
 		// Establecer la hoja activa, para que cuando se abra el documento se muestre primero.
 		$objPHPExcel->setActiveSheetIndex(0);
