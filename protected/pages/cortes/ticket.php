@@ -377,7 +377,7 @@ class ticket extends TPage
         <table cellpadding="0" border="0" style="width: 250px;">
             <tr>
                 <td class="campo">
-                     <img src="'.$sucursal->ticket_logo.'" alt="Logo" height="128" /> 
+                     <img src="'.$sucursal->ticket_logo.'" alt="Logo" height="64px" /> 
                 </td>
             </tr>
             <tr>
