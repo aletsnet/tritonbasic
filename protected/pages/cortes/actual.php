@@ -57,7 +57,7 @@ class actual extends TPage
 			$this->id_cortes->value   = $id_corte;
 			//$this->lFechaInicio->Text = $this->User->fecha($row_corte->fecha_inicio);
 			//$this->lFechaFinal->Text  = $this->User->tiempopasado($row_corte->fecha_inicio);
-			$this->lInicioCaja->Text  = "$ " . number_format($row_corte->inicio_caja,2);
+			$this->lInicioCaja->Text  =  number_format($row_corte->inicio_caja,2);
 			
 			//ventas
 			$rows_ventas = LMsVentas::finder()->findAll(" id_cortes = ? AND estatus = ?", array($id_corte,3));
@@ -300,6 +300,7 @@ class actual extends TPage
 			if($row_corte instanceof LMsCortes){
 				$id_corte = $row_corte->id_cortes;
 				$efectivo = $row_corte->inicio_caja + $row_corte->aportado_creditos + $row_corte->efectivo + $row_corte->entradas_adicionales - $row_corte->gastos_realizados;
+				$row_corte->inicio_caja = (double) $this->lInicioCaja->Text;
 				$row_corte->encaja          = (double) $this->lEnCaja->Text;
 				$row_corte->total = (double) $efectivo;
 				$row_corte->observaciones   = $this->txtObservaciones->Text;

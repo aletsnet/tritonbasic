@@ -349,6 +349,11 @@ class ticket extends TPage
 						</td>
 					</tr>';
 					if(key_exists($deparamento->folio,$desglose)){
+						$html_departamentos .= '<tr>
+								<td class="ccampos" colspan="4">
+								-------------------------------------------------------------------
+								</td>
+							</tr>';
 						$rows_desglose = $this->Application->Modules['query']->Client->queryForList("vwDepartamentosDesglose",["idcorte" => $id_cortes, "folio" => $deparamento->folio]);
 						foreach($rows_desglose as $idesglose => $element){
 							$element = (object) $element;
@@ -367,6 +372,11 @@ class ticket extends TPage
 								</td>
 							</tr>';
 						}
+						$html_departamentos .= '<tr>
+								<td class="ccampos" colspan="4">
+								-------------------------------------------------------------------
+								</td>
+							</tr>';
 					}
 				}
 				$html_departamentos .= '</table>';

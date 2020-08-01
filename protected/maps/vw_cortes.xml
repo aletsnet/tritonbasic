@@ -15,98 +15,35 @@
                 v.id_cortes = #id_corte#
     </select>
     <select id="vwProductosVendidos" resultClass="Array">
-        SELECT
-                a.codigo,
-                a.nombre,
-                concat(SUM(c.cantidad),' ', b.unidad )cantidad, 
-                SUM(c.precio_vendido) monto
-        FROM
-                ms_productos a
-        INNER JOIN
-                ms_inventarios b
-            ON
-                a.id_productos = b.id_productos
-        INNER JOIN
-                ct_ventas_detalle c
-            ON
-                b.id_inventarios = c.id_inventarios
-        INNER JOIN
-                ms_ventas d
-            ON d.id_ventas = c.id_ventas
-        WHERE
-            d.id_cortes = #id_corte#
-			AND 
-				d.estatus = 3
-        GROUP BY
-            b.id_inventarios
+        select a.id_inventarios, d.codigo, d.nombre, concat(sum(a.cantidad), ' ', c.unidad) cantidad, sum(a.precio_vendido) monto from ct_ventas_detalle a 
+INNER join ms_ventas b on a.id_ventas = b.id_ventas
+inner join ms_inventarios c on a.id_inventarios = c.id_inventarios
+inner join ms_productos d on c.id_productos = d.id_productos
+where b.id_cortes =  #id_corte#
+GROUP by a.id_inventarios
         ORDER BY
             monto DESC
     </select>
     <select id="vwDepartamentosVendidos" resultClass="Array">
-        SELECT
-                d.id_departamentos folio,
-                d.nombre nombre,
-                COUNT(d.id_departamentos) unidades,
-                sum(c.precio_vendido) monto
-        FROM
-            ct_ventas_detalle c
-        INNER JOIN
-                ms_inventarios b
-            ON
-                c.id_inventarios = b.id_inventarios
-        INNER JOIN
-                ms_productos a
-            ON
-                b.id_productos = a.id_productos
-        INNER JOIN
-                ct_departamentos d
-            ON
-                d.id_departamentos = a.id_departamentos
-        INNER JOIN
-                ms_ventas e
-            ON
-                    e.id_ventas = c.id_ventas
-                AND
-                    e.estatus IN (3,7)
-        WHERE
-            e.id_cortes = #idcorte#
-        GROUP BY
-            d.id_departamentos
+       select e.id_departamentos folio , e.nombre nombre, concat(sum(a.cantidad), ' ', c.unidad) unidades, sum(a.precio_vendido) monto from ct_ventas_detalle a 
+INNER join ms_ventas b on a.id_ventas = b.id_ventas
+inner join ms_inventarios c on a.id_inventarios = c.id_inventarios
+inner join ms_productos d on c.id_productos = d.id_productos
+inner join ct_departamentos e on d.id_departamentos = e.id_departamentos
+where b.id_cortes = #idcorte#
+GROUP by e.id_departamentos
         ORDER BY
             folio
     </select>
     
     <select id="vwDepartamentosDesglose" resultClass="Array">
-        SELECT
-            a.codigo folio,
-            a.nombre nombre,
-            COUNT(a.id_productos) unidades,
-            sum(c.precio_vendido) monto
-	FROM
-        ct_ventas_detalle c 
-	INNER JOIN
-            ms_inventarios b
-        ON
-            c.id_inventarios = b.id_inventarios
-	INNER JOIN
-            ms_productos a
-        ON
-            b.id_productos = a.id_productos
-	INNER JOIN
-            ct_departamentos d
-        ON
-            d.id_departamentos = a.id_departamentos
-	INNER JOIN
-            ms_ventas e
-        ON
-                e.id_ventas = c.id_ventas
-            AND
-                e.estatus IN (3,7)
-	WHERE
-            e.id_cortes = #idcorte#
-        AND
-            d.id_departamentos = #folio#
-	GROUP BY
-        b.id_productos
+select d.codigo folio , d.nombre nombre, concat(sum(a.cantidad), ' ', c.unidad) unidades, sum(a.precio_vendido) monto from ct_ventas_detalle a 
+INNER join ms_ventas b on a.id_ventas = b.id_ventas
+inner join ms_inventarios c on a.id_inventarios = c.id_inventarios
+inner join ms_productos d on c.id_productos = d.id_productos
+inner join ct_departamentos e on d.id_departamentos = e.id_departamentos
+where b.id_cortes = #idcorte# and e.id_departamentos in(#folio#)
+GROUP by a.id_inventarios
+order by nombre
     </select>
 </sqlMap>

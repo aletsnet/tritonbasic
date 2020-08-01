@@ -28,7 +28,8 @@
 								Inicio de caja:
 							</label>
 							<div class="col-sm-3" style="text-align: right;">
-								<com:TActiveLabel id="lInicioCaja" />
+								<!--- <com:TActiveLabel id="lInicioCaja" /> --->
+								<com:TActiveTextBox id="lInicioCaja" cssclass="form-control text-right" />
 							</div>
 						</div>
 						<div class="form-group">
