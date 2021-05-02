@@ -69,9 +69,7 @@
 					</label>
 					<div class="col-sm-6" style="z-index: 100;">
 						
-							<com:TActiveDatePicker ID="txtFechaMovimiento"
-											   DateFormat="dd/MM/yyyy"
-											   FromYear="2017"
+							<com:TJuiDatePicker ID="txtFechaMovimiento"
 											   AutoPostBack="false"/>
 						
 					</div>
@@ -700,10 +698,7 @@
 						Fecha:
 					</label>
 					<div class="col-sm-5" style="z-index: 100;">
-						<com:TActiveDatePicker ID="txtFecha"
-											   DateFormat="dd/MM/yyyy"
-											   InputMode="DropDownList"
-											   FromYear="2017"
+						<com:TJuiDatePicker ID="txtFecha"
 											   AutoPostBack="false"/>
 					</div>
 				</div>

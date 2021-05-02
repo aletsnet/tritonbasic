@@ -69,9 +69,8 @@
 					</label>
 					<div class="col-sm-6" style="z-index: 100;">
 						
-							<com:TActiveDatePicker ID="txtFechaMovimiento"
-											   DateFormat="dd/MM/yyyy"
-											   FromYear="2017"
+							<com:TJuiDatePicker ID="txtFechaMovimiento"
+											   Options.dateFormat="dd/mm/yy"
 											   AutoPostBack="false"/>
 						
 					</div>
@@ -312,7 +311,6 @@
 					</label>
 					<com:TActivePanel id="camara" CssClass="col-lg-3" visible="false">
 						<link rel="stylesheet" href="css/app.css">
-						<!--- <script type="text/javascript" src="assets/js/webcam.min.js"></script> --->
 						<style>
 							#container {
 								margin: 0px auto;
@@ -700,11 +698,7 @@
 						Fecha:
 					</label>
 					<div class="col-sm-5" style="z-index: 100;">
-						<com:TActiveDatePicker ID="txtFecha"
-											   DateFormat="dd/MM/yyyy"
-											   InputMode="DropDownList"
-											   FromYear="2017"
-											   AutoPostBack="false"/>
+						<com:TJuiDatePicker ID="txtFecha" Options.dateFormat="dd/mm/yy" AutoPostBack="false"/>
 					</div>
 				</div>
 				<div class="form-group">
